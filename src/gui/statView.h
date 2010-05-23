@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	statView.h
 //  Classes				:	CStatView
-//  Description			:	This class visualizes the statistics during the view
+//  Description			:
+/// \brief					This class visualizes the statistics during the view
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef STATVIEW_H
@@ -40,7 +41,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTimeMemory
-// Description			:	Holds info about time and memory
+// Description			:
+/// \brief					Holds info about time and memory
 // Comments				:
 class CTimeMemory : public QWidget {
     Q_OBJECT
@@ -57,7 +59,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNumbers
-// Description			:	Numbers of various items
+// Description			:
+/// \brief					Numbers of various items
 // Comments				:
 class CNumbers : public QWidget {
     Q_OBJECT
@@ -92,7 +95,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStatView
-// Description			:	This is the main statistics view class
+// Description			:
+/// \brief					This is the main statistics view class
 // Comments				:
 class CStatView : public QDialog {
     Q_OBJECT

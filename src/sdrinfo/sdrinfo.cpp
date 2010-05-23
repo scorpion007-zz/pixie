@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	sdrinfo.cpp
 //  Classes				:	-
-//  Description			:	sdr info probram
+//  Description			:
+/// \brief					sdr info probram
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
@@ -38,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
-// Description			:	The god
+// Description			:
+/// \brief					The god
 // Return Value			:	-
 // Comments				:
 int main(int argc, char* argv[]) {

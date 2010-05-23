@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	bsplinePatchgrid.cpp
 //  Classes				:	
-//  Description			:	Patchgrid implementation
+//  Description			:
+/// \brief					Patchgrid implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -40,7 +41,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBSplinePatchGrid
 // Method				:	CBSplinePatchGrid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,float uOrg,float vOrg,float uMult,float vMult,float *ve) : CSurface(a,x) {
@@ -147,7 +149,8 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBSplinePatchGrid
 // Method				:	~CBSplinePatchGrid
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CBSplinePatchGrid::~CBSplinePatchGrid() {

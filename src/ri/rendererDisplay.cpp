@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -47,7 +47,8 @@ static COptions::CDisplay	*currentDisplay	=	NULL;
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	findParameter
-// Description			:	This function can be used by the display server to probe for parameters
+// Description			:
+/// \brief					This function can be used by the display server to probe for parameters
 // Return Value			:	-
 // Comments				:
 void	*findParameter(const char *name,ParameterType type,int numItems) {
@@ -119,7 +120,8 @@ void	*findParameter(const char *name,ParameterType type,int numItems) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getAOVFilter
-// Description			:	Return the name matching the filter
+// Description			:
+/// \brief					Return the name matching the filter
 // Return Value			:
 // Comments				:
 int	CRenderer::getAOVFilter(const char *name) {
@@ -162,7 +164,8 @@ int	CRenderer::getAOVFilter(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	beginDisplays
-// Description			:	Initiate the displays
+// Description			:
+/// \brief					Initiate the displays
 // Return Value			:	-
 // Comments				:
 void	CRenderer::beginDisplays() {
@@ -203,7 +206,8 @@ void	CRenderer::beginDisplays() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	endDisplays
-// Description			:	Terminate the displays
+// Description			:
+/// \brief					Terminate the displays
 // Return Value			:	-
 // Comments				:
 void	CRenderer::endDisplays() {
@@ -257,9 +261,11 @@ void	CRenderer::endDisplays() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	dispatch
-// Description			:	Dispatch a rendered window to the out devices
+// Description			:
+/// \brief					Dispatch a rendered window to the out devices
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 	float	*dest;
 	int		i,j,k,l;
@@ -315,9 +321,11 @@ void	CRenderer::dispatch(int left,int top,int width,int height,float *pixels) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	clear
-// Description			:	Send a clear window to the out devices
+// Description			:
+/// \brief					Send a clear window to the out devices
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void	CRenderer::clear(int left,int top,int width,int height) {
 	float	*pixels;
 	int		size								=	width*height*numSamples*sizeof(float);
@@ -336,9 +344,11 @@ void	CRenderer::clear(int left,int top,int width,int height) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	commit
-// Description			:	Send a window of samples
+// Description			:
+/// \brief					Send a window of samples
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 	// Progress stats
 	if (flags & OPTIONS_FLAGS_PROGRESS)	{
@@ -402,7 +412,8 @@ void	CRenderer::commit(int left,int top,int xpixels,int ypixels,float *pixels) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getDisplayName
-// Description			:	Create the display name
+// Description			:
+/// \brief					Create the display name
 // Return Value			:
 // Comments				:
 void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType) {
@@ -481,7 +492,8 @@ void	CRenderer::getDisplayName(char *out,const char *in,const char *displayType)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	computeDisplayData
-// Description			:	Compute the display data
+// Description			:
+/// \brief					Compute the display data
 // Return Value			:
 // Comments				:
 void	CRenderer::computeDisplayData() {

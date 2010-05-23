@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	subdivisionCreator.cpp
 //  Classes				:	CSision
-//  Description			:	Implements a subdivision surface
+//  Description			:
+/// \brief					Implements a subdivision surface
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -110,13 +111,15 @@ static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVer
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSVertex
-// Description			:	Encapsulates a subdivision mesh vertex
+// Description			:
+/// \brief					Encapsulates a subdivision mesh vertex
 // Comments				:
 class	CSVertex {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CVertexFace
-	// Description			:	Encapsulates a face incident on a vertex
+	// Description			:
+/// \brief					Encapsulates a face incident on a vertex
 	// Comments				:
 	class	CVertexFace {
 	public:
@@ -126,7 +129,8 @@ class	CSVertex {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CVertexEdge
-	// Description			:	Encapsulates an edge incident on a vertex
+	// Description			:
+/// \brief					Encapsulates an edge incident on a vertex
 	// Comments				:
 	class	CVertexEdge {
 	public:
@@ -137,7 +141,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSVertex
 					// Method				:	CSVertex
-					// Description			:	Ctor
+					// Description			:
+/// \brief					Ctor
 					// Return Value			:	-
 					// Comments				:
 					CSVertex(CSubdivData &d) : data(d) {
@@ -175,7 +180,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSVertex
 					// Method				:	split
-					// Description			:	Split a vertex
+					// Description			:
+/// \brief					Split a vertex
 					// Return Value			:	-
 					// Comments				:
 	void			split() {
@@ -190,7 +196,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSVertex
 					// Method				:	addFace
-					// Description			:	Add an incident face into the vertex
+					// Description			:
+/// \brief					Add an incident face into the vertex
 					// Return Value			:	-
 					// Comments				:
 	void			addFace(CSFace *face) {
@@ -207,7 +214,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSVertex
 					// Method				:	addEdge
-					// Description			:	Add an incident edge into the vertex
+					// Description			:
+/// \brief					Add an incident edge into the vertex
 					// Return Value			:	-
 					// Comments				:
 	void			addEdge(CSEdge *edge) {
@@ -233,7 +241,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSEdge
-// Description			:	Encapsulates an edge
+// Description			:
+/// \brief					Encapsulates an edge
 // Comments				:
 class	CSEdge {
 public:
@@ -241,7 +250,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSEdge
 					// Method				:	CSEdge
-					// Description			:	Ctor
+					// Description			:
+/// \brief					Ctor
 					// Return Value			:	-
 					// Comments				:
 					CSEdge(CSubdivData &d) : data(d) {
@@ -270,7 +280,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSEdge
 					// Method				:	split
-					// Description			:	Split an edge
+					// Description			:
+/// \brief					Split an edge
 					// Return Value			:	-
 					// Comments				:
 	void			split() {
@@ -302,7 +313,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSEdge
 					// Method				:	addFace
-					// Description			:	Add a face into an edge
+					// Description			:
+/// \brief					Add a face into an edge
 					// Return Value			:	-
 					// Comments				:
 	void			addFace(CSFace *face) {
@@ -324,14 +336,16 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSFace
-// Description			:	Encapsulates a face
+// Description			:
+/// \brief					Encapsulates a face
 // Comments				:
 class	CSFace {
 public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSFace
 					// Method				:	CSFace
-					// Description			:	Ctor
+					// Description			:
+/// \brief					Ctor
 					// Return Value			:	-
 					// Comments				:
 					CSFace(CSubdivData &d,int ui) : data(d) {
@@ -360,7 +374,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSFace
 					// Method				:	split
-					// Description			:	Split the face
+					// Description			:
+/// \brief					Split the face
 					// Return Value			:	-
 					// Comments				:
 	void			split() {
@@ -768,7 +783,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CSFace
 					// Method				:	unconditionalSplit
-					// Description			:	Unconditionally split this quad until a predefined depth for table computation
+					// Description			:
+/// \brief					Unconditionally split this quad until a predefined depth for table computation
 					// Return Value			:	-
 					// Comments				:
 	void			unconditionalSplit(int depth,int x,int y,CSVertex *org) {
@@ -908,7 +924,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSVertex
 // Method				:	splitIncidentFaces
-// Description			:	Split all the incident faces
+// Description			:
+/// \brief					Split all the incident faces
 // Return Value			:	-
 // Comments				:
 void		CSVertex::splitIncidentFaces() {
@@ -922,7 +939,8 @@ void		CSVertex::splitIncidentFaces() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSVertex
 // Method				:	edgeExists
-// Description			:	Figure out if an edge has already been inserted
+// Description			:
+/// \brief					Figure out if an edge has already been inserted
 // Return Value			:	-
 // Comments				:
 CSEdge		*CSVertex::edgeExists(CSVertex *v) {
@@ -940,7 +958,8 @@ CSEdge		*CSVertex::edgeExists(CSVertex *v) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSVertex
 // Method				:	sort
-// Description			:	Sort 1 ring neighborhood
+// Description			:
+/// \brief					Sort 1 ring neighborhood
 // Return Value			:	-
 // Comments				:
 void		CSVertex::sort(CSVertex **v,CSEdge *cEdge,CSFace *cFace,int exp) {
@@ -1025,7 +1044,8 @@ int		CSVertex::shouldSplit() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSFace
 // Method				:	findEdgeVertices
-// Description			:	get the vertex pair bordering an edge
+// Description			:
+/// \brief					get the vertex pair bordering an edge
 // Return Value			:	-
 // Comments				:
 char	CSFace::findEdgeVertices(int eOrg,int vOrg,CSVertex* &v1,CSVertex* &v2) {
@@ -1346,7 +1366,8 @@ void	CSVertex::computeLimit(float *vertex) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSEdge
 // Method				:	compute
-// Description			:	Edge subdivision rule
+// Description			:
+/// \brief					Edge subdivision rule
 // Return Value			:	-
 // Comments				:
 void	CSEdge::compute(float *vertex) {
@@ -1388,7 +1409,8 @@ void	CSEdge::compute(float *vertex) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSEdge
 // Method				:	computeVarying
-// Description			:	Edge subdivision rule
+// Description			:
+/// \brief					Edge subdivision rule
 // Return Value			:	-
 // Comments				:
 void	CSEdge::computeVarying(float *varying,float *facevarying) {
@@ -1413,7 +1435,8 @@ void	CSEdge::computeVarying(float *varying,float *facevarying) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSFace
 // Method				:	compute
-// Description			:	Face subdivision rule
+// Description			:
+/// \brief					Face subdivision rule
 // Return Value			:	-
 // Comments				:
 void	CSFace::compute(float *vertex) {
@@ -1435,7 +1458,8 @@ void	CSFace::compute(float *vertex) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSFace
 // Method				:	computeVarying
-// Description			:	Face subdivision rule
+// Description			:
+/// \brief					Face subdivision rule
 // Return Value			:	-
 // Comments				:
 void	CSFace::computeVarying(float *varying,float *facevarying) {
@@ -1573,7 +1597,8 @@ static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVer
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	CSubdivMesh
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVerticesPerFace,int *vertexIndices,int ntags,const char **tags,int *nargs,int *intargs,float *floatargs) : CObject(a,x) {
@@ -1639,7 +1664,8 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	~CSubdivMesh
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CSubdivMesh::~CSubdivMesh() {
@@ -1669,7 +1695,8 @@ CSubdivMesh::~CSubdivMesh() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	intersect
-// Description			:	Intersect the thing
+// Description			:
+/// \brief					Intersect the thing
 // Return Value			:	-
 // Comments				:
 void		CSubdivMesh::intersect(CShadingContext *rasterizer,CRay *cRay) {
@@ -1681,7 +1708,8 @@ void		CSubdivMesh::intersect(CShadingContext *rasterizer,CRay *cRay) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	dice
-// Description			:	Dice the primitive
+// Description			:
+/// \brief					Dice the primitive
 // Return Value			:	-
 // Comments				:
 void		CSubdivMesh::dice(CShadingContext *rasterizer) {
@@ -1703,7 +1731,8 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	instantiate
-// Description			:	Clone the primitive
+// Description			:
+/// \brief					Clone the primitive
 // Return Value			:	-
 // Comments				:
 void		CSubdivMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
@@ -1720,7 +1749,8 @@ void		CSubdivMesh::instantiate(CAttributes *a,CXform *x,CRendererContext *c) con
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	split
-// Description			:	Split this into smaller primitives
+// Description			:
+/// \brief					Split this into smaller primitives
 // Return Value			:	-
 // Comments				:
 void		CSubdivMesh::create(CShadingContext *context) {

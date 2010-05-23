@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -44,13 +44,15 @@ class	CVariable;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRibOut
-// Description			:	This class implements a RIB file output
+// Description			:
+/// \brief					This class implements a RIB file output
 // Comments				:
 class	CRibOut : public CRiInterface {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRibAttributes
-	// Description			:	The attributes holder for the RIB file output
+	// Description			:
+/// \brief					The attributes holder for the RIB file output
 	// Comments				:
 	class	CRibAttributes {
 	public:
@@ -230,7 +232,8 @@ private:
 											///////////////////////////////////////////////////////////////////////
 											// Class				:	CRibOut
 											// Method				:	vout
-											// Description			:	Write a variable argument list
+											// Description			:
+/// \brief					Write a variable argument list
 											// Return Value			:	-
 											// Comments				:
 	void									vout(const char *mes,va_list args) {
@@ -247,7 +250,8 @@ private:
 											///////////////////////////////////////////////////////////////////////
 											// Class				:	CRibOut
 											// Method				:	out
-											// Description			:	Write an argument list
+											// Description			:
+/// \brief					Write an argument list
 											// Return Value			:	-
 											// Comments				:
 	void									out(const char *mes,...) {

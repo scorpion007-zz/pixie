@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	precomp.cpp
 //  Classes				:	-
-//  Description			:	This program is used to create misc data
+//  Description			:
+/// \brief					This program is used to create misc data
 //							in header files for the ri.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -53,9 +54,11 @@ typedef struct {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	permute
-// Description			:	Create a permutation of numbers upto n
+// Description			:
+/// \brief					Create a permutation of numbers upto n
 // Return Value			:
-// Comments				:	n has to be a power of 2
+// Comments				:
+/// \note					n has to be a power of 2
 static	void	permute(int *a,int n) {
 	int	i;
 
@@ -73,9 +76,11 @@ static	void	permute(int *a,int n) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	print
-// Description			:	Print an array
+// Description			:
+/// \brief					Print an array
 // Return Value			:
-// Comments				:	n has to be a power of 2
+// Comments				:
+/// \note					n has to be a power of 2
 template <class T> static	void	print(FILE *out,T *a,int n,const char *outName,const char *outType) {
 	int	i;
 
@@ -329,7 +334,8 @@ int	precomputeSubdivisionData() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ouputStochasticFuntionName
-// Description			:	write out the function name for rasterization functions
+// Description			:
+/// \brief					write out the function name for rasterization functions
 // Return Value			:	
 // Comments				:
 void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
@@ -511,7 +517,8 @@ int		precomputeStochasticPrimitivesH() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
-// Description			:	Do the thing baby
+// Description			:
+/// \brief					Do the thing baby
 // Return Value			:	0 on success, 1 on failure
 // Comments				:
 int	main(int argc,char *argv[]) {

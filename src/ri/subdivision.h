@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	subdivision.h
 //  Classes				:	CSubdivision
-//  Description			:	Implements a subdivision surface
+//  Description			:
+/// \brief					Implements a subdivision surface
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef SUBDIVISION_H

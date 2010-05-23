@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -43,14 +43,16 @@ class	CShadingContext;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
-// Description			:	Base class for 3d textures
+// Description			:
+/// \brief					Base class for 3d textures
 // Comments				:
 class	CTexture3d : public CFileResource, public CView {
 protected:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CChannel
-	// Description			:	A 3d texture channel
+	// Description			:
+/// \brief					A 3d texture channel
 	// Comments				:
 	class	CChannel {
 	public:
@@ -101,7 +103,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	texture3Dflatten
-// Description			:	Flatten the channel datas into a vector
+// Description			:
+/// \brief					Flatten the channel datas into a vector
 // Return Value			:	-
 // Comments				:
 inline	void	texture3Dflatten(float *dest,int n,const float **data,int *entry,int *size) {
@@ -135,7 +138,8 @@ inline	void	texture3Dflatten(float *dest,int n,const float **data,int *entry,int
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	texture3DflattenInterpolated
-// Description			:	Flatten the channel datas into a vector
+// Description			:
+/// \brief					Flatten the channel datas into a vector
 // Return Value			:	-
 // Comments				:
 inline	void	texture3DflattenInterpolated(float *dest,int n,const float **data,int *entry,int *size, int uVertices) {
@@ -178,7 +182,8 @@ inline	void	texture3DflattenInterpolated(float *dest,int n,const float **data,in
 }
 ///////////////////////////////////////////////////////////////////////
 // Function				:	texture3Dunpack
-// Description			:	Unpack the data from a flat array
+// Description			:
+/// \brief					Unpack the data from a flat array
 // Return Value			:	-
 // Comments				:
 inline	void	texture3Dunpack(const float *src,int n,float **data,int *entry,int *size) {

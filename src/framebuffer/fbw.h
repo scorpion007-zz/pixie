@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	fbw.h
 //  Classes				:	CWinDisplay
-//  Description			:	Windows image displaying class
+//  Description			:
+/// \brief					Windows image displaying class
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef FBW_H
@@ -46,7 +47,8 @@ enum CHANNEL {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
-// Description			:	The windows display class
+// Description			:
+/// \brief					The windows display class
 // Comments				:
 class	CWinDisplay : public CDisplay {
 public:

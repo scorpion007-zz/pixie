@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	remoteChannel.h
 //  Classes				:	
-//  Description			:	This base class for remote deep data channels
+//  Description			:
+/// \brief					This base class for remote deep data channels
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef REMOTECHANNEL_H
@@ -57,7 +58,8 @@ typedef enum {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemoteChannel
-// Description			:	base class for remote channels
+// Description			:
+/// \brief					base class for remote channels
 // Comments				:	
 class CRemoteChannel {
 public:
@@ -80,7 +82,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemoteTSMChannel
-// Description			:	remote channel for tsm
+// Description			:
+/// \brief					remote channel for tsm
 // Comments				:	
 class	CRemoteTSMChannel : public CRemoteChannel {
 public:
@@ -99,7 +102,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemoteICacheChannel
-// Description			:	remote channel for irradiance caches
+// Description			:
+/// \brief					remote channel for irradiance caches
 // Comments				:	
 class	CRemoteICacheChannel : public CRemoteChannel {
 public:
@@ -117,7 +121,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemotePtCloudChannel
-// Description			:	remote channel for point clouds
+// Description			:
+/// \brief					remote channel for point clouds
 // Comments				:	
 class	CRemotePtCloudChannel : public CRemoteChannel {
 public:

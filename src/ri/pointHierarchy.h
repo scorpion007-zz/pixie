@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,13 +40,15 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPointHierarchy
-// Description			:	A hierarchy of points
+// Description			:
+/// \brief					A hierarchy of points
 // Comments				:
 class	CPointHierarchy : public CTexture3d, public CMap<CPointCloudPoint> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CMapNode
-	// Description			:	Encapsulates a node in the hierarchy
+	// Description			:
+/// \brief					Encapsulates a node in the hierarchy
 	// Comments				:
 	class	CMapNode {
 	public:

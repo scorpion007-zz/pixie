@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -38,7 +38,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDepository
 // Method				:	CDepository
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDepository::CDepository() : CMap<CDepositorySample>() {
@@ -47,7 +48,8 @@ CDepository::CDepository() : CMap<CDepositorySample>() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDepository
 // Method				:	~CDepository
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDepository::~CDepository() {
@@ -56,7 +58,8 @@ CDepository::~CDepository() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDepository
 // Method				:	lookup
-// Description			:	Lookup function
+// Description			:
+/// \brief					Lookup function
 // Return Value			:	-
 // Comments				:
 void		CDepository::lookup(float *C,const float *P,const float *N) {

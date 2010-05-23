@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	os.h
 //  Classes				:	-
-//  Description			:	OS dependent functions
+//  Description			:
+/// \brief					OS dependent functions
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef OS_H
@@ -184,7 +185,8 @@ void safe_strcpy(char *dst, const char *src, int cb);
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osLock
-// Description			:	Lock a mutex
+// Description			:
+/// \brief					Lock a mutex
 // Return Value			:
 // Comments				:
 inline	void	osLock(TMutex &mutex) {
@@ -197,7 +199,8 @@ inline	void	osLock(TMutex &mutex) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osUnlock
-// Description			:	Unlock a mutex
+// Description			:
+/// \brief					Unlock a mutex
 // Return Value			:
 // Comments				:
 inline	void	osUnlock(TMutex &mutex) {
@@ -211,7 +214,8 @@ inline	void	osUnlock(TMutex &mutex) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osUp
-// Description			:	Increment a semaphore
+// Description			:
+/// \brief					Increment a semaphore
 // Return Value			:
 // Comments				:
 inline	void	osUp(TSemaphore &sem) {
@@ -224,7 +228,8 @@ inline	void	osUp(TSemaphore &sem) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osDown
-// Description			:	Decrement a semaphore
+// Description			:
+/// \brief					Decrement a semaphore
 // Return Value			:
 // Comments				:
 inline	void	osDown(TSemaphore &sem) {
@@ -268,7 +273,8 @@ inline	void osDeleteRWLock(TRWLock &l) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osReadLock
-// Description			:	lock for reading
+// Description			:
+/// \brief					lock for reading
 // Return Value			:
 // Comments				:
 inline	void osReadLock(TRWLock &l) {
@@ -286,7 +292,8 @@ inline	void osReadLock(TRWLock &l) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osReadUnlock
-// Description			:	unlock after reading
+// Description			:
+/// \brief					unlock after reading
 // Return Value			:
 // Comments				:
 inline	void osReadUnlock(TRWLock &l) {
@@ -304,7 +311,8 @@ inline	void osReadUnlock(TRWLock &l) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osWriteLock
-// Description			:	lock for writing
+// Description			:
+/// \brief					lock for writing
 // Return Value			:
 // Comments				:
 inline	void osWriteLock(TRWLock &l) {
@@ -320,7 +328,8 @@ inline	void osWriteLock(TRWLock &l) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osWriteUnlock
-// Description			:	unlock after writing
+// Description			:
+/// \brief					unlock after writing
 // Return Value			:
 // Comments				:
 inline	void osWriteUnlock(TRWLock &l) {

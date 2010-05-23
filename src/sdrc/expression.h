@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -83,7 +83,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTwoExpressions
-// Description			:	This expression is used to encapsulate multiple expressions
+// Description			:
+/// \brief					This expression is used to encapsulate multiple expressions
 // Comments				:	
 class	CTwoExpressions : public CExpression {
 public:
@@ -98,7 +99,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNullExpression
-// Description			:	This class is instanciated if there has been an error
+// Description			:
+/// \brief					This class is instanciated if there has been an error
 // Comments				:
 class	CNullExpression : public CExpression {
 public:
@@ -109,7 +111,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVectorExpression
-// Description			:	Cast a vector from a collection of floats
+// Description			:
+/// \brief					Cast a vector from a collection of floats
 // Comments				:
 class	CVectorExpression : public CExpression {
 public:
@@ -124,7 +127,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMatrixExpression
-// Description			:	Cast a matrix from a collection of 16 floats
+// Description			:
+/// \brief					Cast a matrix from a collection of 16 floats
 // Comments				:
 class	CMatrixExpression : public CExpression {
 public:
@@ -139,7 +143,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTerminalExpression
-// Description			:	This encapsulates a variable reference
+// Description			:
+/// \brief					This encapsulates a variable reference
 // Comments				:
 class	CTerminalExpression : public CExpression {
 public:
@@ -154,7 +159,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayExpression
-// Description			:	Extract a particular item from an array
+// Description			:
+/// \brief					Extract a particular item from an array
 // Comments				:
 class	CArrayExpression : public CExpression {
 public:
@@ -169,7 +175,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CConstantExpression
-// Description			:	This encapsulates a constant expression
+// Description			:
+/// \brief					This encapsulates a constant expression
 // Comments				:
 class	CConstantTerminalExpression : public CExpression {
 public:
@@ -186,7 +193,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBinaryExpression
-// Description			:	A binary expression
+// Description			:
+/// \brief					A binary expression
 // Comments				:
 class	CBinaryExpression : public CExpression {
 public:
@@ -201,7 +209,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUnaryExpression
-// Description			:	A unary expression
+// Description			:
+/// \brief					A unary expression
 // Comments				:
 class	CUnaryExpression : public CExpression {
 public:
@@ -216,7 +225,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSysConversionExpression
-// Description			:	System conversion
+// Description			:
+/// \brief					System conversion
 // Comments				:
 class	CSysConversionExpression : public CExpression {
 public:
@@ -233,7 +243,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFuncallExpression
-// Description			:	Function call
+// Description			:
+/// \brief					Function call
 // Comments				:
 class	CFuncallExpression : public CExpression {
 public:
@@ -249,7 +260,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBuiltinExpression
-// Description			:	A built in function call
+// Description			:
+/// \brief					A built in function call
 // Comments				:
 class	CBuiltinExpression : public CExpression {
 public:
@@ -282,7 +294,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAssignmentExpression
-// Description			:	Assignment expression
+// Description			:
+/// \brief					Assignment expression
 // Comments				:
 class	CAssignmentExpression : public CExpression {
 public:
@@ -297,7 +310,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayAssignmentExpression
-// Description			:	Assignment expression
+// Description			:
+/// \brief					Assignment expression
 // Comments				:
 class	CArrayAssignmentExpression : public CExpression {
 public:
@@ -314,7 +328,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArrayAssignmentExpression
-// Description			:	Assignment expression
+// Description			:
+/// \brief					Assignment expression
 // Comments				:
 class	CArrayUpdateExpression : public CExpression {
 public:
@@ -332,7 +347,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArray
-// Description			:	Assignment expression
+// Description			:
+/// \brief					Assignment expression
 // Comments				:
 class	CArrayMove : public CExpression {
 public:
@@ -349,7 +365,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUpdateExpression
-// Description			:	Update expression
+// Description			:
+/// \brief					Update expression
 // Comments				:
 class	CUpdateExpression : public CExpression {
 public:
@@ -401,7 +418,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CForLoop
-// Description			:	For loop
+// Description			:
+/// \brief					For loop
 // Comments				:
 class	CForLoop : public CExpression {
 public:
@@ -418,7 +436,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIlluminationLoop
-// Description			:	Illumination loop
+// Description			:
+/// \brief					Illumination loop
 // Comments				:
 class	CIlluminationLoop : public CExpression {
 public:
@@ -452,7 +471,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFixedExpression
-// Description			:	A fixed string expression
+// Description			:
+/// \brief					A fixed string expression
 // Comments				:
 class	CFixedExpression : public CExpression {
 public:

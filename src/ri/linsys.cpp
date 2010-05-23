@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	linsys.cpp
 //  Classes				:	-
-//  Description			:	Functions for solving linear system of equations
+//  Description			:
+/// \brief					Functions for solving linear system of equations
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -37,7 +38,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ludcmp
-// Description			:	LU Decomposition routine
+// Description			:
+/// \brief					LU Decomposition routine
 // Return Value			:	-
 // Comments				:
 template <class T> int ludcmp(T **a, int n, int *indx, T *d) {
@@ -94,7 +96,8 @@ template <class T> int ludcmp(T **a, int n, int *indx, T *d) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	ludcmp
-// Description			:	LU backward substitution code
+// Description			:
+/// \brief					LU backward substitution code
 // Return Value			:	-
 // Comments				:
 template <class T> void lubksb(T **a, int n, int *indx, T b[]) {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	executeMisc.cpp
 //  Classes				:	-
-//  Description			:	This file implements the main shader execution
+//  Description			:
+/// \brief					This file implements the main shader execution
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -50,7 +51,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	duFloat
-// Description			:	Compute the u derivative
+// Description			:
+/// \brief					Compute the u derivative
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::duFloat(float *dest,const float *src) {
@@ -135,7 +137,8 @@ void	CShadingContext::duFloat(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	DuFloat
-// Description			:	Compute the u differences
+// Description			:
+/// \brief					Compute the u differences
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::DuFloat(float *dest,const float *src) {
@@ -213,7 +216,8 @@ void	CShadingContext::DuFloat(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	dvFloat
-// Description			:	Compute the v derivatives
+// Description			:
+/// \brief					Compute the v derivatives
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::dvFloat(float *dest,const float *src) {
@@ -304,7 +308,8 @@ void	CShadingContext::dvFloat(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	DvFloat
-// Description			:	Compute the v differences
+// Description			:
+/// \brief					Compute the v differences
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::DvFloat(float *dest,const float *src) {
@@ -413,7 +418,8 @@ void	CShadingContext::DvFloat(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	duVector
-// Description			:	Compute the u derivative
+// Description			:
+/// \brief					Compute the u derivative
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::duVector(float *dest,const float *src) {
@@ -514,7 +520,8 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	DuVector
-// Description			:	Compute the u differences
+// Description			:
+/// \brief					Compute the u differences
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::DuVector(float *dest,const float *src) {
@@ -609,7 +616,8 @@ void	CShadingContext::DuVector(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	dvVector
-// Description			:	Compute the v derivative
+// Description			:
+/// \brief					Compute the v derivative
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::dvVector(float *dest,const float *src) {
@@ -711,7 +719,8 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	DvVector
-// Description			:	Compute the v differences
+// Description			:
+/// \brief					Compute the v differences
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::DvVector(float *dest,const float *src) {
@@ -841,7 +850,8 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	traceTransmission
-// Description			:	Trace transmission rays
+// Description			:
+/// \brief					Trace transmission rays
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int probeOnly) {
@@ -950,7 +960,8 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	traceReflection
-// Description			:	Trace reflected rays
+// Description			:
+/// \brief					Trace reflected rays
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probeOnly) {
@@ -1107,7 +1118,8 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	rayDiff
-// Description			:	Compute the ray differentials
+// Description			:
+/// \brief					Compute the ray differentials
 // Return Value			:	-
 // Comments				:
 float		*CShadingContext::rayDiff(const float *from,const float *dir,const float *to) {
@@ -1294,7 +1306,8 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	rayDiff
-// Description			:	Compute the ray differentials
+// Description			:
+/// \brief					Compute the ray differentials
 // Return Value			:	-
 // Comments				:
 float		*CShadingContext::rayDiff(const float *from) {

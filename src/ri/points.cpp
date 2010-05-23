@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	points.cpp
 //  Classes				:	CPoints
-//  Description			:	Points primitive
+//  Description			:
+/// \brief					Points primitive
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -40,7 +41,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	CPoints
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
@@ -137,7 +139,8 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	CPoints
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi) : CSurface(a,x) {
@@ -168,7 +171,8 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPointBase *b,int np,const float **pi)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	~CPoints
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPoints::~CPoints() {
@@ -305,7 +309,8 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	dispatch
-// Description			:	Push all the defined variables into the arrays
+// Description			:
+/// \brief					Push all the defined variables into the arrays
 // Return Value			:	-
 // Comments				:
 void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &usedParameters) const {
@@ -364,7 +369,8 @@ void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,u
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	interpolate
-// Description			:	Interpolate the varying junck and save the uniform stuff
+// Description			:
+/// \brief					Interpolate the varying junck and save the uniform stuff
 // Return Value			:	-
 // Comments				:
 void	CPoints::interpolate(int numVertices,float **varying,float ***locals) const {
@@ -376,7 +382,8 @@ void	CPoints::interpolate(int numVertices,float **varying,float ***locals) const
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	instantiate
-// Description			:	Clone the points
+// Description			:
+/// \brief					Clone the points
 // Return Value			:	-
 // Comments				:
 void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
@@ -395,7 +402,8 @@ void	CPoints::instantiate(CAttributes *a,CXform *x,CRendererContext *c) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPoints
 // Method				:	prep
-// Description			:	Prepare the points
+// Description			:
+/// \brief					Prepare the points
 // Return Value			:	-
 // Comments				:
 void	CPoints::prep() {

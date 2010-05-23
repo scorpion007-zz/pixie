@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	shaderFunctions.h
 //  Classes				:	-
-//  Description			:	Shader language specific buint in functions
+//  Description			:
+/// \brief					Shader language specific buint in functions
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1471,13 +1472,11 @@ DEFFUNC(ShaderNames				,"shadername"					,"s=s"		,SHADERNAMESEXPR_PRE,SHADERNAME
 								operand(4,t,const float *);														\
 								/* Get the texture */															\
 								CTexture	*tex;																\
-								if ((tex = lookup->map) == NULL) {												\
-									const char		**op1;														\
-									operand(1,op1,const char **);												\
-									osLock(CRenderer::shaderMutex);												\
-									lookup->map = tex	=	CRenderer::getTexture(*op1);						\
-									osUnlock(CRenderer::shaderMutex);											\
-								}																				\
+								const char		**op1;															\
+								operand(1,op1,const char **);													\
+								osLock(CRenderer::shaderMutex);													\
+								lookup->map = tex	=	CRenderer::getTexture(*op1);							\
+								osUnlock(CRenderer::shaderMutex);												\
 								int				i;																\
 								float			*dsdu		=	(float *) ralloc(numVertices*4*sizeof(float),threadMemory);	\
 								float			*dsdv		=	dsdu + numVertices;								\

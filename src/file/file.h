@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	file.cpp
 //  Classes				:
-//  Description			:	This file implements the default output device
+//  Description			:
+/// \brief					This file implements the default output device
 //							that sends the image into a file
 //
 ////////////////////////////////////////////////////////////////////////
@@ -36,14 +37,16 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebuffer
-// Description			:	Holds the framebuffer
+// Description			:
+/// \brief					Holds the framebuffer
 // Comments				:
 class CFileFramebuffer {
 public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFileFramebuffer
 	// Method				:	CFileFramebuffer
-	// Description			:	Ctor
+	// Description			:
+/// \brief					Ctor
 	// Return Value			:	-
 	// Comments				:
 	CFileFramebuffer() { };
@@ -51,7 +54,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFileFramebuffer
 	// Method				:	CFileFramebuffer
-	// Description			:	Dtor
+	// Description			:
+/// \brief					Dtor
 	// Return Value			:	-
 	// Comments				:
 	virtual ~CFileFramebuffer() { };
@@ -59,7 +63,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFileFramebuffer
 	// Method				:	write
-	// Description			:	Write image data to the file
+	// Description			:
+/// \brief					Write image data to the file
 	// Return Value			:	-
 	// Comments				:
 	virtual void write(int x,int y,int w,int h,float *data) { };
@@ -67,7 +72,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFileFramebuffer
 	// Method				:	success
-	// Description			:	Returns True if constructor succeeded with file creation
+	// Description			:
+/// \brief					Returns True if constructor succeeded with file creation
 	// Return Value			:	-
 	// Comments				:
 	virtual bool success() { return false; };

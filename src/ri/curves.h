@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	curves.h
 //  Classes				:	CCurve
-//  Description			:	Curve primitive
+//  Description			:
+/// \brief					Curve primitive
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef CURVES_H
@@ -39,14 +40,16 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurves
-// Description			:	Implements a curve primitive
+// Description			:
+/// \brief					Implements a curve primitive
 // Comments				:
 class	CCurve : public CSurface {
 public:
 
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CBase
-					// Description			:	This class holds the data about a single curve
+					// Description			:
+/// \brief					This class holds the data about a single curve
 					// Comments				:
 					class	CBase : public CRefCounter  {
 					public:
@@ -88,7 +91,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicCurves
-// Description			:	Implements a curve primitive
+// Description			:
+/// \brief					Implements a curve primitive
 // Comments				:
 class	CCubicCurve : public CCurve {
 public:
@@ -104,7 +108,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLinearCurves
-// Description			:	Implements a linear primitive
+// Description			:
+/// \brief					Implements a linear primitive
 // Comments				:
 class	CLinearCurve : public CCurve {
 public:
@@ -122,7 +127,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCurvesMesh
-// Description			:	Encapsulates a curves mesh
+// Description			:
+/// \brief					Encapsulates a curves mesh
 // Comments				:
 class	CCurveMesh : public CObject {
 public:

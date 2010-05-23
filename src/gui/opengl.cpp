@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	opengl
 //  Classes				:
-//  Description			:	Hardware resterizer
+//  Description			:
+/// \brief					Hardware resterizer
 //
 // !!! Work under progress !!!
 ////////////////////////////////////////////////////////////////////////
@@ -49,7 +50,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglTriangleMesh
-// Description			:	Draw triangles with OpenGL
+// Description			:
+/// \brief					Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
 void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
@@ -65,7 +67,8 @@ void		pglTriangleMesh(int n,const int *indices,const float *P,const float *C) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglTriangles
-// Description			:	Draw triangles with OpenGL
+// Description			:
+/// \brief					Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
 void		pglTriangles(int n,const float *P,const float *C) {
@@ -81,7 +84,8 @@ void		pglTriangles(int n,const float *P,const float *C) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglLines
-// Description			:	Draw triangles with OpenGL
+// Description			:
+/// \brief					Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
 void		pglLines(int n,const float *P,const float *C) {
@@ -97,7 +101,8 @@ void		pglLines(int n,const float *P,const float *C) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglTriangles
-// Description			:	Draw triangles with OpenGL
+// Description			:
+/// \brief					Draw triangles with OpenGL
 // Return Value			:	-
 // Comments				:
 void		pglPoints(int n,const float *P,const float *C) {
@@ -114,7 +119,8 @@ void		pglPoints(int n,const float *P,const float *C) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglDisks
-// Description			:	Draw disks with OpenGL
+// Description			:
+/// \brief					Draw disks with OpenGL
 // Return Value			:	-
 // Comments				:
 void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *C) {
@@ -146,7 +152,8 @@ void		pglDisks(int n,const float *P,const float *dP,const float *N,const float *
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	pglFile
-// Description			:	Read the primitives from a file
+// Description			:
+/// \brief					Read the primitives from a file
 // Return Value			:	-
 // Comments				:
 void		pglFile(const char *fileName) {

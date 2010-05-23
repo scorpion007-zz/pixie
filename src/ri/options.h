@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -80,7 +80,8 @@ const	unsigned int		OPTIONS_FLAGS_SAMPLEMOTION			=	1<<20;	// We want the hider t
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COptions
-// Description			:	This class settings that are constant accross a frame
+// Description			:
+/// \brief					This class settings that are constant accross a frame
 // Comments				:
 class COptions {
 public:
@@ -88,13 +89,15 @@ public:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CDisplay
-	// Description			:	Holds a display setting
+	// Description			:
+/// \brief					Holds a display setting
 	// Comments				:
 	class CDisplay {
 	public:
 									///////////////////////////////////////////////////////////////////////
 									// Class				:	TDisplayParameter
-									// Description			:	Holds a display parameter
+									// Description			:
+/// \brief					Holds a display parameter
 									// Comments				:
 									typedef struct {
 										char			*name;
@@ -124,7 +127,8 @@ public:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CClipPlane
-	// Description			:	Holds a user defined clip plane description
+	// Description			:
+/// \brief					Holds a user defined clip plane description
 	// Comments				:
 	class CClipPlane {
 	public:

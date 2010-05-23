@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	error.cpp
 //  Classes				:	-
-//  Description			:	The error display functions
+//  Description			:
+/// \brief					The error display functions
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdarg.h>
@@ -38,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	translate
-// Description			:	Translate an error code
+// Description			:
+/// \brief					Translate an error code
 // Return Value			:
 // Comments				:
 static	int	translate(EErrorCode c) {
@@ -155,7 +157,8 @@ static	int	translate(EErrorCode c) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	error
-// Description			:	Generate an error message
+// Description			:
+/// \brief					Generate an error message
 // Return Value			:
 // Comments				:
 void	error(EErrorCode code,const char *mes,...) {
@@ -171,7 +174,8 @@ void	error(EErrorCode code,const char *mes,...) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	warning
-// Description			:	Generate a warning message
+// Description			:
+/// \brief					Generate a warning message
 // Return Value			:
 // Comments				:
 void	warning(EErrorCode code,const char *mes,...) {
@@ -187,7 +191,8 @@ void	warning(EErrorCode code,const char *mes,...) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	fatal
-// Description			:	Generate a fatal message
+// Description			:
+/// \brief					Generate a fatal message
 // Return Value			:
 // Comments				:
 void	fatal(EErrorCode code,const char *mes,...) {
@@ -204,7 +209,8 @@ void	fatal(EErrorCode code,const char *mes,...) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	info
-// Description			:	Generate an info message
+// Description			:
+/// \brief					Generate an info message
 // Return Value			:
 // Comments				:
 void	info(EErrorCode code,const char *mes,...) {

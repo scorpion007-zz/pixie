@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -57,7 +57,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureBlock
-// Description			:	This class holds information about a particular texture block
+// Description			:
+/// \brief					This class holds information about a particular texture block
 // Comments				:
 class	CTextureBlock	{
 public:
@@ -94,7 +95,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // function				:	tiffErrorHandler
-// Description			:	Handle errors coming from the libtiff
+// Description			:
+/// \brief					Handle errors coming from the libtiff
 // Return Value			:	-
 // Comments				:
 static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
@@ -107,7 +109,8 @@ static	void	tiffErrorHandler(const char *module,const char *fmt,va_list ap) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureQuickSort
-// Description			:	Sort the textures in the order of increasing last ref number
+// Description			:
+/// \brief					Sort the textures in the order of increasing last ref number
 // Return Value			:
 // Comments				:
 static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end,int thread) {
@@ -137,7 +140,8 @@ static	void	textureQuickSort(CTextureBlock **activeBlocks,int start,int end,int 
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureMemFlush
-// Description			:	Try to deallocate some textures from memory
+// Description			:
+/// \brief					Try to deallocate some textures from memory
 // Return Value			:
 // Comments				:
 static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context,int all) {
@@ -214,7 +218,8 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureLoadBlock
-// Description			:	Read a block of texture from disk
+// Description			:
+/// \brief					Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
 static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,CShadingContext *context) {
@@ -238,7 +243,8 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,CShadingC
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureLoadBlock
-// Description			:	Read a block of texture from disk
+// Description			:
+/// \brief					Read a block of texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
 static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir,CShadingContext *context) {
@@ -424,7 +430,8 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 
 //////////////////////////////////////////////////////////////////////
 // Function				:	texturRegisterBlock
-// Description			:	Add a block into the list of used blocks
+// Description			:
+/// \brief					Add a block into the list of used blocks
 // Return Value			:	Pointer to the new block
 // Comments				:
 static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
@@ -454,7 +461,8 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 
 //////////////////////////////////////////////////////////////////////
 // Function				:	texturUnregisterBlock
-// Description			:	Remove the block
+// Description			:
+/// \brief					Remove the block
 // Return Value			:	Pointer to the new block
 // Comments				:
 static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
@@ -522,7 +530,8 @@ typedef enum {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLayer
-// Description			:	This class encapsulates a single 2D texture layer in a file
+// Description			:
+/// \brief					This class encapsulates a single 2D texture layer in a file
 // Comments				:
 class	CTextureLayer  {
 public:
@@ -632,14 +641,16 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBasicTexture
-// Description			:	Thic class holds a basic uncached texture
+// Description			:
+/// \brief					Thic class holds a basic uncached texture
 // Comments				:
 template <class T> class CBasicTexture : public CTextureLayer {
 public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CBasicTexture
 					// Method				:	CBasicTexture
-					// Description			:	Ctor
+					// Description			:
+/// \brief					Ctor
 					// Return Value			:	-
 					// Comments				:
 					CBasicTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
@@ -650,7 +661,8 @@ public:
 					///////////////////////////////////////////////////////////////////////
 					// Class				:	CBasicTexture
 					// Method				:	~CBasicTexture
-					// Description			:	Dtor
+					// Description			:
+/// \brief					Dtor
 					// Return Value			:	-
 					// Comments				:
 					~CBasicTexture() {
@@ -712,7 +724,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CTiledTexture
 				// Method				:	CTiledTexture
-				// Description			:	Ctor
+				// Description			:
+/// \brief					Ctor
 				// Return Value			:	-
 				// Comments				:
 				CTiledTexture(const char *name,short directory,int width,int height,short numSamples,int fileWidth,int fileHeight,TTextureMode sMode,TTextureMode tMode,int tileWidth,int tileWidthShift,int tileHeight, int tileHeightShift, double Mult) : CTextureLayer(name,directory,width,height,numSamples,fileWidth,fileHeight,sMode,tMode) {
@@ -741,7 +754,8 @@ public:
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CTiledTexture
 				// Method				:	~CTiledTexture
-				// Description			:	Dtor
+				// Description			:
+/// \brief					Dtor
 				// Return Value			:	-
 				// Comments				:
 				~CTiledTexture() {
@@ -825,7 +839,8 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMadeTexture
-// Description			:	A previously made texture
+// Description			:
+/// \brief					A previously made texture
 // Comments				:
 class	CMadeTexture : public CTexture {
 public:
@@ -1018,7 +1033,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRegularTexture
-// Description			:	A regular texture
+// Description			:
+/// \brief					A regular texture
 // Comments				:
 class	CRegularTexture : public CTexture {
 public:
@@ -1167,7 +1183,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadow
-// Description			:	A single sided shadow map
+// Description			:
+/// \brief					A single sided shadow map
 // Comments				:
 class	CShadow : public CEnvironment{
 public:
@@ -1244,7 +1261,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDeepShadow
-// Description			:	A deep shadow map
+// Description			:
+/// \brief					A deep shadow map
 // Comments				:
 class	CDeepShadow : public CEnvironment{
 
@@ -1512,7 +1530,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCubicEnvironment
-// Description			:	A Cubic environment map
+// Description			:
+/// \brief					A Cubic environment map
 // Comments				:
 class	CCubicEnvironment : public CEnvironment{
 public:
@@ -1713,7 +1732,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphericalEnvironment
-// Description			:	A Spherical environment map
+// Description			:
+/// \brief					A Spherical environment map
 // Comments				:	RenderMan does not support cylinderical env. maps yet so this class is not used
 class	CSphericalEnvironment : public CEnvironment{
 public:
@@ -1761,7 +1781,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylindericalEnvironment
-// Description			:	A Cylinderical environment map
+// Description			:
+/// \brief					A Cylinderical environment map
 // Comments				:
 class	CCylindericalEnvironment : public CEnvironment{
 public:
@@ -1844,7 +1865,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyTexture
 // Method				:	lookupz
-// Description			:	Dummy
+// Description			:
+/// \brief					Dummy
 // Return Value			:
 // Comments				:
 float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) { 
@@ -1854,7 +1876,8 @@ float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyTexture
 // Method				:	lookup
-// Description			:	Dummy
+// Description			:
+/// \brief					Dummy
 // Return Value			:
 // Comments				:
 void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context) { 
@@ -1864,7 +1887,8 @@ void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyTexture
 // Method				:	lookup4
-// Description			:	Dummy
+// Description			:
+/// \brief					Dummy
 // Return Value			:
 // Comments				:
 void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingContext *context) { 
@@ -1874,7 +1898,8 @@ void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingC
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDummyEnvironment
 // Method				:	lookup
-// Description			:	Dummy
+// Description			:
+/// \brief					Dummy
 // Return Value			:
 // Comments				:
 void		CDummyEnvironment::lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
@@ -1924,7 +1949,8 @@ void		CDummyEnvironment::lookup(float *dest,const float *D0,const float *D1,cons
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	readTexture
-// Description			:	Read the pyramid layers
+// Description			:
+/// \brief					Read the pyramid layers
 // Return Value			:	TRUE on success
 // Comments				:
 template <class T> static CTexture	*readMadeTexture(const char *name,const char *aname,TIFF *in,int &dstart,int width,int height,const char *smode,const char *tmode,T enforcer) {
@@ -2019,7 +2045,8 @@ template <class T> static CTexture	*readMadeTexture(const char *name,const char 
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	readTexture
-// Description			:	read a regular texture
+// Description			:
+/// \brief					read a regular texture
 // Return Value			:	The texture
 // Comments				:
 template <class T> static CTexture	*readTexture(const char *name,const char *aname,TIFF *in,int &dstart,T enforcer) {
@@ -2050,7 +2077,8 @@ template <class T> static CTexture	*readTexture(const char *name,const char *ana
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureLoad
-// Description			:	Load a texture from disk
+// Description			:
+/// \brief					Load a texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
 static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart,int unMade = FALSE) {
@@ -2135,7 +2163,8 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	textureLoad
-// Description			:	Load a texture from disk
+// Description			:
+/// \brief					Load a texture from disk
 // Return Value			:	Pointer to the new texture
 // Comments				:
 CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
@@ -2177,7 +2206,8 @@ CTexture		*CRenderer::textureLoad(const char *name,TSearchpath *path) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	environmentLoad
-// Description			:	Load an environment from disk
+// Description			:
+/// \brief					Load an environment from disk
 // Return Value			:	Pointer to the new environment
 // Comments				:
 CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,float *toWorld) {
@@ -2254,7 +2284,8 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	initTextures
-// Description			:	Set the maximum texture memory and init texturing
+// Description			:
+/// \brief					Set the maximum texture memory and init texturing
 // Return Value			:	-
 // Comments				:
 void			CRenderer::initTextures(int mm) {
@@ -2281,7 +2312,8 @@ void			CRenderer::initTextures(int mm) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	shutdownTextures
-// Description			:	Set the maximum texture memory and init texturing
+// Description			:
+/// \brief					Set the maximum texture memory and init texturing
 // Return Value			:	-
 // Comments				:
 void			CRenderer::shutdownTextures() {

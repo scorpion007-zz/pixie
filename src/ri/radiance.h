@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	radiance.h
 //  Classes				:	CRadianceCache
-//  Description			:	This class holds a radiance cache
+//  Description			:
+/// \brief					This class holds a radiance cache
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef RADIANCECACHE_H
@@ -44,13 +45,15 @@ class	CTriangleHash;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
-// Description			:	Radiance cache responsible for estimating stuff
+// Description			:
+/// \brief					Radiance cache responsible for estimating stuff
 // Comments				:
 class	CRadianceCache : public CCache {
 public:
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRadianceSample
-	// Description			:	Holds a radiance sample
+	// Description			:
+/// \brief					Holds a radiance sample
 	// Comments				:
 	class	CRadianceHarmonic {
 	public:
@@ -63,7 +66,8 @@ public:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRadianceNode
-	// Description			:	Defines a radiance node
+	// Description			:
+/// \brief					Defines a radiance node
 	// Comments				:
 	class	CRadianceNode {
 	public:
@@ -75,7 +79,8 @@ public:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CShadingPoint
-	// Description			:	Holds a shading point
+	// Description			:
+/// \brief					Holds a shading point
 	// Comments				:
 	class	CShadingPoint {
 	public:

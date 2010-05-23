@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	os.cpp
 //  Classes				:	-
-//  Description			:	OS dependent functions
+//  Description			:
+/// \brief					OS dependent functions
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +102,8 @@ static	time_t	osStartTimeMsec;
 
 ///////////////////////////////////////////////////////////////////////
 // Funvtion				:	osInit
-// Description			:	Initialize the operating system
+// Description			:
+/// \brief					Initialize the operating system
 // Return Value			:	-
 // Comments				:
 void	osInit() {
@@ -115,7 +117,8 @@ void	osInit() {
 
 ///////////////////////////////////////////////////////////////////////
 // Funvtion				:	osShutdown
-// Description			:	Shutdown the operating system
+// Description			:
+/// \brief					Shutdown the operating system
 // Return Value			:	-
 // Comments				:
 void	osShutdown() {
@@ -154,7 +157,8 @@ void	*osLoadModule(const char *name) {
 
 ///////////////////////////////////////////////////////////////////////
 // Funvtion				:	osModuleError
-// Description			:	Get the latest error
+// Description			:
+/// \brief					Get the latest error
 // Return Value			:	The error string
 // Comments				:
 const char *osModuleError() {
@@ -210,7 +214,8 @@ void	*osResolve(void *cModule,const char *name) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osEnvironment
-// Description			:	Get an environment variable
+// Description			:
+/// \brief					Get an environment variable
 // Return Value			:	The variable value if found
 // Comments				:
 char			*osEnvironment(const char *name) {	
@@ -219,7 +224,8 @@ char			*osEnvironment(const char *name) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osFileExists
-// Description			:	Check if a file exists
+// Description			:
+/// \brief					Check if a file exists
 // Return Value			:	TRUE if it does
 // Comments				:
 int		osFileExists(const char *name) {
@@ -235,7 +241,8 @@ int		osFileExists(const char *name) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osFixSlashes
-// Description			:	Make sure the slashes are right
+// Description			:
+/// \brief					Make sure the slashes are right
 // Return Value			:	-
 // Comments				:
 void	osFixSlashes(char *st) {
@@ -247,7 +254,8 @@ void	osFixSlashes(char *st) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function            :   osTempdir
-// Description         :   Create a path to a directory suitable
+// Description         :
+/// \brief					Create a path to a directory suitable
 //                     :   for storing temporary files.
 // Return Value        :   -
 // Comments            :   The directory will end with / or \
@@ -285,7 +293,8 @@ void   osTempdir(char *result, size_t resultsize) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osTempname
-// Description			:	Create a temporary file
+// Description			:
+/// \brief					Create a temporary file
 // Return Value			:	-
 // Comments				:	The directory must end with / (or \)
 void	osTempname(const char *directory,const char *prefix,char *result) {
@@ -308,7 +317,8 @@ void	osTempname(const char *directory,const char *prefix,char *result) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osCreateDir
-// Description			:	Create a directory
+// Description			:
+/// \brief					Create a directory
 // Return Value			:	-
 // Comments				:
 void	osCreateDir(const char *n) {
@@ -321,7 +331,8 @@ void	osCreateDir(const char *n) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osDeleteDir
-// Description			:	Remove a directory
+// Description			:
+/// \brief					Remove a directory
 // Return Value			:	-
 // Comments				:
 void	osDeleteDir(const char *n)	{
@@ -334,7 +345,8 @@ void	osDeleteDir(const char *n)	{
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osDeleteFile
-// Description			:	Delete a file
+// Description			:
+/// \brief					Delete a file
 // Return Value			:	-
 // Comments				:
 void	osDeleteFile(const char *n)	{
@@ -348,7 +360,8 @@ void	osDeleteFile(const char *n)	{
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	enumerate
-// Description			:	Enumerate the files matching a criteria
+// Description			:
+/// \brief					Enumerate the files matching a criteria
 // Return Value			:
 // Comments				:
 void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *userData) {
@@ -398,7 +411,8 @@ void	osEnumerate(const char *name,int (*callback)(const char *,void *),void *use
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osTime
-// Description			:	Get the time
+// Description			:
+/// \brief					Get the time
 // Return Value			:
 // Comments				:
 float	osTime() {
@@ -411,7 +425,8 @@ float	osTime() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osTime
-// Description			:	Get the time
+// Description			:
+/// \brief					Get the time
 // Return Value			:
 // Comments				:
 float	osCPUTime() {
@@ -420,7 +435,8 @@ float	osCPUTime() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osCreateThread
-// Description			:	Start a thread
+// Description			:
+/// \brief					Start a thread
 // Return Value			:
 // Comments				:
 TThread	osCreateThread(TFun entry,void *d) {
@@ -444,7 +460,8 @@ TThread	osCreateThread(TFun entry,void *d) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osWaitThread
-// Description			:	Wait for the termination of a thread
+// Description			:
+/// \brief					Wait for the termination of a thread
 // Return Value			:
 // Comments				:
 int		osWaitThread(TThread	thread) {
@@ -459,7 +476,8 @@ int		osWaitThread(TThread	thread) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osCreateMutex
-// Description			:	Create a mutex
+// Description			:
+/// \brief					Create a mutex
 // Return Value			:
 // Comments				:
 void	osCreateMutex(TMutex &mutex) {
@@ -472,7 +490,8 @@ void	osCreateMutex(TMutex &mutex) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osDeleteMutex
-// Description			:	Delete a mutex
+// Description			:
+/// \brief					Delete a mutex
 // Return Value			:
 // Comments				:
 void	osDeleteMutex(TMutex &mutex) {
@@ -485,7 +504,8 @@ void	osDeleteMutex(TMutex &mutex) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osCreateSemaphore
-// Description			:	Create a semaphere
+// Description			:
+/// \brief					Create a semaphere
 // Return Value			:
 // Comments				:
 void	osCreateSemaphore(TSemaphore &sem,int count) {
@@ -498,7 +518,8 @@ void	osCreateSemaphore(TSemaphore &sem,int count) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osDeleteMutex
-// Description			:	Delete a mutex
+// Description			:
+/// \brief					Delete a mutex
 // Return Value			:
 // Comments				:
 void	osDeleteSemaphore(TSemaphore &sem) {
@@ -512,7 +533,8 @@ void	osDeleteSemaphore(TSemaphore &sem) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	osProcessEscapes
-// Description			:	Process the escape characters in a string
+// Description			:
+/// \brief					Process the escape characters in a string
 // Return Value			:
 // Comments				:
 void	osProcessEscapes(char *str) {
@@ -552,7 +574,8 @@ void	osProcessEscapes(char *str) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function            :   osAvailableCPUs
-// Description         :   Get number of CPUs available
+// Description         :
+/// \brief					Get number of CPUs available
 // Return Value        :   Number of available CPUs or -1 if unknown
 // Comments            :   See <http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine>
 int    osAvailableCPUs() {

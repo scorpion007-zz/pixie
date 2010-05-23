@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	remoteChannel.cpp
 //  Classes				:	
-//  Description			:	This base class for remote deep data channels
+//  Description			:
+/// \brief					This base class for remote deep data channels
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,10 +46,12 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	requestRemoteChannel
-// Description			:	Ask client to set up remote channel like the
+// Description			:
+/// \brief					Ask client to set up remote channel like the
 //							one passed as an argument
 // Return Value			:
-// Comments				:	The channel will either be deleted or managed
+// Comments				:
+/// \note					The channel will either be deleted or managed
 int		CRenderer::requestRemoteChannel(CRemoteChannel *serverChannel){
 	int nameLength			= (int) strlen(serverChannel->name)+1;
 	int clientInitialized	= FALSE;	
@@ -287,7 +290,8 @@ void CRenderer::sendBucketDataChannels(int x,int y) {
 // Method				:	recvBucketDataChannels
 // Description			:	Recieve all bucket-data channels
 // Return Value			:
-// Comments				:	Each channel update is preceeded by identified
+// Comments				:
+/// \note					Each channel update is preceeded by identified
 //							which was assigned when creating it
 void CRenderer::recvBucketDataChannels(SOCKET s,int x,int y) {
 	unsigned int	numKnownChannels	= remoteChannels->numItems;
@@ -378,7 +382,8 @@ void CRenderer::sendFrameDataChannels() {
 // Method				:	recvFrameDataChannels
 // Description			:	Recieve all frame-data channels
 // Return Value			:
-// Comments				:	Each channel update is preceeded by identified
+// Comments				:
+/// \note					Each channel update is preceeded by identified
 //							which was assigned when creating it
 void CRenderer::recvFrameDataChannels(SOCKET s) {
 	unsigned int	numKnownChannels	= remoteChannels->numItems;
@@ -423,7 +428,8 @@ void CRenderer::recvFrameDataChannels(SOCKET s) {
 // Class				:	CRemoteTSMChannel
 // Method				:	ctor
 // Description			:	-
-// Comments				:	The file is opened elsewhere and closed elsewhere
+// Comments				:
+/// \note					The file is opened elsewhere and closed elsewhere
 CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,int yb) : CRemoteChannel(name,REMOTECHANNEL_PERBUCKET,CHANNELTYPE_TSM) {
 	tsmFile = f;
 	index = idx;
@@ -435,7 +441,8 @@ CRemoteTSMChannel::CRemoteTSMChannel(const char *name,FILE *f,int *idx,int xb,in
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemoteTSMChannel
 // Method				:	sendRemoteBucket
-// Description			:	send a buckets worth of tsm data
+// Description			:
+/// \brief					send a buckets worth of tsm data
 // Return Value			:	success or failure
 // Comments				:	
 int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
@@ -479,7 +486,8 @@ int		CRemoteTSMChannel::sendRemoteBucket(SOCKET s,int x,int y) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemoteTSMChannel
 // Method				:	recvRemoteBucket
-// Description			:	receive a buckets worth of tsm data
+// Description			:
+/// \brief					receive a buckets worth of tsm data
 // Return Value			:	success or failure
 // Comments				:	
 int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
@@ -512,7 +520,8 @@ int		CRemoteTSMChannel::recvRemoteBucket(SOCKET s,int x,int y) {
 // Class				:	CRemoteTSMChannel
 // Method				:	ctor
 // Description			:	-
-// Comments				:	The cache is opened elsewhere and closed elsewhere
+// Comments				:
+/// \note					The cache is opened elsewhere and closed elsewhere
 CRemoteICacheChannel::CRemoteICacheChannel(CIrradianceCache *c) : CRemoteChannel(c->name,REMOTECHANNEL_PERFRAME,CHANNELTYPE_ICACHE) {
 	cache = c;
 }
@@ -662,7 +671,8 @@ int	CRemoteICacheChannel::setup(SOCKET s) {
 // Class				:	CRemotePtCloudChannel
 // Method				:	ctor
 // Description			:	-
-// Comments				:	The cache is opened elsewhere and closed elsewhere
+// Comments				:
+/// \note					The cache is opened elsewhere and closed elsewhere
 CRemotePtCloudChannel::CRemotePtCloudChannel(CPointCloud *c) : CRemoteChannel(c->name,REMOTECHANNEL_PERFRAME,CHANNELTYPE_PTCLOUD) {
 	cloud = c;
 }
@@ -723,7 +733,8 @@ int		CRemotePtCloudChannel::recvRemoteFrame(SOCKET s) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemotePtCloudChannel
 // Method				:	sendSetupData
-// Description			:	sendSetupData
+// Description			:
+/// \brief					sendSetupData
 // Return Value			:	success or failure
 // Comments				:	
 int		CRemotePtCloudChannel::sendSetupData(SOCKET s) {
@@ -748,7 +759,8 @@ int		CRemotePtCloudChannel::sendSetupData(SOCKET s) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRemotePtCloudChannel
 // Method				:	setup
-// Description			:	setup
+// Description			:
+/// \brief					setup
 // Return Value			:	success or failure
 // Comments				:	
 int	CRemotePtCloudChannel::setup(SOCKET s) {

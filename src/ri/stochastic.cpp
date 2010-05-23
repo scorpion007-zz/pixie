@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	stochastic.cpp
 //  Classes				:	CStochastic
-//  Description			:	implements the stochastic hider
+//  Description			:
+/// \brief					implements the stochastic hider
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -56,7 +57,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	CStochastic
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(), apertureGenerator(CRenderer::frame) {
@@ -95,7 +97,8 @@ CStochastic::CStochastic(int thread) : CReyes(thread), COcclusionCuller(), apert
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	~CStochastic
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CStochastic::~CStochastic() {
@@ -114,7 +117,8 @@ CStochastic::~CStochastic() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	rasterBegin
-// Description			:	Begin drawing an image
+// Description			:
+/// \brief					Begin drawing an image
 // Return Value			:	-
 // Comments				:
 void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
@@ -223,7 +227,8 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	rasterDrawPrimitives
-// Description			:	Draw bunch of primitives
+// Description			:
+/// \brief					Draw bunch of primitives
 // Return Value			:	-
 // Comments				:
 void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
@@ -387,7 +392,8 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	rasterEnd
-// Description			:	Get the image from the screen
+// Description			:
+/// \brief					Get the image from the screen
 // Return Value			:	-
 // Comments				:
 void		CStochastic::rasterEnd(float *fb2,int noObjects) {
@@ -943,7 +949,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	outSample
-// Description			:	This function is used to output a depth sample
+// Description			:
+/// \brief					This function is used to output a depth sample
 // Return Value			:	-
 // Comments				:
 inline	void	startSample(FILE *outFile,float threshold,CTSMData &data) {
@@ -968,7 +975,8 @@ inline	void	startSample(FILE *outFile,float threshold,CTSMData &data) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	outSample
-// Description			:	This function is used to output a depth sample
+// Description			:
+/// \brief					This function is used to output a depth sample
 // Return Value			:	-
 // Comments				:
 inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
@@ -1067,7 +1075,8 @@ inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	finishSample
-// Description			:	This function is used to output the last sample
+// Description			:
+/// \brief					This function is used to output the last sample
 // Return Value			:	-
 // Comments				:
 inline	void	finishSample(float cZ,const float *opacity,CTSMData &data) {

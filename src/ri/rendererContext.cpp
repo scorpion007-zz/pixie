@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	rendererContext.cpp
 //  Classes				:	-
-//  Description			:	Renderer implementation
+//  Description			:
+/// \brief					Renderer implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -93,7 +94,8 @@ extern	CRiInterface	*renderMan;							// Defined in ri.cpp
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	CRendererContext
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CRendererContext::CRendererContext(const char *ribFile,const char *riNetString) {
@@ -138,7 +140,8 @@ CRendererContext::CRendererContext(const char *ribFile,const char *riNetString) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	~CRendererContext
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CRendererContext::~CRendererContext() {
@@ -199,7 +202,8 @@ CRendererContext::~CRendererContext() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	getXform
-// Description			:	Return the active Xform
+// Description			:
+/// \brief					Return the active Xform
 // Return Value			:
 // Comments				:
 CXform		*CRendererContext::getXform(int modify) {
@@ -220,7 +224,8 @@ CXform		*CRendererContext::getXform(int modify) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	getAttributes
-// Description			:	Return the active attributes
+// Description			:
+/// \brief					Return the active attributes
 // Return Value			:
 // Comments				:
 CAttributes	*CRendererContext::getAttributes(int modify) {
@@ -242,7 +247,8 @@ CAttributes	*CRendererContext::getAttributes(int modify) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	getOptions
-// Description			:	Return the active options
+// Description			:
+/// \brief					Return the active options
 // Return Value			:
 // Comments				:
 COptions	*CRendererContext::getOptions() {
@@ -255,7 +261,8 @@ COptions	*CRendererContext::getOptions() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	getShader
-// Description			:	Create an instance of a shader
+// Description			:
+/// \brief					Create an instance of a shader
 // Return Value			:
 // Comments				:
 CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,const char **params,const void **vals) {
@@ -326,7 +333,8 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	screenArea
-// Description			:	Compute the screen space area of a box
+// Description			:
+/// \brief					Compute the screen space area of a box
 // Return Value			:	The area
 // Comments				:
 static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
@@ -377,7 +385,8 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	processDelayedObject
-// Description			:	Process a delayed primitive
+// Description			:
+/// \brief					Process a delayed primitive
 //							i.e. : Raytrace it or add it to the graphics state
 // Return Value			:
 // Comments				:
@@ -412,7 +421,8 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	processDelayedObject
-// Description			:	Process a delayed primitive
+// Description			:
+/// \brief					Process a delayed primitive
 //							i.e. : Raytrace it or add it to the graphics state
 // Return Value			:
 // Comments				:
@@ -421,8 +431,8 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 	// Set the delayed object
 	delayed	=	cDelayed;
 	
-	//CAttributes		*cAttributes	=	cDelayed->attributes;
-	CAttributes		*cAttributes	=	NULL;
+	CAttributes		*cAttributes	=	cDelayed->attributes;
+	//CAttributes		*cAttributes	=	NULL;
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
 		cAttributes		=	getAttributes(FALSE);
 	}
@@ -442,7 +452,8 @@ void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayed
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	addObject
-// Description			:	Add an object into the scene
+// Description			:
+/// \brief					Add an object into the scene
 // Return Value			:
 // Comments				:
 void	CRendererContext::addObject(CObject *o) {
@@ -487,7 +498,8 @@ void	CRendererContext::addObject(CObject *o) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRendererContext
 // Method				:	addInstance
-// Description			:	Add an instance of a compound object
+// Description			:
+/// \brief					Add an instance of a compound object
 // Return Value			:
 // Comments				:
 void	CRendererContext::addInstance(const void *d) {
@@ -529,7 +541,8 @@ void	CRendererContext::addInstance(const void *d) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	addMotion
-// Description			:	Make sure the command is good to go
+// Description			:
+/// \brief					Make sure the command is good to go
 // Return Value			:	The processing type (see below)
 // Comments				:
 //	0	-	skip

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	fileResource.h
 //  Classes				:	CFileResource
-//  Description			:	Any class that reads from a file must be derived from this class
+//  Description			:
+/// \brief					Any class that reads from a file must be derived from this class
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef FILERESOURCE_H
@@ -51,7 +52,8 @@ const	unsigned	int	magicNumberReversed	=	((magicNumber & 0xFF000000) >> 24) |
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileResource
-// Description			:	Any class that is read or written to a file must derive from this class
+// Description			:
+/// \brief					Any class that is read or written to a file must derive from this class
 // Comments				:
 class	CFileResource {
 public:

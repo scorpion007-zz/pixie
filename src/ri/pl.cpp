@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	pl.cpp
 //  Classes				:	
-//  Description			:	Parameter list class implementation
+//  Description			:
+/// \brief					Parameter list class implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <string.h>
@@ -48,7 +49,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParameter
 // Method				:	CParameter
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CParameter::CParameter(CVariable *v) {
@@ -63,7 +65,8 @@ CParameter::CParameter(CVariable *v) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParameter
 // Method				:	~CParameter
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CParameter::~CParameter() {
@@ -75,7 +78,8 @@ CParameter::~CParameter() {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUniformParameter
-// Description			:	Encapsulates a uniform parameter
+// Description			:
+/// \brief					Encapsulates a uniform parameter
 // Comments				:
 class	CUniformParameter : public CParameter {
 public:
@@ -208,7 +212,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUniformParameter
-// Description			:	Encapsulates a varying parameter
+// Description			:
+/// \brief					Encapsulates a varying parameter
 // Comments				:
 class	CVaryingParameter : public CParameter {
 public:
@@ -300,7 +305,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CUniformParameter
-// Description			:	Encapsulates a varying parameter
+// Description			:
+/// \brief					Encapsulates a varying parameter
 // Comments				:
 class	CVarying3Parameter : public CParameter {
 public:
@@ -393,7 +399,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVarying2Parameter
-// Description			:	Encapsulates a varying parameter
+// Description			:
+/// \brief					Encapsulates a varying parameter
 // Comments				:
 class	CVarying2Parameter : public CParameter {
 public:
@@ -521,7 +528,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVertexData
 // Method				:	CVertexData
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CVertexData::CVertexData() {
@@ -531,7 +539,8 @@ CVertexData::CVertexData() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVertexData
 // Method				:	~CVertexData
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CVertexData::~CVertexData() {
@@ -544,7 +553,8 @@ CVertexData::~CVertexData() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVertexData
 // Method				:	dispatch
-// Description			:	Dispatch vertex data
+// Description			:
+/// \brief					Dispatch vertex data
 // Return Value			:
 // Comments				:
 void	CVertexData::dispatch(const float *data,int start,int numVertices,float **varying,float ***locals) {
@@ -572,7 +582,8 @@ void	CVertexData::dispatch(const float *data,int start,int numVertices,float **v
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	CPl
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
@@ -589,7 +600,8 @@ CPl::CPl(int dataSize,int numParameters,CPlParameter *p,float *d0,float *d1) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	~CPl
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CPl::~CPl() {
@@ -613,7 +625,8 @@ CPl::~CPl() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	append
-// Description			:	Append another data block for the shutter close
+// Description			:
+/// \brief					Append another data block for the shutter close
 // Return Value			:
 // Comments				:
 void		CPl::append(float *d) {
@@ -627,7 +640,8 @@ void		CPl::append(float *d) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	transform
-// Description			:	Transform the variables into another coordinaye system
+// Description			:
+/// \brief					Transform the variables into another coordinaye system
 // Return Value			:
 // Comments				:
 void		CPl::transform(CXform *x,float *data) {
@@ -705,7 +719,8 @@ void		CPl::transform(CXform *x,float *data) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertexData
-// Description			:	Extract the vertex data from the parameter list
+// Description			:
+/// \brief					Extract the vertex data from the parameter list
 // Return Value			:
 // Comments				:
 CVertexData	*CPl::vertexData() {
@@ -751,7 +766,8 @@ CVertexData	*CPl::vertexData() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertexData
-// Description			:	Extract the vertex data from the parameter list
+// Description			:
+/// \brief					Extract the vertex data from the parameter list
 // Return Value			:
 // Comments				:
 CPl				*CPl::clone(CAttributes *a) {
@@ -793,7 +809,8 @@ CPl				*CPl::clone(CAttributes *a) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	find
-// Description			:	Find a variable in the parameter list
+// Description			:
+/// \brief					Find a variable in the parameter list
 // Return Value			:
 // Comments				:
 CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
@@ -813,7 +830,8 @@ CPlParameter	*CPl::find(int t,const float *&d0,const float *&d1) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page) {
@@ -892,7 +910,8 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	uniform
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::uniform(int u,CParameter *p) {
@@ -952,7 +971,8 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
@@ -983,7 +1003,8 @@ CParameter		*CPl::varying(int v0,int v1,int v2,int v3,CParameter *p) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
@@ -1012,7 +1033,8 @@ CParameter		*CPl::varying(int v0,int v1,CParameter *p) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p) {
@@ -1048,7 +1070,8 @@ CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
@@ -1079,7 +1102,8 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter *p) {
@@ -1115,7 +1139,8 @@ CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	vertices
-// Description			:	Extract the vertex data
+// Description			:
+/// \brief					Extract the vertex data
 // Return Value			:
 // Comments				:
 CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
@@ -1145,7 +1170,8 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPl
 // Method				:	parameters
-// Description			:	Extracts the parameters set by the list
+// Description			:
+/// \brief					Extracts the parameters set by the list
 // Return Value			:
 // Comments				:
 unsigned int CPl::parameterUsage() {
@@ -1166,7 +1192,8 @@ unsigned int CPl::parameterUsage() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	parseParameterList
-// Description			:	Parse a parameter list
+// Description			:
+/// \brief					Parse a parameter list
 // Return Value			:	The parsed parameter list
 // Comments				:
 CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFaceVarying,int numParams,const char **params,const void **vals,const char *required,int flags,CAttributes *attributes) {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	fbx.h
 //  Classes				:	CXDisplay
-//  Description			:	X Windows image displaying class
+//  Description			:
+/// \brief					X Windows image displaying class
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef FBX_H
@@ -44,7 +45,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
-// Description			:	The windows display class
+// Description			:
+/// \brief					The windows display class
 // Comments				:
 class	CXDisplay : public CDisplay {
 public:

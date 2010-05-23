@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -26,7 +26,8 @@
 //  File				:	raytracer.h
 //  Classes				:	CRaytracer
 //							and helper classes
-//  Description			:	The raytracer hider
+//  Description			:
+/// \brief					The raytracer hider
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef RAYTRACER_H
@@ -41,7 +42,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
-// Description			:	Encapsulates a primary camera ray
+// Description			:
+/// \brief					Encapsulates a primary camera ray
 // Comments				:
 class	CPrimaryRay : public CRay {
 public:
@@ -55,7 +57,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
-// Description			:	Defines a raytracer
+// Description			:
+/// \brief					Defines a raytracer
 // Comments				:
 class	CPrimaryBundle : public CRayBundle {
 public:
@@ -79,7 +82,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
-// Description			:	Defines a raytracer
+// Description			:
+/// \brief					Defines a raytracer
 // Comments				:
 class	CRaytracer : public CShadingContext {
 public:

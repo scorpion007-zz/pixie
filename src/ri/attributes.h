@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	attributes.h
 //  Classes				:	CAttributes
-//  Description			:	Holds the attributes attached to an object
+//  Description			:
+/// \brief					Holds the attributes attached to an object
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef ATTRIBUTES_H
@@ -68,7 +69,8 @@ const	float				ATTRIBUTES_MIN_SHADINGRATE					=	C_EPSILON;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CActiveLight
-// Description			:	Holds an active light source instance
+// Description			:
+/// \brief					Holds an active light source instance
 // Comments				:
 class	CActiveLight {
 public:
@@ -89,7 +91,8 @@ typedef enum {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
-// Description			:	This class encapsulates the attributes attached
+// Description			:
+/// \brief					This class encapsulates the attributes attached
 //							to a surface. Surfaces that have the same set of 
 //							attributes share a common clone to avoid unnecessary
 //							memory allocation.

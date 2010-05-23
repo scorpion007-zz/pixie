@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	random.cpp
 //  Classes				:	CSobol, CSphereSampler, CCosineSampler
-//  Description			:	Several random generators
+//  Description			:
+/// \brief					Several random generators
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -117,9 +118,11 @@ const int v_init[8][SOBOL_MAX_DIMENSION] = {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	sampleHemisphere
-// Description			:	Sample vectors distributed uniformly in a hemisphere
+// Description			:
+/// \brief					Sample vectors distributed uniformly in a hemisphere
 // Return Value			:
-// Comments				:	Z must be unit
+// Comments				:
+/// \note					Z must be unit
 void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator) {
 	float	P[4];
 	vector	Po;
@@ -155,9 +158,11 @@ void	sampleHemisphere(float *R,const float *Z,const float theta,CSobol<4> &gener
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	sampleHemisphere
-// Description			:	Sample vectors distributed uniformly in a hemisphere
+// Description			:
+/// \brief					Sample vectors distributed uniformly in a hemisphere
 // Return Value			:
-// Comments				:	Z must be unit
+// Comments				:
+/// \note					Z must be unit
 void		sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4> &generator) {
 	float			P[4];
 	vector			Po;
@@ -194,7 +199,8 @@ void		sampleCosineHemisphere(float *R,const float *Z,const float theta,CSobol<4>
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	sampleSphere
-// Description			:	Sample a point in a unit sphere
+// Description			:
+/// \brief					Sample a point in a unit sphere
 // Return Value			:
 // Comments				:
 void	sampleSphere(float *P,CSobol<3> &generator) {

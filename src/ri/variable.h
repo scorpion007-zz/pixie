@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	variable.h
 //  Classes				:	CVariable
-//  Description			:	This class holds variable information
+//  Description			:
+/// \brief					This class holds variable information
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef VARIABLE_H
@@ -37,7 +38,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CVariable
-// Description			:	This class holds information about a variable
+// Description			:
+/// \brief					This class holds information about a variable
 // Comments				:	FIXME: Maximum length of a variable's name is 63 characters
 class CVariable {
 public:

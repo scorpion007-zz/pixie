@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	show.h
 //  Classes				:	-
-//  Description			:	The wrapped openGL interface
+//  Description			:
+/// \brief					The wrapped openGL interface
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef SHOW_H
@@ -38,7 +39,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShow
-// Description			:	This is just a wrapper to visualize a file
+// Description			:
+/// \brief					This is just a wrapper to visualize a file
 // Comments				:
 class	CShow : public CShadingContext {
 public:

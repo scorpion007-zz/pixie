@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	fbx.cpp
 //  Classes				:	CXDisplay
-//  Description			:	X Windows image displaying class
+//  Description			:
+/// \brief					X Windows image displaying class
 //
 ////////////////////////////////////////////////////////////////////////
 #include "common/global.h"
@@ -69,7 +70,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayThread
-// Description			:	Starts the display thread
+// Description			:
+/// \brief					Starts the display thread
 // Return Value			:
 // Comments				:
 void		*displayThread(void *w) {
@@ -85,7 +87,8 @@ void		*displayThread(void *w) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
 // Method				:	CXDisplay
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CXDisplay::CXDisplay(const char *name,const char *samples,int width,int height,int numSamples)
@@ -227,7 +230,8 @@ CXDisplay::CXDisplay(const char *name,const char *samples,int width,int height,i
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
 // Method				:	~CXDisplay
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CXDisplay::~CXDisplay() {
@@ -238,7 +242,8 @@ CXDisplay::~CXDisplay() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
 // Method				:	main
-// Description			:	The main display loop
+// Description			:
+/// \brief					The main display loop
 // Return Value			:	-
 // Comments				:
 void	CXDisplay::main() {
@@ -369,7 +374,8 @@ void	CXDisplay::main() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
 // Method				:	finish
-// Description			:	Finish displaying data
+// Description			:
+/// \brief					Finish displaying data
 // Return Value			:	-
 // Comments				:
 void		CXDisplay::finish() {
@@ -384,7 +390,8 @@ void		CXDisplay::finish() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
 // Method				:	handleData_xxx
-// Description			:	Stuff data into pixmap
+// Description			:
+/// \brief					Stuff data into pixmap
 // Return Value			:	-
 // Comments				:
 
@@ -535,7 +542,8 @@ DEFINE_DATA_HANDLER(abgr32,color_abgr,get_pix_abgr)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CXDisplay
 // Method				:	data
-// Description			:	Commit the image data
+// Description			:
+/// \brief					Commit the image data
 // Return Value			:	-
 // Comments				:
 int		CXDisplay::data(int x,int y,int w,int h,float *d) {

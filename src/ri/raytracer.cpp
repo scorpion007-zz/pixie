@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPrimaryBundle
 // Method				:	CPrimaryBundle
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOrder,int numExtraSamp,float *sampDefaults) {
@@ -69,7 +70,8 @@ CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOr
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPrimaryBundle
 // Method				:	~CPrimaryBundle
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPrimaryBundle::~CPrimaryBundle() {
@@ -91,7 +93,8 @@ int		CPrimaryBundle::postTraceAction() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	postShade
-// Description			:	Record the raytracing results
+// Description			:
+/// \brief					Record the raytracing results
 // Return Value			:	-
 // Comments				:
 void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
@@ -231,7 +234,8 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	CRaytracer
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 void	CPrimaryBundle::postShade(int nr,CRay **r) {
@@ -267,7 +271,8 @@ void	CPrimaryBundle::postShade(int nr,CRay **r) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	CRaytracer
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 void	CPrimaryBundle::post() {
@@ -280,7 +285,8 @@ void	CPrimaryBundle::post() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	CRaytracer
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRenderer::shootStep,CRenderer::numSamples,CRenderer::numExtraChannels,CRenderer::sampleOrder,CRenderer::numExtraSamples,CRenderer::sampleDefaults)  {
@@ -298,7 +304,8 @@ CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRen
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	~CRaytracer
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CRaytracer::~CRaytracer() {
@@ -310,7 +317,8 @@ CRaytracer::~CRaytracer() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	replace
-// Description			:	Replace the occurance of a pointer with another
+// Description			:
+/// \brief					Replace the occurance of a pointer with another
 // Return Value			:	-
 // Comments				:
 void	CRaytracer::renderingLoop() {
@@ -379,7 +387,8 @@ void	CRaytracer::renderingLoop() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	sampleFi
-// Description			:	Samples a rectangular array of pixels
+// Description			:
+/// \brief					Samples a rectangular array of pixels
 // Return Value			:	-
 // Comments				:
 void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
@@ -454,7 +463,8 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	computeSamples
-// Description			:	Raytrace the sample locations
+// Description			:
+/// \brief					Raytrace the sample locations
 // Return Value			:	-
 // Comments				:
 void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
@@ -540,7 +550,8 @@ void	CRaytracer::computeSamples(CPrimaryRay *rays,int numShading) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRaytracer
 // Method				:	splatSamples
-// Description			:	Splat the samples on the image
+// Description			:
+/// \brief					Splat the samples on the image
 // Return Value			:	-
 // Comments				:
 void	CRaytracer::splatSamples(CPrimaryRay *samples,int numShading,int left,int top,int xpixels,int ypixels) {

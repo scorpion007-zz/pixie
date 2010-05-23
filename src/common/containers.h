@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -31,7 +31,8 @@
 //							CMemPool
 //							CMemStack
 //							CArray
-//  Description			:	Misc template data structures
+//  Description			:
+/// \brief					Misc template data structures
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef CONTAINERS_H
@@ -54,7 +55,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDictionary
-// Description			:	Pure virtual parent class for dictionary
+// Description			:
+/// \brief					Pure virtual parent class for dictionary
 // Comments				:
 template <class keyType,class valType> class CDictionary  {
 public:
@@ -82,13 +84,15 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHash
-// Description			:	Hash table
+// Description			:
+/// \brief					Hash table
 // Comments				:
 template <class keyType,class valType>	class CHash : public CDictionary<keyType,valType> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CHashBucket
-	// Description			:	Hash table
+	// Description			:
+/// \brief					Hash table
 	// Comments				:
 	class CHashBucket {
 	public:
@@ -242,13 +246,15 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTrie
-// Description			:	Trie class
+// Description			:
+/// \brief					Trie class
 // Comments				:
 template <class valType> class CTrie : public CDictionary<const char *,valType> {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CTrieLeaf
-	// Description			:	Encapsulates a trie leaf
+	// Description			:
+/// \brief					Encapsulates a trie leaf
 	// Comments				:
 	class CTrieLeaf {
 	public:
@@ -263,7 +269,8 @@ template <class valType> class CTrie : public CDictionary<const char *,valType> 
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CTrieNode
-	// Description			:	Encapsulates a trie internal node
+	// Description			:
+/// \brief					Encapsulates a trie internal node
 	// Comments				:
 	class CTrieNode {
 	public:
@@ -432,13 +439,15 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPqueue
-// Description			:	Priority queue
+// Description			:
+/// \brief					Priority queue
 // Comments				:
 template <class ItemType,class PriorityType> class CPqueue  {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CPqueueItem
-	// Description			:	Holds a priority queue item
+	// Description			:
+/// \brief					Holds a priority queue item
 	// Comments				:
 	class	CPqueueItem	{
 	public:
@@ -652,13 +661,15 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMemStack
-// Description			:	A stack based memory manager
+// Description			:
+/// \brief					A stack based memory manager
 // Comments				:
 class CMemStack {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CMemPage
-	// Description			:	This class contains a memory page
+	// Description			:
+/// \brief					This class contains a memory page
 	// Comments				:
 	class CMemPage {
 	public:
@@ -760,7 +771,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CArray
-// Description			:	Array
+// Description			:
+/// \brief					Array
 // Comments				:
 template <class T> class CArray {
 public:
@@ -840,8 +852,10 @@ protected:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CList
-// Description			:	List
-// Comments				:	This class provides iteration functionality over an array
+// Description			:
+/// \brief					List
+// Comments				:
+/// \note					This class provides iteration functionality over an array
 template <class T>	class CList : public CArray<T> {
 public:
 						CList() {

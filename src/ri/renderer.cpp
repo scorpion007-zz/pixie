@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -284,7 +284,8 @@ const CUserAttributeDictionary	*CRenderer::userOptions					=	NULL;					// initia
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	beginRenderer
-// Description			:	Begin the renderer
+// Description			:
+/// \brief					Begin the renderer
 // Return Value			:	-
 // Comments				:
 void		CRenderer::beginRenderer(CRendererContext *c,const char *ribFile,const char *riNetString) {
@@ -328,7 +329,8 @@ void		CRenderer::beginRenderer(CRendererContext *c,const char *ribFile,const cha
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	endRenderer
-// Description			:	End the renderer
+// Description			:
+/// \brief					End the renderer
 // Return Value			:	-
 // Comments				:
 void		CRenderer::endRenderer() {
@@ -378,7 +380,8 @@ void		CRenderer::endRenderer() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	copyOptions
-// Description			:	Make a local copy of the options
+// Description			:
+/// \brief					Make a local copy of the options
 // Return Value			:	-
 // Comments				:
 static void	copyOptions(const COptions *o) {
@@ -921,7 +924,8 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	endFrame
-// Description			:	Finish the frame
+// Description			:
+/// \brief					Finish the frame
 // Return Value			:	-
 // Comments				:
 void		CRenderer::endFrame() {
@@ -1032,7 +1036,8 @@ void		CRenderer::endFrame() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	render
-// Description			:	Add an object into the scene
+// Description			:
+/// \brief					Add an object into the scene
 // Return Value			:
 // Comments				:
 void			CRenderer::render(CObject *cObject) {
@@ -1087,7 +1092,8 @@ void			CRenderer::render(CObject *cObject) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	dispatcherThread
-// Description			:	This thread is responsible for dispatching needed buckets
+// Description			:
+/// \brief					This thread is responsible for dispatching needed buckets
 //							the servers
 // Return Value			:
 // Comments				:
@@ -1099,7 +1105,8 @@ static	TFunPrefix		serverDispatchThread(void *w) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rendererThread
-// Description			:	This thread is responsible for rendering
+// Description			:
+/// \brief					This thread is responsible for rendering
 // Return Value			:
 // Comments				:
 static	TFunPrefix		rendererDispatchThread(void *w) {
@@ -1112,7 +1119,8 @@ static	TFunPrefix		rendererDispatchThread(void *w) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	renderFrame
-// Description			:	Render the frame
+// Description			:
+/// \brief					Render the frame
 // Return Value			:	-
 // Comments				:
 void		CRenderer::renderFrame() {

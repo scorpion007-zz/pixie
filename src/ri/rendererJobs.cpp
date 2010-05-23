@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	rendererJobs.cpp
 //  Classes				:	CRenderer
-//  Description			:	Functions that deal with the actual rendering
+//  Description			:
+/// \brief					Functions that deal with the actual rendering
 //
 ////////////////////////////////////////////////////////////////////////
 #include "renderer.h"
@@ -42,7 +43,8 @@ void			(*CRenderer::dispatchJob)(int thread,CJob &job)	=	NULL;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	dispatchReyes
-// Description			:	Dispatch individual buckets
+// Description			:
+/// \brief					Dispatch individual buckets
 // Return Value			:	-
 // Comments				:	-
 void			CRenderer::dispatchReyes(int thread,CJob &job) {
@@ -150,7 +152,8 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	getJob
-// Description			:	This function is used by the hiders to request a job
+// Description			:
+/// \brief					This function is used by the hiders to request a job
 // Return Value			:	-
 // Comments				:	-
 void			CRenderer::dispatchPhoton(int thread,CJob &job) {
@@ -190,7 +193,8 @@ void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	advanceBucket
-// Description			:	Advance the bucket for network parallel rendering
+// Description			:
+/// \brief					Advance the bucket for network parallel rendering
 // Return Value			:	TRUE if we're still rendering, FALSE otherwise
 // Comments				:
 int				CRenderer::advanceBucket(int index,int &x,int &y) {
@@ -256,7 +260,8 @@ int				CRenderer::advanceBucket(int index,int &x,int &y) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	serverThread
-// Description			:	This function actually manages the servers
+// Description			:
+/// \brief					This function actually manages the servers
 // Return Value			:
 // Comments				:
 void		CRenderer::serverThread(void *w) {
@@ -357,7 +362,8 @@ void		CRenderer::serverThread(void *w) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	processServerRequest
-// Description			:	Process a server request
+// Description			:
+/// \brief					Process a server request
 // Return Value			:	-
 // Comments				:
 void			CRenderer::processServerRequest(T32 req,int index) {

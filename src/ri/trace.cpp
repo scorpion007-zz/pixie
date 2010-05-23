@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	trace.cpp
 //  Classes				:	CShadingContext
-//  Description			:	This file implements raytracing functionality of the shading context
+//  Description			:
+/// \brief					This file implements raytracing functionality of the shading context
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -316,7 +317,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	trace
-// Description			:	Trace a single ray
+// Description			:
+/// \brief					Trace a single ray
 // Return Value			:	-
 // Comments				:	Assume the following fields of CRay have been set:
 //							1. from

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	radiance.cpp
 //  Classes				:	CRadianceCache
-//  Description			:	This class holds a radiance cache
+//  Description			:
+/// \brief					This class holds a radiance cache
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -67,7 +68,8 @@ static	int		plusOnes[6][5]			=	{
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTriTon
-// Description			:	This holds a triangle
+// Description			:
+/// \brief					This holds a triangle
 // Comments				:
 class	CTriTon : public CTon {
 public:
@@ -88,7 +90,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTriangleHash
-// Description			:	A hash that holds the contribution that comes from faraway geometry
+// Description			:
+/// \brief					A hash that holds the contribution that comes from faraway geometry
 // Comments				:
 class	CTriangleHash : public CMap<CTriTon> {
 public:
@@ -323,7 +326,8 @@ private:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	CRadianceCache
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *bmin,const float *bmax,FILE *in,CArray<CTriangle *> *t) : CCache(name,mode) {
@@ -367,7 +371,8 @@ CRadianceCache::CRadianceCache(const char *name,unsigned int mode,const float *b
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	~CRadianceCache
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CRadianceCache::~CRadianceCache() {
@@ -404,7 +409,8 @@ CRadianceCache::~CRadianceCache() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	lookup
-// Description			:	Lookup da radiance cache
+// Description			:
+/// \brief					Lookup da radiance cache
 // Return Value			:	-
 // Comments				:
 void		CRadianceCache::lookup(float *C,const float *P,const float *N,const CGlobalIllumLookup *lookup) {
@@ -461,7 +467,8 @@ void		CRadianceCache::lookup(float *C,const float *P,const float *N,const CGloba
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	cachesample
-// Description			:	Check the existance of a sample in the cache
+// Description			:
+/// \brief					Check the existance of a sample in the cache
 // Return Value			:	-
 // Comments				:
 void		CRadianceCache::cachesample(float *C,const float *P,const float *N,float dP) {
@@ -516,7 +523,8 @@ void		CRadianceCache::cachesample(float *C,const float *P,const float *N,float d
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	finalize
-// Description			:	Finalize da cache
+// Description			:
+/// \brief					Finalize da cache
 // Return Value			:	-
 // Comments				:
 void		CRadianceCache::finalize(const CGlobalIllumLookup *l) {
@@ -696,7 +704,8 @@ void		CRadianceCache::finalize(const CGlobalIllumLookup *l) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	preparetriangles
-// Description			:	Split the triangles as necessary
+// Description			:
+/// \brief					Split the triangles as necessary
 // Return Value			:	-
 // Comments				:
 void	CRadianceCache::prepareTriangles() {
@@ -753,7 +762,8 @@ void	CRadianceCache::prepareTriangles() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	split
-// Description			:	Split a triangle
+// Description			:
+/// \brief					Split a triangle
 // Return Value			:	-
 // Comments				:
 void					CRadianceCache::split(const float *corners,const float *N,CAttributes *attributes) {
@@ -909,7 +919,8 @@ void					CRadianceCache::split(const float *corners,const float *N,CAttributes *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	writeNode
-// Description			:	Write a cache node onto the disk
+// Description			:
+/// \brief					Write a cache node onto the disk
 // Return Value			:	-
 // Comments				:
 void					CRadianceCache::writeNode(FILE *out,CRadianceNode *node) {
@@ -938,7 +949,8 @@ void					CRadianceCache::writeNode(FILE *out,CRadianceNode *node) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	readNode
-// Description			:	Read a cache node from disk
+// Description			:
+/// \brief					Read a cache node from disk
 // Return Value			:	-
 // Comments				:
 CRadianceCache::CRadianceNode				*CRadianceCache::readNode(FILE *in) {
@@ -978,7 +990,8 @@ CRadianceCache::CRadianceNode				*CRadianceCache::readNode(FILE *in) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	compute
-// Description			:	Compute the harmonic samples
+// Description			:
+/// \brief					Compute the harmonic samples
 // Return Value			:	-
 // Comments				:
 void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLookup *texLookup) {
@@ -1230,7 +1243,8 @@ void			CRadianceCache::compute(int numSamples,CShadingPoint **points,CTextureLoo
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	partition
-// Description			:	Partition the shading points into two clusters
+// Description			:
+/// \brief					Partition the shading points into two clusters
 // Return Value			:	-
 // Comments				:
 int				CRadianceCache::partition(int numRays,CShadingPoint **rays) {
@@ -1350,7 +1364,8 @@ int				CRadianceCache::partition(int numRays,CShadingPoint **rays) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	draw
-// Description			:	Draw the sucker
+// Description			:
+/// \brief					Draw the sucker
 // Return Value			:	-
 // Comments				:
 void		CRadianceCache::draw() {
@@ -1401,7 +1416,8 @@ void		CRadianceCache::draw() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRadianceCache
 // Method				:	bound
-// Description			:	Bound the structure
+// Description			:
+/// \brief					Bound the structure
 // Return Value			:	-
 // Comments				:
 void		CRadianceCache::bound(float *bmin,float *bmax) {

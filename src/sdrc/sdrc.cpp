@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	sdrc.cpp
 //  Classes				:	-
-//  Description			:	The main shader compiler source code
+//  Description			:
+/// \brief					The main shader compiler source code
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -105,7 +106,8 @@ static	const char	*argumentQuietInfo				=			"-q";
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printVersion
-// Description			:	Print the version
+// Description			:
+/// \brief					Print the version
 // Return Value			:	-
 // Comments				:
 void	printVersion() {
@@ -117,7 +119,8 @@ void	printVersion() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printUsage
-// Description			:	Print the compiler usage
+// Description			:
+/// \brief					Print the compiler usage
 // Return Value			:	-
 // Comments				:
 void	printUsage() {
@@ -140,7 +143,8 @@ void	printUsage() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	initError
-// Description			:	Display an error and exit
+// Description			:
+/// \brief					Display an error and exit
 // Return Value			:	-
 // Comments				:
 void	initError(char *mes,...) {
@@ -154,7 +158,8 @@ void	initError(char *mes,...) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	append
-// Description			:	Append a file name
+// Description			:
+/// \brief					Append a file name
 // Return Value			:	-
 // Comments				:
 int		append(const char *file,void *ud) {
@@ -168,7 +173,8 @@ int		append(const char *file,void *ud) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
-// Description			:	Shading compiler main
+// Description			:
+/// \brief					Shading compiler main
 // Return Value			:	-
 // Comments				:
 int main(int argc, char* argv[]) {

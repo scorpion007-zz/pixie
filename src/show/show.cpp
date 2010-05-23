@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	show.cpp
 //  Classes				:	-
-//  Description			:	The main show file
+//  Description			:
+/// \brief					The main show file
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
@@ -39,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
-// Description			:	Da main function for show
+// Description			:
+/// \brief					Da main function for show
 // Return Value			:	1 on failure, 0 on success
 // Comments				:
 int	main(int argc,char *argv[]) {

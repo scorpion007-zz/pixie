@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -52,14 +52,16 @@ class CRemoteICacheChannel;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
-// Description			:	Encapsulates an irradiance cache
+// Description			:
+/// \brief					Encapsulates an irradiance cache
 // Comments				:
 class	CIrradianceCache : public CTexture3d {
 public:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CIrradiance
-	// Description			:	Holds irradiance information on a surface
+	// Description			:
+/// \brief					Holds irradiance information on a surface
 	// Comments				:
 	class	CCacheSample {
 	public:
@@ -78,7 +80,8 @@ public:
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CIrradianceNode
-	// Description			:	Holds information about incident illumination
+	// Description			:
+/// \brief					Holds information about incident illumination
 	// Comments				:
 	class	CCacheNode {
 	public:

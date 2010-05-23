@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	patchgrid.cpp
 //  Classes				:	
-//  Description			:	Patchgrid implementation
+//  Description			:
+/// \brief					Patchgrid implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -48,7 +49,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchGrid
 // Method				:	CPatchGrid
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,int nu,int nv,int bTop,int bRgt,int bBot,int bLft,float *ve) : CSurface(a,x) {
@@ -187,7 +189,8 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPatchGrid
 // Method				:	~CPatchGrid
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPatchGrid::~CPatchGrid() {

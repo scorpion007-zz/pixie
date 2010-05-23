@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -94,7 +94,8 @@ const	unsigned int		SHADERFLAGS_NONSPECULAR			=	4;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderData
-// Description			:	This class records extra data for a shader instance
+// Description			:
+/// \brief					This class records extra data for a shader instance
 // Comments				:
 class CShaderData {
 public:
@@ -104,7 +105,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLightShaderData
-// Description			:	This class records data for a light
+// Description			:
+/// \brief					This class records data for a light
 // Comments				:
 class CLightShaderData : public CShaderData {
 public:
@@ -125,7 +127,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShader
-// Description			:	This class encapsulates a shader
+// Description			:
+/// \brief					This class encapsulates a shader
 // Comments				:
 class	CShader	: public CFileResource {
 public:
@@ -165,7 +168,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderInstance
-// Description			:	This class encapsulates an instance of a shader
+// Description			:
+/// \brief					This class encapsulates an instance of a shader
 // Comments				:
 class	CShaderInstance : public CRefCounter {
 public:
@@ -192,13 +196,15 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CProgrammableShaderInstance
-// Description			:	This class encapsulates an instance of a programmable shader
+// Description			:
+/// \brief					This class encapsulates an instance of a programmable shader
 // Comments				:
 class	CProgrammableShaderInstance : public CShaderInstance {
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CAllocatedString
-	// Description			:	We use this class to keep track of the allocated strings for parameters
+	// Description			:
+/// \brief					We use this class to keep track of the allocated strings for parameters
 	// Comments				:
 	class	CAllocatedString {
 	public:

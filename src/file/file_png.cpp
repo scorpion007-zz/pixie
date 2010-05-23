@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	file_png.cpp
 //  Classes				:
-//  Description			:	This file implements the PNG writer output device
+//  Description			:
+/// \brief					This file implements the PNG writer output device
 //							PNG only does 8 and 16 bit pixel depths, so 32bits or floats give error
 //							Gamma is stored in the metadata and does not change pixel values
 //
@@ -43,7 +44,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferPNG
-// Description			:	Holds the framebuffer
+// Description			:
+/// \brief					Holds the framebuffer
 // Comments				:
 CFileFramebufferPNG::CFileFramebufferPNG(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter): 
 CFileFramebuffer() 
@@ -183,7 +185,8 @@ CFileFramebuffer()
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferPNG
 // Method				:	~CFileFramebufferPNG
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CFileFramebufferPNG::~CFileFramebufferPNG() {
@@ -211,7 +214,8 @@ CFileFramebufferPNG::~CFileFramebufferPNG() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferPNG
 // Method				:	write
-// Description			:	Write image data to the file
+// Description			:
+/// \brief					Write image data to the file
 // Return Value			:	-
 // Comments				:
 void CFileFramebufferPNG::write(int x,int y,int w,int h,float *data) 

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	attributes.cpp
 //  Classes				:	CAttributes
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -148,7 +149,8 @@ CAttributes::CAttributes() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	CAttributes
-// Description			:	This functions creates an exact replica of 
+// Description			:
+/// \brief					This functions creates an exact replica of 
 //							another attribute set
 // Return Value			:	-
 // Comments				:
@@ -197,7 +199,8 @@ CAttributes::CAttributes(const CAttributes *a) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	~CAttributes
-// Description			:	Deallocate everything
+// Description			:
+/// \brief					Deallocate everything
 // Return Value			:	-
 // Comments				:
 CAttributes::~CAttributes(){
@@ -260,7 +263,8 @@ void	CAttributes::addLight(CShaderInstance *cLight) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	removeLight
-// Description			:	This method must be used to remove a light
+// Description			:
+/// \brief					This method must be used to remove a light
 //							source from the active light source list
 // Return Value			:	-
 // Comments				:
@@ -283,7 +287,8 @@ void	CAttributes::removeLight(CShaderInstance *light) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	lightParameterCheck
-// Description			:	Check the light parameters
+// Description			:
+/// \brief					Check the light parameters
 // Return Value			:	-
 // Comments				:
 void	CAttributes::checkParameters() {
@@ -307,7 +312,8 @@ void	CAttributes::checkParameters() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	findParameter
-// Description			:	Find a particular parameter
+// Description			:
+/// \brief					Find a particular parameter
 // Return Value			:	-
 // Comments				:
 CVariable	*CAttributes::findParameter(const char *name) {
@@ -337,7 +343,8 @@ CVariable	*CAttributes::findParameter(const char *name) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	restore
-// Description			:	Restore some portion of the shading state from another attribute block
+// Description			:
+/// \brief					Restore some portion of the shading state from another attribute block
 // Return Value			:	-
 // Comments				:
 void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding) {
@@ -420,7 +427,8 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	find
-// Description			:	Find a particular attribute
+// Description			:
+/// \brief					Find a particular attribute
 // Return Value			:	-
 // Comments				:
 int		CAttributes::find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const {
@@ -497,7 +505,8 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	findShadingModel
-// Description			:	Find the shading model from text
+// Description			:
+/// \brief					Find the shading model from text
 // Return Value			:	-
 // Comments				:
 EShadingModel		CAttributes::findShadingModel(const char *val) {
@@ -524,7 +533,8 @@ EShadingModel		CAttributes::findShadingModel(const char *val) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	findShadingModel
-// Description			:	The other way around
+// Description			:
+/// \brief					The other way around
 // Return Value			:	-
 // Comments				:
 const char			*CAttributes::findShadingModel(EShadingModel model) {
@@ -558,7 +568,8 @@ const char			*CAttributes::findShadingModel(EShadingModel model) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	findHitMode
 // Method				:	setHitmode
-// Description			:	Translate hitmode from string
+// Description			:
+/// \brief					Translate hitmode from string
 // Return Value			:	-
 // Comments				:
 char		CAttributes::findHitMode(const char *mode) {
@@ -577,7 +588,8 @@ char		CAttributes::findHitMode(const char *mode) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CAttributes
 // Method				:	findHitMode
-// Description			:	The other way around
+// Description			:
+/// \brief					The other way around
 // Return Value			:	-
 // Comments				:
 const char		*CAttributes::findHitMode(char mode) {

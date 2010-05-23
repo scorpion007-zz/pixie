@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -67,7 +67,8 @@ const float		sinphi[]	=	{	0.000000f,0.024541f,0.049068f,0.073565f,0.098017f,0.12
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	CPhotonMap
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource(n) {
@@ -117,7 +118,8 @@ CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	~CPhotonMap
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CPhotonMap::~CPhotonMap() {
@@ -155,7 +157,8 @@ CPhotonMap::~CPhotonMap() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	reset
-// Description			:	Reset the photonmap
+// Description			:
+/// \brief					Reset the photonmap
 // Return Value			:
 // Comments				:
 void	CPhotonMap::reset() {
@@ -165,7 +168,8 @@ void	CPhotonMap::reset() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	write
-// Description			:	Write the photon map into a file
+// Description			:
+/// \brief					Write the photon map into a file
 // Return Value			:
 // Comments				:
 void	CPhotonMap::write(const CXform *world) {
@@ -209,7 +213,8 @@ void	CPhotonMap::write(const CXform *world) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	lookup
-// Description			:	Locate the nearest maxFoundPhoton photons
+// Description			:
+/// \brief					Locate the nearest maxFoundPhoton photons
 // Return Value			:
 // Comments				:	
 int		CPhotonMap::probe(float *C,const float *P,const float *N) {
@@ -289,7 +294,8 @@ int		CPhotonMap::probe(float *C,const float *P,const float *N) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	insert
-// Description			:	Insert a sample
+// Description			:
+/// \brief					Insert a sample
 // Return Value			:
 // Comments				:	
 void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
@@ -348,9 +354,11 @@ void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	lookup
-// Description			:	Locate the nearest maxFoundPhoton photons
+// Description			:
+/// \brief					Locate the nearest maxFoundPhoton photons
 // Return Value			:
-// Comments				:	Nl	must be normalized
+// Comments				:
+/// \note					Nl	must be normalized
 //							Il	must be normalized
 void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) {
 	int				numFound;
@@ -406,9 +414,11 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	lookup
-// Description			:	Locate the nearest maxFoundPhoton photons
+// Description			:
+/// \brief					Locate the nearest maxFoundPhoton photons
 // Return Value			:
-// Comments				:	Nl	must be normalized
+// Comments				:
+/// \note					Nl	must be normalized
 //							Il	must be normalized
 void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 	int				numFound	=	0;
@@ -460,7 +470,8 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	balance
-// Description			:	Balance the map
+// Description			:
+/// \brief					Balance the map
 // Return Value			:
 // Comments				:
 void	CPhotonMap::balance() {
@@ -480,7 +491,8 @@ void	CPhotonMap::balance() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	store
-// Description			:	Store a photon
+// Description			:
+/// \brief					Store a photon
 // Return Value			:
 // Comments				:
 void	CPhotonMap::store(const float *P,const float *N,const float *I,const float *C) {
@@ -497,7 +509,8 @@ void	CPhotonMap::store(const float *P,const float *N,const float *I,const float 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	bound
-// Description			:	Bound the data
+// Description			:
+/// \brief					Bound the data
 // Return Value			:
 // Comments				:
 void	CPhotonMap::bound(float *bmin,float *bmax) {
@@ -512,7 +525,8 @@ void	CPhotonMap::bound(float *bmin,float *bmax) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMap
 // Method				:	draw
-// Description			:	Draw the photonmap
+// Description			:
+/// \brief					Draw the photonmap
 // Return Value			:
 // Comments				:
 void	CPhotonMap::draw() {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	opengl.h
 //  Classes				:	-
-//  Description			:	This is a wrapper for openGL so that Pixie 
+//  Description			:
+/// \brief					This is a wrapper for openGL so that Pixie 
 //							can interact with OpenGL without linkinking to it
 //
 ////////////////////////////////////////////////////////////////////////
@@ -46,7 +47,8 @@ typedef void	(*TGlFileFunction)(const char *fileName);
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CView
-// Description			:	Encapsulates a data view
+// Description			:
+/// \brief					Encapsulates a data view
 // Comments				:	The classes that "show" can visualize must be derived
 class	CView {
 public:

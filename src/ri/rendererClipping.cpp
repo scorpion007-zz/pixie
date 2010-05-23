@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	rendererClipping.cpp
 //  Classes				:	CRenderer
-//  Description			:	Functions that deal with clipping are defines here
+//  Description			:
+/// \brief					Functions that deal with clipping are defines here
 //
 ////////////////////////////////////////////////////////////////////////
 #include "common/global.h"
@@ -36,7 +37,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	beginClipping
-// Description			:	Compute various quantities that have to do with clipping
+// Description			:
+/// \brief					Compute various quantities that have to do with clipping
 // Return Value			:	-
 // Comments				:
 void		CRenderer::beginClipping() {
@@ -87,7 +89,8 @@ void		CRenderer::beginClipping() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	inFrustrum
-// Description			:	Check if the given box is inside the viewing frustrum
+// Description			:
+/// \brief					Check if the given box is inside the viewing frustrum
 // Return Value			:	-
 // Comments				:
 int			CRenderer::inFrustrum(const float *bmin,const float *bmax) {
@@ -156,7 +159,8 @@ int			CRenderer::inFrustrum(const float *bmin,const float *bmax) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	inFrustrum
-// Description			:	Check if the given box is inside the viewing frustrum
+// Description			:
+/// \brief					Check if the given box is inside the viewing frustrum
 // Return Value			:	-
 // Comments				:
 int			CRenderer::inFrustrum(const float *P) {
@@ -186,7 +190,8 @@ int			CRenderer::inFrustrum(const float *P) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRenderer
 // Method				:	clipCode
-// Description			:	Compute the clipping codes for a point
+// Description			:
+/// \brief					Compute the clipping codes for a point
 // Return Value			:	-
 // Comments				:
 unsigned int			CRenderer::clipCode(const float *P) {

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	hcshader.h
 //  Classes				:	-
-//  Description			:	This file holds the hardcoded shaders
+//  Description			:
+/// \brief					This file holds the hardcoded shaders
 //
 ////////////////////////////////////////////////////////////////////////
 #ifndef HCSHADER_H
@@ -38,7 +39,8 @@ class	CActiveLight;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CQuadLight
-// Description			:	This is a quadratic area light source
+// Description			:
+/// \brief					This is a quadratic area light source
 // Comments				:
 class	CQuadLight : public CShaderInstance {
 public:
@@ -66,7 +68,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphereLight
-// Description			:	This is a spherical area light source
+// Description			:
+/// \brief					This is a spherical area light source
 // Comments				:
 class	CSphereLight : public CShaderInstance {
 public:

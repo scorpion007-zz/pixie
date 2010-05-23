@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	execute.cpp
 //  Classes				:	-
-//  Description			:	This file implements the main shader execution
+//  Description			:
+/// \brief					This file implements the main shader execution
 //
 ////////////////////////////////////////////////////////////////////////
 #include <math.h>
@@ -173,7 +174,8 @@ void							convertColorTo(float *,const float *,ECoordinateSystem);
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShadingContext
 // Method				:	execute
-// Description			:	Execute a shader
+// Description			:
+/// \brief					Execute a shader
 // Return Value			:	-
 // Comments				:
 void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **locals) {

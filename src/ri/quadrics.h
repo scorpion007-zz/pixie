@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -40,7 +40,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSphere
-// Description			:	Encapsulates a sphere
+// Description			:
+/// \brief					Encapsulates a sphere
 // Comments				:
 class	CSphere : public CSurface {
 public:
@@ -68,7 +69,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDisk
-// Description			:	Encapsulates a disk
+// Description			:
+/// \brief					Encapsulates a disk
 // Comments				:
 class	CDisk : public CSurface {
 public:
@@ -94,7 +96,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCone
-// Description			:	Encapsulates a cone
+// Description			:
+/// \brief					Encapsulates a cone
 // Comments				:
 class	CCone : public CSurface {
 public:
@@ -122,7 +125,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CParaboloid
-// Description			:	Encapsulates a paraboloid
+// Description			:
+/// \brief					Encapsulates a paraboloid
 // Comments				:
 class	CParaboloid : public CSurface {
 public:
@@ -150,7 +154,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CCylinder
-// Description			:	Encapsulates a cylinder
+// Description			:
+/// \brief					Encapsulates a cylinder
 // Comments				:
 class	CCylinder : public CSurface {
 public:
@@ -177,7 +182,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHyperboloid
-// Description			:	Encapsulates a hyperboloid
+// Description			:
+/// \brief					Encapsulates a hyperboloid
 // Comments				:
 class	CHyperboloid : public CSurface {
 public:
@@ -206,7 +212,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CToroid
-// Description			:	Encapsulates a torus
+// Description			:
+/// \brief					Encapsulates a torus
 // Comments				:
 class	CToroid : public CSurface {
 public:

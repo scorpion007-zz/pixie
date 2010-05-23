@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	file.cpp
 //  Classes				:
-//  Description			:	This file implements the default output device
+//  Description			:
+/// \brief					This file implements the default output device
 //							that sends the image into a file
 //
 ////////////////////////////////////////////////////////////////////////
@@ -48,7 +49,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayStart
-// Description			:	Begin receiving an image
+// Description			:
+/// \brief					Begin receiving an image
 // Return Value			:	The handle to the image on success, NULL othervise
 // Comments				:
 void	*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter) {
@@ -83,7 +85,8 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayData
-// Description			:	Receive image data
+// Description			:
+/// \brief					Receive image data
 // Return Value			:	TRUE on success, FALSE otherwise
 // Comments				:
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
@@ -99,7 +102,8 @@ int		displayData(void *im,int x,int y,int w,int h,float *data) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayFinish
-// Description			:	Finish receiving an image
+// Description			:
+/// \brief					Finish receiving an image
 // Return Value			:	-
 // Comments				:
 void	displayFinish(void *im) {

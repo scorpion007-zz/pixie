@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -41,7 +41,8 @@ class	CPolygonTriangle;
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonMesh
-// Description			:	Encapsulates a polygon mesh
+// Description			:
+/// \brief					Encapsulates a polygon mesh
 // Comments				:
 class	CPolygonMesh : public CObject {
 public:
@@ -70,7 +71,8 @@ private:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonTriangle
-// Description			:	This class is used during the tesselation
+// Description			:
+/// \brief					This class is used during the tesselation
 //							Every polygon is first triangulated to obtain a 
 //							meaningful parameter space. Then individual triangles
 //							(this class) is tesselated into microtriangles
@@ -97,7 +99,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPolygonQuad
-// Description			:	Holds a bilinear polygon
+// Description			:
+/// \brief					Holds a bilinear polygon
 // Comments				:
 class	CPolygonQuad : public CSurface {
 public:

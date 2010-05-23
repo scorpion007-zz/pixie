@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	fbw.cpp
 //  Classes				:	CWinDisplay
-//  Description			:	Implements a window that display the image
+//  Description			:
+/// \brief					Implements a window that display the image
 //
 ////////////////////////////////////////////////////////////////////////
 #include "framebuffer.h"
@@ -70,7 +71,8 @@ inline double round(double x) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	displayThread
-// Description			:	Starts the display thread
+// Description			:
+/// \brief					Starts the display thread
 // Return Value			:
 // Comments				:
 DWORD WINAPI  displayThread(void *w) {
@@ -85,7 +87,8 @@ DWORD WINAPI  displayThread(void *w) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	CWinDisplay
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CWinDisplay::CWinDisplay(const char *name,
@@ -140,7 +143,8 @@ m_alpha(false) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	~CWinDisplay
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CWinDisplay::~CWinDisplay() {
@@ -282,7 +286,8 @@ void CWinDisplay::QuantizeChannels(DWORD channels) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	main
-// Description			:	The main display loop
+// Description			:
+/// \brief					The main display loop
 // Return Value			:	-
 // Comments				:
 void	CWinDisplay::main() {
@@ -469,7 +474,8 @@ void CWinDisplay::ZoomImage(float mag) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	redraw
-// Description			:	Redraw the image
+// Description			:
+/// \brief					Redraw the image
 // Return Value			:	-
 // Comments				:
 void	CWinDisplay::redraw() {
@@ -589,7 +595,8 @@ BOOL CWinDisplay::OnSetCursor() {
 ///////////////////////////////////////////////////////////////////////
 // Class        : CWinDisplay
 // Method				: data
-// Description  : Draw the data onto the screen
+// Description			:
+/// \brief					Draw the data onto the screen
 // Return Value :
 // Comments     : Must be thread safe! Called from multiple threads
 // concurrently.
@@ -669,7 +676,8 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	finish
-// Description			:	Finish displaying the data
+// Description			:
+/// \brief					Finish displaying the data
 // Return Value			:	-
 // Comments				:
 void	CWinDisplay::finish() {
@@ -679,7 +687,8 @@ void	CWinDisplay::finish() {
 
 ///////////////////////////////////////////////////////////////////////
 // Method				:	WndProc
-// Description			:	Windows callback function
+// Description			:
+/// \brief					Windows callback function
 // Return Value			:	-
 // Comments				:
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {

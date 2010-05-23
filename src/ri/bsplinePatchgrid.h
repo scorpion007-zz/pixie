@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -39,7 +39,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CBSplinePatchGrid
 // Description			:	Implements a non-regular catmull-clark subdivision patch
-// Comments				:	This is valid for irregular patches away from the border
+// Comments				:
+/// \note					This is valid for irregular patches away from the border
 class	CBSplinePatchGrid : public CSurface {
 public:
 					CBSplinePatchGrid(CAttributes *,CXform *,CVertexData *,CParameter *,int,int,float,float,float,float,float *);

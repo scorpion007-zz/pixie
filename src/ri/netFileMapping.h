@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -33,7 +33,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CNetFileMapping
-// Description			:	Maps files to alternate paths
+// Description			:
+/// \brief					Maps files to alternate paths
 // Comments				:
 class CNetFileMapping{
 public:

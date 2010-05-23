@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	rndr.cpp
 //  Classes				:	-
-//  Description			:	rib parser
+//  Description			:
+/// \brief					rib parser
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdlib.h>
@@ -44,6 +45,7 @@
 #include <signal.h>
 #endif
 
+/// Buffersize
 #define	BUFFERSIZE			1024
 #define DEFAULT_DAEMON_PORT	24666
 #define	MAX_LOCALSERVERS	8
@@ -73,8 +75,9 @@ extern "C" {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	exitFunction
-// Description			:	This function is called before exitting so that if
-//							we're running a server, it can spawn another one
+// Description			:
+/// \brief					This function is called before exitting so that if
+///							we're running a server, it can spawn another one
 // Return Value			:	-
 // Comments				:
 void	exitFunction() {
@@ -111,7 +114,8 @@ void	exitFunction() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printVersion
-// Description			:	Print the version
+// Description			:
+/// \brief					Print the version
 // Return Value			:	-
 // Comments				:
 void	printVersion() {
@@ -123,7 +127,8 @@ void	printVersion() {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	printUsage
-// Description			:	Print the stinking usage
+// Description			:
+/// \brief					Print the stinking usage
 // Return Value			:	-
 // Comments				:
 void	printUsage() {
@@ -149,12 +154,16 @@ void	printUsage() {
 	printf("\nEnvironment variables:\n");
 	printf("  PIXIEHOME       Pixie installation path\n");
 	printf("  SHADERS         Shader search path\n");
+	printf("  DISPLAYS        Displays search path\n");
+	printf("  PIXIE_RUNPROGRAM\n");
+	printf("                  If is set, write out to stdout\n");
 }
 
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	riThread
-// Description			:	The main rendering thread
+// Description			:
+/// \brief					The main rendering thread
 // Return Value			:
 // Comments				:
 void	riThread(void *w) {
@@ -194,9 +203,11 @@ void	riThread(void *w) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rndrc
-// Description			:	run as a local server and connect to client
+// Description			:
+/// \brief					Run as a local server and connect to client
 // Return Value			:	-
-// Comments				:	Servers connect back to client to avoid race
+// Comments				:
+/// \note					Servers connect back to client to avoid race
 void	rndrc(char *ribFile,int port) {
 	char		managerString[1024];
 	SOCKET		sock;
@@ -281,9 +292,11 @@ retryBind:
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	runLocalServers
-// Description			:	Run a set of subprocess and pre-accept connects
+// Description			:
+/// \brief					Run a set of subprocess and pre-accept connects
 // Return Value			:	-
-// Comments				:	the accepted sockets are handed back in managerString
+// Comments				:
+/// \note					The accepted sockets are handed back in managerString
 int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 	SOCKET		sock;
 	struct		sockaddr_in	me;
@@ -447,7 +460,8 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rndrd
-// Description			:	Run the network daemon
+// Description			:
+/// \brief					Run the network daemon
 // Return Value			:	-
 // Comments				:
 void	rndrd(int port) {
@@ -555,7 +569,8 @@ void	rndrd(int port) {
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	main
-// Description			:	The god
+// Description			:
+/// \brief					The god.
 // Return Value			:	-
 // Comments				:
 int main(int argc, char* argv[]) {

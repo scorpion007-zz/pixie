@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	shaderPl.cpp
 //  Classes				:	CPLLookup
-//  Description			:	Implementation
+//  Description			:
+/// \brief					Implementation
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stddef.h>
@@ -44,7 +45,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPLLookup
 // Method				:	CPLLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPLLookup::CPLLookup() {
@@ -60,7 +62,8 @@ CPLLookup::CPLLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPLLookup
 // Method				:	~CPLLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPLLookup::~CPLLookup() {
@@ -70,7 +73,8 @@ CPLLookup::~CPLLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPLLookup
 // Method				:	bind
-// Description			:	The default action simply prints an error
+// Description			:
+/// \brief					The default action simply prints an error
 // Return Value			:	-
 // Comments				:
 void	CPLLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -80,7 +84,8 @@ void	CPLLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderIn
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPLLookup
 // Method				:	add
-// Description			:	Add a parameter
+// Description			:
+/// \brief					Add a parameter
 // Return Value			:	-
 // Comments				:
 void	CPLLookup::add(const char *name,int opIndex,int step,void *data,size_t dest) {
@@ -109,7 +114,8 @@ void	CPLLookup::add(const char *name,int opIndex,int step,void *data,size_t dest
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
 // Method				:	CTextureLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTextureLookup::CTextureLookup() {
@@ -120,7 +126,8 @@ CTextureLookup::CTextureLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
 // Method				:	~CTextureLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTextureLookup::~CTextureLookup() {
@@ -130,7 +137,8 @@ CTextureLookup::~CTextureLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
 // Method				:	bind
-// Description			:	Bind a texture lookup parameter
+// Description			:
+/// \brief					Bind a texture lookup parameter
 // Return Value			:	-
 // Comments				:
 void		CTextureLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -161,7 +169,8 @@ void		CTextureLookup::bind(const char *name,int &opIndex,int step,void *data,CSh
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CTextureLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -177,9 +186,11 @@ void		CTextureLookup::init(CShadingScratch *scratch,const CAttributes *attribute
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTextureLookup
 // Method				:	init
-// Description			:	Initialize texture lookup scratch for null lookup
+// Description			:
+/// \brief					Initialize texture lookup scratch for null lookup
 // Return Value			:	-
-// Comments				:	used by irradiance cache
+// Comments				:
+/// \note					used by irradiance cache
 void CTextureLookup::staticInit(CShadingScratch *scratch) {
 	scratch->textureParams.filter	=	RiBoxFilter;
 	scratch->textureParams.blur		=	0;
@@ -193,7 +204,8 @@ void CTextureLookup::staticInit(CShadingScratch *scratch) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceLookup
 // Method				:	CTraceLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTraceLookup::CTraceLookup() {
@@ -202,7 +214,8 @@ CTraceLookup::CTraceLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTraceLookup
 // Method				:	~CTraceLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTraceLookup::~CTraceLookup() {
@@ -212,7 +225,8 @@ CTraceLookup::~CTraceLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTransmissionLookup
 // Method				:	bind
-// Description			:	Bind an environment lookup parameter
+// Description			:
+/// \brief					Bind an environment lookup parameter
 // Return Value			:	-
 // Comments				:
 void		CTraceLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -238,7 +252,8 @@ void		CTraceLookup::bind(const char *name,int &opIndex,int step,void *data,CShad
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTransmissionLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CTraceLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -259,7 +274,8 @@ void		CTraceLookup::init(CShadingScratch *scratch,const CAttributes *attributes)
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CEnvironmentLookup
 // Method				:	CEnvironmentLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CEnvironmentLookup::CEnvironmentLookup() {
@@ -270,7 +286,8 @@ CEnvironmentLookup::CEnvironmentLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CEnvironmentLookup
 // Method				:	~CEnvironmentLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CEnvironmentLookup::~CEnvironmentLookup() {
@@ -280,7 +297,8 @@ CEnvironmentLookup::~CEnvironmentLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CEnvironmentLookup
 // Method				:	bind
-// Description			:	Bind an environment lookup parameter
+// Description			:
+/// \brief					Bind an environment lookup parameter
 // Return Value			:	-
 // Comments				:
 void		CEnvironmentLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -308,7 +326,8 @@ void		CEnvironmentLookup::bind(const char *name,int &opIndex,int step,void *data
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CEnvironmentLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CEnvironmentLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -335,7 +354,8 @@ void		CEnvironmentLookup::init(CShadingScratch *scratch,const CAttributes *attri
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMapLookup
 // Method				:	CPhotonMapLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CPhotonMapLookup::CPhotonMapLookup() {
@@ -345,7 +365,8 @@ CPhotonMapLookup::CPhotonMapLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMapLookup
 // Method				:	~CPhotonMapLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CPhotonMapLookup::~CPhotonMapLookup() {
@@ -355,7 +376,8 @@ CPhotonMapLookup::~CPhotonMapLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMapLookup
 // Method				:	bind
-// Description			:	Bind an environment lookup parameter
+// Description			:
+/// \brief					Bind an environment lookup parameter
 // Return Value			:	-
 // Comments				:
 void		CPhotonMapLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -375,7 +397,8 @@ void		CPhotonMapLookup::bind(const char *name,int &opIndex,int step,void *data,C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CPhotonMapLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CPhotonMapLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -388,7 +411,8 @@ void		CPhotonMapLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapInfoLookup
 // Method				:	CMapInfoLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CMapInfoLookup::CMapInfoLookup() {
@@ -398,7 +422,8 @@ CMapInfoLookup::CMapInfoLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CMapInfoLookup
 // Method				:	~CMapInfoLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CMapInfoLookup::~CMapInfoLookup() {
@@ -411,7 +436,8 @@ CMapInfoLookup::~CMapInfoLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dLookup
 // Method				:	CTexture3dLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CTexture3dLookup::CTexture3dLookup() {
@@ -422,7 +448,8 @@ CTexture3dLookup::CTexture3dLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dLookup
 // Method				:	~CTexture3dLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CTexture3dLookup::~CTexture3dLookup() {
@@ -465,7 +492,8 @@ void		CTexture3dLookup::bind(const char *name,int &opIndex,int step,void *data,C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3dLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CTexture3dLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -478,7 +506,8 @@ void		CTexture3dLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CTexture3dLookup::postBind(CShadingScratch *scratch) {
@@ -493,7 +522,8 @@ void		CTexture3dLookup::postBind(CShadingScratch *scratch) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionLookup
 // Method				:	COcclusionLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 COcclusionLookup::COcclusionLookup() {
@@ -504,7 +534,8 @@ COcclusionLookup::COcclusionLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionLookup
 // Method				:	~COcclusionLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 COcclusionLookup::~COcclusionLookup() {
@@ -578,7 +609,8 @@ void		COcclusionLookup::bind(const char *name,int &opIndex,int step,void *data,C
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -610,7 +642,8 @@ void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 ///////////////////////////////////////////////////////////////////////
 // Class				:	COcclusionLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		COcclusionLookup::postBind(CShadingScratch *scratch) {
@@ -623,7 +656,8 @@ void		COcclusionLookup::postBind(CShadingScratch *scratch) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFilterLookup
 // Method				:	CFilterLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CFilterLookup::CFilterLookup() {
@@ -633,7 +667,8 @@ CFilterLookup::CFilterLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFilterLookup
 // Method				:	~CFilterLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CFilterLookup::~CFilterLookup() {
@@ -642,7 +677,8 @@ CFilterLookup::~CFilterLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFilterLookup
 // Method				:	bind
-// Description			:	Bind the filterstep parameters
+// Description			:
+/// \brief					Bind the filterstep parameters
 // Return Value			:	-
 // Comments				:
 void		CFilterLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -660,7 +696,8 @@ void		CFilterLookup::bind(const char *name,int &opIndex,int step,void *data,CSha
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFilterLookup
 // Method				:	init
-// Description			:	Initialize the scratch for this lookup
+// Description			:
+/// \brief					Initialize the scratch for this lookup
 // Return Value			:	-
 // Comments				:
 void		CFilterLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {
@@ -678,7 +715,8 @@ void		CFilterLookup::init(CShadingScratch *scratch,const CAttributes *attributes
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderVectorVariable
-// Description			:	Encapsulates a shader variable
+// Description			:
+/// \brief					Encapsulates a shader variable
 // Comments				:
 class	CShaderVectorVariable : public CGatherVariable {
 public:
@@ -697,7 +735,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CShaderFloatVariable
-// Description			:	Encapsulates a shader variable
+// Description			:
+/// \brief					Encapsulates a shader variable
 // Comments				:
 class	CShaderFloatVariable : public CGatherVariable {
 public:
@@ -717,7 +756,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRayOriginVariable
-// Description			:	Ray origin variable
+// Description			:
+/// \brief					Ray origin variable
 // Comments				:
 class	CRayOriginVariable : public CGatherVariable {
 public:
@@ -734,7 +774,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRayDirVariable
-// Description			:	Ray direction variable
+// Description			:
+/// \brief					Ray direction variable
 // Comments				:
 class	CRayDirVariable : public CGatherVariable {
 public:
@@ -751,7 +792,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CRayLengthVariable
-// Description			:	Ray length variable
+// Description			:
+/// \brief					Ray length variable
 // Comments				:
 class	CRayLengthVariable : public CGatherVariable {
 public:
@@ -770,7 +812,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherLookup
 // Method				:	CGatherLookup
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CGatherLookup::CGatherLookup() {
@@ -783,7 +826,8 @@ CGatherLookup::CGatherLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherLookup
 // Method				:	~CGatherLookup
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CGatherLookup::~CGatherLookup() {
@@ -804,7 +848,8 @@ CGatherLookup::~CGatherLookup() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherLookup
 // Method				:	addOutput
-// Description			:	Adds an output
+// Description			:
+/// \brief					Adds an output
 // Return Value			:	-
 // Comments				:
 void	CGatherLookup::addOutput(const char *output,int destIndex,CShaderInstance *shader) {
@@ -869,7 +914,8 @@ void	CGatherLookup::addOutput(const char *output,int destIndex,CShaderInstance *
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherLookup
 // Method				:	bind
-// Description			:	Bind variables
+// Description			:
+/// \brief					Bind variables
 // Return Value			:	-
 // Comments				:
 void	CGatherLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader) {
@@ -894,7 +940,8 @@ void	CGatherLookup::bind(const char *name,int &opIndex,int step,void *data,CShad
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CGatherLookup
 // Method				:	init
-// Description			:	Init the gather parameters
+// Description			:
+/// \brief					Init the gather parameters
 // Return Value			:	-
 // Comments				:
 void	CGatherLookup::init(CShadingScratch *scratch,const CAttributes *attributes) {

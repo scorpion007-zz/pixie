@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -166,7 +166,8 @@ int				CReyes::numVertexSamples;
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes::CBucket
 // Method				:	CBucket
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CReyes::CBucket::CBucket() {
@@ -177,7 +178,8 @@ CReyes::CBucket::CBucket() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes::CBucket
 // Method				:	~CBucket
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:6
 CReyes::CBucket::~CBucket() {
@@ -186,7 +188,8 @@ CReyes::CBucket::~CBucket() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	CReyes
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CReyes::CReyes(int thread) : CShadingContext(thread) {
@@ -222,7 +225,8 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	~CReyes
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CReyes::~CReyes() {
@@ -262,7 +266,8 @@ CReyes::~CReyes() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	renderingLoop
-// Description			:	This is the rendering loop for the thread
+// Description			:
+/// \brief					This is the rendering loop for the thread
 // Return Value			:	-
 // Comments				:
 void		CReyes::renderingLoop() {
@@ -322,7 +327,8 @@ void		CReyes::renderingLoop() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	render
-// Description			:	Render the current bucket
+// Description			:
+/// \brief					Render the current bucket
 // Return Value			:	-
 // Comments				:
 void	CReyes::render() {
@@ -522,7 +528,8 @@ void	CReyes::render() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	skip
-// Description			:	Skip the current bucket
+// Description			:
+/// \brief					Skip the current bucket
 // Return Value			:
 // Comments				:
 void	CReyes::skip() {
@@ -583,9 +590,11 @@ void	CReyes::skip() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	drawObject
-// Description			:	Draw an object
+// Description			:
+/// \brief					Draw an object
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void		CReyes::drawObject(CObject *object) {
 	float				xmin,xmax,ymin,ymax;
 	float				x[4],y[4];
@@ -732,9 +741,11 @@ void		CReyes::drawObject(CObject *object) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	drawGrid
-// Description			:	Draw a grid
+// Description			:
+/// \brief					Draw a grid
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,float vmin,float vmax) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
@@ -760,9 +771,11 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	drawPoints
-// Description			:	Draw bunch of points
+// Description			:
+/// \brief					Draw bunch of points
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Create a grid on the surface
 	CRasterGrid			*nGrid;
@@ -838,7 +851,8 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	shadeGrid
-// Description			:	Shade a grid
+// Description			:
+/// \brief					Shade a grid
 // Return Value			:	-
 // Comments				:
 void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
@@ -1116,7 +1130,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	copyPoints
-// Description			:	Copy the point data
+// Description			:
+/// \brief					Copy the point data
 // Return Value			:	-
 // Comments				:
 void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int stage) {
@@ -1151,9 +1166,11 @@ void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int st
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	copySamples
-// Description			:	Copy the shading data over
+// Description			:
+/// \brief					Copy the shading data over
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int stage) {
 	const	float	*C		=	varying[VARIABLE_CI];
 	const	float	*O		=	varying[VARIABLE_OI];
@@ -1265,9 +1282,11 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	newObject
-// Description			:	Allocate a new raster object
+// Description			:
+/// \brief					Allocate a new raster object
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	CRasterObject	*nObject;
 
@@ -1290,9 +1309,11 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	newGrid
-// Description			:	Initialize a grid by copying the points
+// Description			:
+/// \brief					Initialize a grid by copying the points
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int points,int numVerticesU,int numVerticesV) {
 	CRasterGrid		*grid;
 
@@ -1330,7 +1351,8 @@ CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int points,int numVertice
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	deleteObject
-// Description			:	Delete a raster object
+// Description			:
+/// \brief					Delete a raster object
 // Return Value			:	-
 // Comments				:	detach is not thread safe. dObject->mutex must be locked
 void				CReyes::deleteObject(CRasterObject *dObject) {
@@ -1380,9 +1402,11 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	insertGrid
-// Description			:	Compute the grid bound and insert the grid into the correct bucket
+// Description			:
+/// \brief					Compute the grid bound and insert the grid into the correct bucket
 // Return Value			:	-
-// Comments				:	Thread safe
+// Comments				:
+/// \note					Thread safe
 void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 	// Compute the grid bound and insert it
 	int				i;
@@ -1623,7 +1647,8 @@ void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	insertObject
-// Description			:	Insert an object into all hiders
+// Description			:
+/// \brief					Insert an object into all hiders
 // Return Value			:
 // Comments				:	* Called from parse thread *
 void	CReyes::insertObject(CRasterObject *object) {

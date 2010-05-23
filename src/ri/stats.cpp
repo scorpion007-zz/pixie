@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	stats.h
 //  Classes				:	CStats
-//  Description			:	Holds statistics about the renderer
+//  Description			:
+/// \brief					Holds statistics about the renderer
 //
 ////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
@@ -46,7 +47,8 @@ extern "C" {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStats
 // Method				:	reset
-// Description			:	Reset the renderer statistics
+// Description			:
+/// \brief					Reset the renderer statistics
 // Return Value			:
 // Comments				:
 void	CStats::reset() {
@@ -122,7 +124,8 @@ void	CStats::reset() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStats
 // Method				:	printStats
-// Description			:	Prints the statistics
+// Description			:
+/// \brief					Prints the statistics
 // Return Value			:
 // Comments				:
 void	CStats::printStats(int level) {
@@ -210,7 +213,8 @@ void	CStats::printStats(int level) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStats
 // Method				:	check
-// Description			:	Make sure everything is deallocated
+// Description			:
+/// \brief					Make sure everything is deallocated
 // Return Value			:
 // Comments				:
 void	CStats::check() {

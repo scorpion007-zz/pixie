@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -65,7 +65,8 @@ CTexture3d::CChannel	CIrradianceCache::cacheChannels[3]	=	{
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	CIrradianceCache
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:
 // Comments				:
 CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,const float *from,const float *to,const float *tondc) : CTexture3d(name,from,to,tondc,3,cacheChannels) {
@@ -119,7 +120,8 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	~CIrradianceCache
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:
 // Comments				:
 CIrradianceCache::~CIrradianceCache() {
@@ -150,7 +152,8 @@ CIrradianceCache::~CIrradianceCache() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	writeNode
-// Description			:	Write a node into a file
+// Description			:
+/// \brief					Write a node into a file
 // Return Value			:
 // Comments				:
 void			CIrradianceCache::writeNode(FILE *out,CCacheNode *cNode) {
@@ -177,7 +180,8 @@ void			CIrradianceCache::writeNode(FILE *out,CCacheNode *cNode) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	readNode
-// Description			:	Read a node from file
+// Description			:
+/// \brief					Read a node from file
 // Return Value			:
 // Comments				:
 CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
@@ -208,7 +212,8 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	lookup
-// Description			:	Lookup da cache
+// Description			:
+/// \brief					Lookup da cache
 // Return Value			:
 // Comments				:
 void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const float *cdPdv,const float *cN,CShadingContext *context) {
@@ -373,7 +378,8 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const 
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CHemisphereSample
-// Description			:	This class is used to hold data about a hemisphere sample
+// Description			:
+/// \brief					This class is used to hold data about a hemisphere sample
 // Comments				:	-
 class	CHemisphereSample {
 public:
@@ -391,7 +397,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	posGradient
-// Description			:	Compute the positional gradient for bunch of data points
+// Description			:
+/// \brief					Compute the positional gradient for bunch of data points
 // Return Value			:	-
 // Comments				:
 inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
@@ -492,7 +499,8 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	rotGradient
-// Description			:	Compute the rotational gradient for bunch of data points
+// Description			:
+/// \brief					Compute the rotational gradient for bunch of data points
 // Return Value			:	-
 // Comments				:
 inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float *X,const float *Y) {
@@ -546,7 +554,8 @@ inline	void	rotGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	sample
-// Description			:	Sample the occlusion
+// Description			:
+/// \brief					Sample the occlusion
 // Return Value			:
 // Comments				:
 void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const float *dPdv,const float *N,CShadingContext *context) {
@@ -902,7 +911,8 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	clamp
-// Description			:	Clamp the radius
+// Description			:
+/// \brief					Clamp the radius
 // Return Value			:
 // Comments				:
 void		CIrradianceCache::clamp(CCacheSample *nSample) {
@@ -954,7 +964,8 @@ void		CIrradianceCache::clamp(CCacheSample *nSample) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	draw
-// Description			:	Draw the irradiance cache
+// Description			:
+/// \brief					Draw the irradiance cache
 // Return Value			:
 // Comments				:
 void		CIrradianceCache::draw() {
@@ -1016,7 +1027,8 @@ void		CIrradianceCache::draw() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	keyDown
-// Description			:	handle keypresses
+// Description			:
+/// \brief					handle keypresses
 // Return Value			:	-
 // Comments				:
 int			CIrradianceCache::keyDown(int key) {
@@ -1035,7 +1047,8 @@ int			CIrradianceCache::keyDown(int key) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CIrradianceCache
 // Method				:	bound
-// Description			:	Bound the irradiance cache
+// Description			:
+/// \brief					Bound the irradiance cache
 // Return Value			:
 // Comments				:
 void		CIrradianceCache::bound(float *bmin,float *bmax) {

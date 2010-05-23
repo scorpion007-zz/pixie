@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -25,7 +25,8 @@
 //
 //  File				:	patcheUtils.cpp
 //  Classes				:	
-//  Description			:	Utilities for bicubic patches
+//  Description			:
+/// \brief					Utilities for bicubic patches
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,7 +78,8 @@ static	dmatrix	dinvBezier		=	{	0,		0,			0,			1.0,
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeCubicBound
-// Description			:	Converts the control vertices to Bezier control vertices
+// Description			:
+/// \brief					Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
 #define	makeCubicBound(__bmin,__bmax,__gx,__gy,__gz) {							\
@@ -114,7 +116,8 @@ static	dmatrix	dinvBezier		=	{	0,		0,			0,			1.0,
 
 ///////////////////////////////////////////////////////////////////////
 // Function				:	makeCubicBound
-// Description			:	Converts the control vertices to Bezier control vertices
+// Description			:
+/// \brief					Converts the control vertices to Bezier control vertices
 // Return Value			:	-
 // Comments				:
 #define	makeCubicBoundX(__bmin,__bmax,__gx,__gy,__gz,__xform) {					\

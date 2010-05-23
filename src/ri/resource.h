@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -37,7 +37,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CResource
-// Description			:	Holds resources
+// Description			:
+/// \brief					Holds resources
 // Comments				:
 class CResource {
 public:

@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -36,7 +36,8 @@
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDepositorySample
-// Description			:	This class holds a depository sample
+// Description			:
+/// \brief					This class holds a depository sample
 // Comments				:
 class CDepositorySample : public CMapItem {
 public:
@@ -47,7 +48,8 @@ public:
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CLocalHash
-// Description			:	A hash that holds the contribution that comes from nearby geometry
+// Description			:
+/// \brief					A hash that holds the contribution that comes from nearby geometry
 // Comments				:
 class	CDepository : public CMap<CDepositorySample> {
 public:

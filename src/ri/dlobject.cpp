@@ -2,7 +2,7 @@
 //
 //                             Pixie
 //
-// Copyright © 1999 - 2003, Okan Arikan
+// Copyright © 1999 - 2010, Okan Arikan
 //
 // Contact: okan@cs.utexas.edu
 //
@@ -41,7 +41,8 @@
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	CDLObject
-// Description			:	Ctor
+// Description			:
+/// \brief					Ctor
 // Return Value			:	-
 // Comments				:
 CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const float *bmi,const float *bma,dloInitFunction initFunction,dloIntersectFunction intersectFunction,dloTiniFunction tiniFunction) : CSurface(a,x) {
@@ -63,7 +64,8 @@ CDLObject::CDLObject(CAttributes *a,CXform *x,void *handle,void *data,const floa
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	~CDLObject
-// Description			:	Dtor
+// Description			:
+/// \brief					Dtor
 // Return Value			:	-
 // Comments				:
 CDLObject::~CDLObject() {
@@ -78,7 +80,8 @@ CDLObject::~CDLObject() {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	intersect
-// Description			:	Intersect the surface with the ray
+// Description			:
+/// \brief					Intersect the surface with the ray
 // Return Value			:	-
 // Comments				:
 void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
@@ -116,7 +119,8 @@ void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	sample
-// Description			:	Sample the surface
+// Description			:
+/// \brief					Sample the surface
 // Return Value			:	-
 // Comments				:
 void					CDLObject::sample(int,int,float **,float ***,unsigned int &up) const {
@@ -126,7 +130,8 @@ void					CDLObject::sample(int,int,float **,float ***,unsigned int &up) const {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	interpolate
-// Description			:	Interpolate the surface
+// Description			:
+/// \brief					Interpolate the surface
 // Return Value			:	-
 // Comments				:
 void					CDLObject::interpolate(int,float **,float ***)	const {
@@ -145,7 +150,8 @@ void					CDLObject::dice(CShadingContext *) {
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	instantiate
-// Description			:	Create a copy
+// Description			:
+/// \brief					Create a copy
 // Return Value			:	-
 // Comments				:
 void					CDLObject::instantiate(CAttributes *a,CXform *x,CRendererContext *context) const {
@@ -155,7 +161,8 @@ void					CDLObject::instantiate(CAttributes *a,CXform *x,CRendererContext *conte
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CDLObject
 // Method				:	shade
-// Description			:	Shade the surface
+// Description			:
+/// \brief					Shade the surface
 // Return Value			:	-
 // Comments				:
 void					CDLObject::shade(CShadingContext *context,int numRays,CRay **rays) {
