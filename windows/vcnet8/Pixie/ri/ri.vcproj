@@ -973,7 +973,16 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l&#x0D;&#x0A;"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
+						Outputs="../../../../src/ri/lex.if.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
 						Outputs="../../../../src/ri/lex.if.cpp"
 					/>
 				</FileConfiguration>
@@ -982,7 +991,16 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l&#x0D;&#x0A;"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
+						Outputs="../../../../src/ri/lex.if.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l"
 						Outputs="../../../../src/ri/lex.if.cpp"
 					/>
 				</FileConfiguration>
@@ -995,7 +1013,17 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose&#x0D;&#x0A;"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
+						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
+						Outputs="../../../../src/ri/ifexpr.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
 						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
 						Outputs="../../../../src/ri/ifexpr.cpp"
 					/>
@@ -1005,7 +1033,17 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose&#x0D;&#x0A;"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
+						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
+						Outputs="../../../../src/ri/ifexpr.cpp"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose"
 						AdditionalDependencies="../../../../src/ri/lex.if.cpp"
 						Outputs="../../../../src/ri/ifexpr.cpp"
 					/>
