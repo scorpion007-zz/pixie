@@ -45,6 +45,7 @@ static HINSTANCE hInst;  // Our DLL's instance.
 // Foward declarations of functions included in this code module:
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 void GenCheckerboard(unsigned int *buf, int w, int h);
+void ScaleRectAboutPoint(RectF *rc, const PointF &p, float scale);
 
 #define	color(r,g,b,a)	((a << 24) | (r << 16) | (g << 8) | b)
 #define	get_a(col)		((col) >> 24)
@@ -63,6 +64,9 @@ void GenCheckerboard(unsigned int *buf, int w, int h);
 
 // Amount we zoom by each increment.
 static const float ZOOM_INCREMENT = .1f;
+
+// Amount we pan by for keyboard controls.
+static const float PAN_INCREMENT = 10.f;
 
 // Valid for positive numbers.
 inline double round(double x) {
@@ -98,18 +102,13 @@ CWinDisplay::CWinDisplay(const char *name,
                          int numSamples):
 CDisplay(name, samples, width, height, numSamples),
 mouseDown(false), mag_fac(1), hWnd(NULL), m_channels(0),
-m_alpha(false) {
+m_alpha(false), m_dest(0, 0, width, height) {
 	DWORD	threadID;
 
   memset(m_channelsPresent, 0, sizeof(m_channelsPresent));
 
   // Initialize GDI+.
   GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-  zoomOrigin.x = 0;
-  zoomOrigin.y = 0;
-  lastPos.x = 0;
-  lastPos.y = 0;
 
   // Default to RGB
   SetRGBA();
@@ -134,7 +133,6 @@ m_alpha(false) {
   }
 
 	active		=	TRUE;
-	willRedraw	=	FALSE;
 
 	// Create the thread
 	thread		=	CreateThread(NULL,0,displayThread,this,0,&threadID);
@@ -283,6 +281,21 @@ void CWinDisplay::QuantizeChannels(DWORD channels) {
   }
 }
 
+void ScaleRectAboutPoint(RectF *rc, const PointF &p, float scale) {
+  assert(rc);
+  // Translate rc by -p.
+  rc->Offset(-p.X, -p.Y);
+
+  // Scale the components.
+  rc->X *= scale;
+  rc->Y *= scale;
+  rc->Width *= scale;
+  rc->Height *= scale;
+
+  // Translate it back.
+  rc->Offset(p);
+}
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	main
@@ -369,8 +382,8 @@ void	CWinDisplay::main() {
 
 void CWinDisplay::OnMouseDown(int x, int y) {
   mouseDown = true;
-  lastPos.x = (float)x;
-  lastPos.y = (float)y;
+  lastPos.X = (float)x;
+  lastPos.Y = (float)y;
 
   InvalidateRect(hWnd, NULL, TRUE);
   SetCapture(hWnd);
@@ -391,22 +404,23 @@ void CWinDisplay::OnGetMinMaxInfo(MINMAXINFO *mmi) {
 
 void CWinDisplay::OnMouseUp(int x, int y) {
   mouseDown = false;
-  lastPos.x = (float)x;
-  lastPos.y = (float)y;
+  lastPos.X = (float)x;
+  lastPos.Y = (float)y;
   ReleaseCapture();
 }
 
 void CWinDisplay::OnMouseMove(int x, int y) {
   if (mouseDown) {
-    float dx = (x - lastPos.x);
-    float dy = (y - lastPos.y);
+    float dx = (x - lastPos.X);
+    float dy = (y - lastPos.Y);
 
-    zoomOrigin.x += dx;
-    zoomOrigin.y += dy;
+    m_panOffset.X += dx;
+    m_panOffset.Y += dy;
+
     InvalidateRect(hWnd, NULL, TRUE);
 
-    lastPos.x = (float)x;
-    lastPos.y = (float)y;
+    lastPos.X = (float)x;
+    lastPos.Y = (float)y;
   }
 }
 
@@ -420,54 +434,65 @@ inline T clamp(T x, T low, T high) {
   return x;
 }
 
+void CWinDisplay::CenterOfViewport(PointF *p) {
+  RECT rc;
+  GetClientRect(hWnd, &rc);
+  p->X = (rc.right - rc.left)/2 - m_panOffset.X;
+  p->Y = (rc.bottom - rc.top)/2 - m_panOffset.Y;
+}
+
+// (x, y) - point in client coordinates.
 void CWinDisplay::OnMouseWheel(int x, int y, int zDelta) {
-  UNREFERENCED_PARAMETER(x);
-  UNREFERENCED_PARAMETER(y);
+  PointF p(x - m_panOffset.X, y - m_panOffset.Y);
   if (zDelta > 0) {
-    ZoomIn();
+    ZoomIn(p);
   } else {
-    ZoomOut();
+    ZoomOut(p);
   }
 }
 
-void CWinDisplay::ZoomDelta(float dmag) {
-  ZoomImage(mag_fac + dmag);
+void CWinDisplay::ZoomDelta(float dmag, const PointF &p) {
+  ZoomImage(mag_fac + dmag, p);
 }
 
-void CWinDisplay::ZoomIn() {
-  ZoomDelta(ZOOM_INCREMENT);
+void CWinDisplay::ZoomIn(const PointF &p) {
+  ZoomDelta(ZOOM_INCREMENT*mag_fac, p);
 }
 
-void CWinDisplay::ZoomOut() {
-  ZoomDelta(-ZOOM_INCREMENT);
+void CWinDisplay::ZoomOut(const PointF &p) {
+  ZoomDelta(-ZOOM_INCREMENT*mag_fac, p);
 }
 
 void CWinDisplay::CenterImage() {
   RECT rc;
   GetClientRect(hWnd, &rc);
 
-  zoomOrigin.x = ((rc.right - rc.left) - width*mag_fac)/2;
-  zoomOrigin.y = ((rc.bottom - rc.top) - height*mag_fac)/2;
+  m_panOffset.X = ((rc.right - rc.left) - width*mag_fac)/2 - m_dest.X;
+  m_panOffset.Y = ((rc.bottom - rc.top) - height*mag_fac)/2 - m_dest.Y;
 
   InvalidateRect(hWnd, NULL, FALSE);
 }
 
 void CWinDisplay::ActualPixels() {
-  ZoomImage(1);
+  ZoomImage(1, PointF(0,0));
   CenterImage();
 }
 
-void CWinDisplay::ZoomImage(float mag) {
+void CWinDisplay::ZoomImage(float new_mag, const PointF &p) {
   const float MINZOOM = .2f;
   const float MAXZOOM = 10.f;
 
-  mag_fac = mag;
-
   // Clamp zoom.
-  mag_fac = clamp(mag_fac, MINZOOM, MAXZOOM);
+  new_mag = clamp(new_mag, MINZOOM, MAXZOOM);
+
+  RectF rc(m_dest);
+  ScaleRectAboutPoint(&rc, p, 1.0/mag_fac);
+  ScaleRectAboutPoint(&rc, p, new_mag);
+  m_dest = rc;
+
+  mag_fac = new_mag;
 
   UpdateWinTitle();
-
   InvalidateRect(hWnd, NULL, TRUE);
 }
 
@@ -479,23 +504,23 @@ void CWinDisplay::ZoomImage(float mag) {
 // Return Value			:	-
 // Comments				:
 void	CWinDisplay::redraw() {
-  float dstx = zoomOrigin.x;
-  float dsty = zoomOrigin.y;
-
-  float dstw = width*mag_fac;
-  float dsth = height*mag_fac;
-
   // Entire surface.
   RECT rcEntire;
   GetClientRect(hWnd, &rcEntire);
 
+  RectF rc(m_dest);
+  rc.Offset(m_panOffset);
+
   Graphics graphics(hWnd);
+
+  // Set device parameters.
   graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
   graphics.SetPixelOffsetMode(PixelOffsetModeHalf);
+
   Bitmap bm(&info, imageData);
 
-  RectF dest(dstx, dsty, dstw, dsth);
-  graphics.ExcludeClip(dest);
+  // Fill in viewport background.
+  graphics.ExcludeClip(rc);
   SolidBrush bgBrush(Color(127, 127, 127));
   graphics.FillRectangle(&bgBrush,
     rcEntire.left, rcEntire.top,
@@ -503,8 +528,8 @@ void	CWinDisplay::redraw() {
     rcEntire.bottom-rcEntire.top);
   graphics.ResetClip();
 
-  graphics.DrawImage(&bm, dest);
-  willRedraw = FALSE;
+  // Draw bitmap contents.
+  graphics.DrawImage(&bm, rc);
 }
 
 void CWinDisplay::ToggleChannel(int channel) {
@@ -579,6 +604,41 @@ void CWinDisplay::OnKeyDown(int vk) {
     case VK_HOME:
       CenterImage();
       break;
+
+    // Keyboard panning controls.
+    case VK_LEFT:
+      m_panOffset.X += PAN_INCREMENT;
+      InvalidateRect(hWnd, NULL, FALSE);
+      break;
+    case VK_RIGHT:
+      m_panOffset.X -= PAN_INCREMENT;
+      InvalidateRect(hWnd, NULL, FALSE);
+      break;
+    case VK_UP:
+      m_panOffset.Y += PAN_INCREMENT;
+      InvalidateRect(hWnd, NULL, FALSE);
+      break;
+    case VK_DOWN:
+      m_panOffset.Y -= PAN_INCREMENT;
+      InvalidateRect(hWnd, NULL, FALSE);
+      break;
+
+    // Numpad +
+    case VK_ADD: {
+      PointF p;
+      CenterOfViewport(&p);
+      // Zoom about the center of viewport.
+      ZoomIn(p);
+      break;
+    }
+    // Numpad -
+    case VK_SUBTRACT: {
+      PointF p;
+      CenterOfViewport(&p);
+      // Zoom about the center of viewport.
+      ZoomOut(p);
+      break;
+    }
   }
 }
 
@@ -664,8 +724,8 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 	}
 
 	if (active) {
-    float dstx = zoomOrigin.x + x;
-    float dsty = zoomOrigin.y + y;
+    float dstx = m_panOffset.X + x;
+    float dsty = m_panOffset.Y + y;
     RECT rc = { dstx, dsty, dstx + w*mag_fac , dsty + h*mag_fac };
     InvalidateRect(hWnd, &rc, FALSE);
 	}
@@ -708,10 +768,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_MOUSEMOVE:
       dpy->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
       break;
-    case WM_MOUSEWHEEL:
-      dpy->OnMouseWheel(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam),
-        GET_WHEEL_DELTA_WPARAM(wParam));
+    case WM_MOUSEWHEEL: {
+      // NOTE: MOUSEWHEEL gets (x,y) in screen coords! Not client coords!
+      POINT p = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+      ScreenToClient(hWnd, &p);  // Convert them to client coords.
+      dpy->OnMouseWheel(p.x, p.y, GET_WHEEL_DELTA_WPARAM(wParam));
       break;
+    }
     case WM_KEYDOWN:
       dpy->OnKeyDown(wParam);
       break;

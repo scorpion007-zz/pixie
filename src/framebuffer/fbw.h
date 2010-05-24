@@ -82,15 +82,17 @@ private:
   bool m_channelsPresent[MAX_CHANNELS];
 
 	int				active;
-	int				willRedraw;
 
   void QuantizeChannels(DWORD channels);
   void QuantizeAlpha();
   DWORD ComputeDisplayPixel(DWORD channels, int x, int y);
 
   void UpdateWinTitle();
-  void ZoomImage(float mag);   // Zoom to a fixed factor.
-  void ZoomDelta(float dmag);  // Zoom by some offset
+
+  /// Zoom to a fixed factor.
+  void ZoomImage(float new_mag, const Gdiplus::PointF &p);
+  /// Zoom by some offset.
+  void ZoomDelta(float dmag, const Gdiplus::PointF &p);
 
   void ToggleChannel(int channel);
   void ShowAlpha();
@@ -99,10 +101,11 @@ private:
   void SetRGBA();
 
   // Helper functions for common cases.
-  void ZoomIn();
-  void ZoomOut();
+  void ZoomIn(const Gdiplus::PointF &p);
+  void ZoomOut(const Gdiplus::PointF &p);
   void ActualPixels();  // Zoom to 100%.
   void CenterImage();
+  void CenterOfViewport(Gdiplus::PointF *p);
 
   ULONG_PTR gdiplusToken;
   Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -111,11 +114,11 @@ private:
   DWORD m_channels;
   bool m_alpha;   // Show alpha only (takes precedence over color).
 
-  // Zoom origin
-  POINTFLOAT zoomOrigin;
-  POINTFLOAT lastPos;
+  Gdiplus::PointF m_panOffset;
+  Gdiplus::PointF lastPos;
   float mag_fac;
   bool mouseDown;
+  Gdiplus::RectF m_dest;
 
   HCURSOR curPan;  // Pan cursor.
 };
