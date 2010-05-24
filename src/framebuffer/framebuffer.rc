@@ -65,6 +65,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 //
 
 IDC_PAN                 CURSOR                  "panCursor.cur"
+IDC_EYEDROPPER          CURSOR                  "eyedropper.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -72,8 +73,8 @@ IDC_PAN                 CURSOR                  "panCursor.cur"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -91,12 +92,12 @@ BEGIN
             VALUE "Comments", "The default framebuffer display driver for the Pixie renderer."
             VALUE "CompanyName", "Pixie team"
             VALUE "FileDescription", "Framebuffer display driver for Pixie."
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileVersion", "1, 1, 0, 0"
             VALUE "InternalName", "framebuffer"
             VALUE "LegalCopyright", "Copyright (C) 2010 Pixie team."
             VALUE "OriginalFilename", "framebuffer.dll"
             VALUE "ProductName", "framebuffer display driver."
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "1, 1, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -104,6 +105,46 @@ BEGIN
         VALUE "Translation", 0xc09, 1200
     END
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_COLORINFO DIALOGEX 0, 0, 142, 73
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_SYSMENU | WS_THICKFRAME
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Red:",IDC_STATIC,7,7,16,8
+    LTEXT           "R",IDC_CHAN_R,32,7,57,8
+    LTEXT           "Green:",IDC_STATIC,7,16,23,8
+    LTEXT           "G",IDC_CHAN_G,32,16,57,8
+    LTEXT           "Blue:",IDC_STATIC,7,25,17,8
+    LTEXT           "B",IDC_CHAN_B,32,25,57,8
+    LTEXT           "Alpha:",IDC_STATIC,7,34,22,8
+    LTEXT           "A",IDC_CHAN_A,32,34,57,8
+    CONTROL         "",IDC_COLOR_SWATCH,"ColorSwatchCls",WS_TABSTOP,97,7,38,31,WS_EX_CLIENTEDGE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_COLORINFO, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 135
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 66
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////

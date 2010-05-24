@@ -143,7 +143,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -319,7 +319,7 @@
 				BufferSecurityCheck="false"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="0"
 			/>
 			<Tool
@@ -380,6 +380,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\..\..\src\framebuffer\colorswatch.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\framebuffer\fbw.cpp"
 				>
 				<FileConfiguration
@@ -402,6 +406,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\..\src\framebuffer\colorswatch.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\src\framebuffer\fbw.h"
 				>
 			</File>
@@ -419,6 +427,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath="..\..\..\..\src\framebuffer\eyedropper.cur"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\..\src\framebuffer\framebuffer.rc"
 				>

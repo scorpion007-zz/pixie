@@ -62,14 +62,17 @@ public:
 	HANDLE			thread;
 
   void      redraw();
-  void      OnMouseDown(int x, int y);
-  void      OnMouseUp(int x, int y);
+  BOOL      OnCreate(HWND hwnd);
+  void      OnDestroy();
+  void      OnLButtonDown(int x, int y);
+  void      OnRButtonDown(int x, int y);
+  void      OnLButtonUp(int x, int y);
+  void      OnRButtonUp(int x, int y);
   void      OnMouseMove(int x, int y);
   void      OnMouseWheel(int x, int y, int zDelta);
   void      OnKeyDown(int vk);
   void      OnSize(int cx, int cy);
   BOOL      OnSetCursor();
-  void      OnGetMinMaxInfo(MINMAXINFO *mmi);
 private:
 	HWND			hWnd;								// current window
 	BITMAPINFO		info;								// bitmap info
@@ -100,6 +103,13 @@ private:
   void ShowRGBA();
   void SetRGBA();
 
+  /// Sample a value from a channel.
+  float SampleChannel(DWORD channel, int x, int y);
+  void ComputeSamplePoint(POINT *sp, int x, int y);
+  /// Sample a complete color.
+  void GetColorSample(int x, int y, float rgba[4]);
+  void UpdateColorInfo(int x, int y);
+
   // Helper functions for common cases.
   void ZoomIn(const Gdiplus::PointF &p);
   void ZoomOut(const Gdiplus::PointF &p);
@@ -117,10 +127,13 @@ private:
   Gdiplus::PointF m_panOffset;
   Gdiplus::PointF lastPos;
   float mag_fac;
-  bool mouseDown;
+  bool m_lMouseDown;
+  bool m_rMouseDown;
   Gdiplus::RectF m_dest;
 
+  HWND hColorInfo;  // Color info dialog.
   HCURSOR curPan;  // Pan cursor.
+  HCURSOR curEyedropper;  // Color picker cursor.
 };
 
 

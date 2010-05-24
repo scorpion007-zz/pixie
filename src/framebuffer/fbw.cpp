@@ -31,21 +31,27 @@
 ////////////////////////////////////////////////////////////////////////
 #include "framebuffer.h"
 #include "fbw.h"
+#include "colorswatch.h"
 
 #include "resource.h"
 
 #include <windowsx.h>
 #include <math.h>
 #include <tchar.h>
+#include <stdarg.h>
 
 using namespace Gdiplus;
 
-static HINSTANCE hInst;  // Our DLL's instance.
+HINSTANCE hInst;  // Our DLL's instance.
 
 // Foward declarations of functions included in this code module:
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+// Dialog proc for color info window.
+INT_PTR CALLBACK ColorInfoProc(HWND hWnd, UINT uMsg,
+                               WPARAM wParam, LPARAM lParam);
 void GenCheckerboard(unsigned int *buf, int w, int h);
 void ScaleRectAboutPoint(RectF *rc, const PointF &p, float scale);
+void safe_stprintf(TCHAR *buf, size_t cch, const TCHAR *format, ...);
 
 #define	color(r,g,b,a)	((a << 24) | (r << 16) | (g << 8) | b)
 #define	get_a(col)		((col) >> 24)
@@ -69,8 +75,19 @@ static const float ZOOM_INCREMENT = .1f;
 static const float PAN_INCREMENT = 10.f;
 
 // Valid for positive numbers.
-inline double round(double x) {
+inline int round(double x) {
   return (int)(x + .5);
+}
+
+// Clamp a value to a range.
+template<class T>
+inline T clamp(T x, T low, T high) {
+  if (x < low) {
+    x = low;
+  } else if (x > high) {
+    x = high;
+  }
+  return x;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -101,8 +118,8 @@ CWinDisplay::CWinDisplay(const char *name,
                          int height,
                          int numSamples):
 CDisplay(name, samples, width, height, numSamples),
-mouseDown(false), mag_fac(1), hWnd(NULL), m_channels(0),
-m_alpha(false), m_dest(0, 0, width, height) {
+m_lMouseDown(false), m_rMouseDown(false), mag_fac(1), hWnd(NULL),
+m_channels(0), m_alpha(false), m_dest(0, 0, width, height), hColorInfo(NULL) {
 	DWORD	threadID;
 
   memset(m_channelsPresent, 0, sizeof(m_channelsPresent));
@@ -146,7 +163,7 @@ m_alpha(false), m_dest(0, 0, width, height) {
 // Return Value			:	-
 // Comments				:
 CWinDisplay::~CWinDisplay() {
-	delete [] imageData;
+  delete [] imageData;
   for (int i = 0; i < MAX_CHANNELS; ++i) {
     if (m_channelsPresent[i]) {
       delete [] m_channelData[i];
@@ -169,6 +186,15 @@ TCHAR *basename(TCHAR *path) {
   } else {
     return path;
   }
+}
+
+// Safe, truncating version of stprintf
+void safe_stprintf(TCHAR *buf, size_t cch, const TCHAR *format, ...) {
+  va_list args;
+  va_start(args, format);
+  _vsntprintf(buf, cch-1, format, args);
+  va_end(args);
+  buf[cch-1] = 0;  // Guarantee NULL-termination.
 }
 
 // Makes a title for the framebuffer window, containing various pieces of
@@ -296,6 +322,24 @@ void ScaleRectAboutPoint(RectF *rc, const PointF &p, float scale) {
   rc->Offset(p);
 }
 
+BOOL CWinDisplay::OnCreate(HWND hwnd) {
+  if (!InitColorSwatch()) {
+    return FALSE;
+  }
+  hColorInfo = CreateDialog(hInst, MAKEINTRESOURCE(IDD_COLORINFO),
+    hwnd, ColorInfoProc);
+  if (!hColorInfo) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+void CWinDisplay::OnDestroy() {
+  DestroyWindow(hColorInfo);
+  UninitColorSwatch();
+  PostQuitMessage(0);
+}
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CWinDisplay
 // Method				:	main
@@ -309,6 +353,7 @@ void	CWinDisplay::main() {
   const char *szPixieWndClass = "PixieWinDisplay";
 
   curPan = LoadCursor(hInst, MAKEINTRESOURCE(IDC_PAN));
+  curEyedropper = LoadCursor(hInst, MAKEINTRESOURCE(IDC_EYEDROPPER));
 
 	wcex.cbSize						= sizeof(WNDCLASSEX);
 
@@ -342,15 +387,12 @@ void	CWinDisplay::main() {
   // Create the window (non-resizable).
   hWnd = CreateWindow(szPixieWndClass, wndTitle,
     dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left,
-    rc.bottom - rc.top, NULL, NULL, hInst, NULL);
+    rc.bottom - rc.top, NULL, NULL, hInst, (LPVOID)this);
 
 	if (!hWnd)	{
 		active	=	FALSE;
 		return;	// Nothing to do
 	}
-
-  // Associate a pointer to our instance with this window.
-  SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
 
   ActualPixels();
 
@@ -380,8 +422,8 @@ void	CWinDisplay::main() {
 	active	=	FALSE;
 }
 
-void CWinDisplay::OnMouseDown(int x, int y) {
-  mouseDown = true;
+void CWinDisplay::OnLButtonDown(int x, int y) {
+  m_lMouseDown = true;
   lastPos.X = (float)x;
   lastPos.Y = (float)y;
 
@@ -390,27 +432,109 @@ void CWinDisplay::OnMouseDown(int x, int y) {
   SetCursor(curPan);
 }
 
+float CWinDisplay::SampleChannel(DWORD channel, int x, int y) {
+  assert(channel < MAX_CHANNELS);
+  assert(m_channelsPresent[channel]);
+  assert(x >= 0 && x < width);
+  assert(y >= 0 && y < height);
+  return m_channelData[channel][x + y * width];
+}
+
+// Given mouse client coords (x,y), compute where we should sample from in the
+// image, taking into account zoom/pan state.
+void CWinDisplay::ComputeSamplePoint(POINT *sp, int x, int y) {
+  float vx = clamp<float>((x - m_dest.X - m_panOffset.X)/mag_fac, 0, width-1);
+  float vy = clamp<float>((y - m_dest.Y - m_panOffset.Y)/mag_fac, 0, height-1);
+  sp->x = round(vx);
+  sp->y = height-1-round(vy);  // We're upside down.
+}
+
+void CWinDisplay::GetColorSample(int x, int y, float rgba[4]) {
+  POINT sp;
+  ComputeSamplePoint(&sp, x, y);
+  for (int i = 0; i < MAX_CHANNELS; ++i) {
+    rgba[i] = 0;
+    if (m_channelsPresent[i]) {
+      rgba[i] = SampleChannel(i, sp.x, sp.y);
+    }
+  }
+}
+
+COLORREF ClampPixel(float rgba[]) {
+  BYTE clamped[3] = {0};
+  for (int i = 0; i < 3; ++i) {
+    clamped[i] = (BYTE)(clamp(rgba[i], 0.f, 1.f) * 255);
+  }
+  return RGB(clamped[0], clamped[1], clamped[2]);
+}
+
+void CWinDisplay::UpdateColorInfo(int x, int y) {
+  int sx = clamp(x, 0, width-1);
+  int sy = clamp(y, 0, height-1);
+
+  float rgba[4] = {0};
+  GetColorSample(sx, sy, rgba);
+
+  // Update swatch's color.
+  SendMessage(GetDlgItem(hColorInfo, IDC_COLOR_SWATCH),
+    CSM_SETBKCOLOR, ClampPixel(rgba), 0);
+
+  InvalidateRect(GetDlgItem(hColorInfo, IDC_COLOR_SWATCH), NULL, FALSE);
+
+  TCHAR buf[100] = {0};
+
+  // Set up RGBA static controls.
+  safe_stprintf(buf, ARRAY_COUNT(buf), _T("%f"), rgba[0]);
+  SetDlgItemText(hColorInfo, IDC_CHAN_R, buf);
+  safe_stprintf(buf, ARRAY_COUNT(buf), _T("%f"), rgba[1]);
+  SetDlgItemText(hColorInfo, IDC_CHAN_G, buf);
+  safe_stprintf(buf, ARRAY_COUNT(buf), _T("%f"), rgba[2]);
+  SetDlgItemText(hColorInfo, IDC_CHAN_B, buf);
+  safe_stprintf(buf, ARRAY_COUNT(buf), _T("%f"), rgba[3]);
+  SetDlgItemText(hColorInfo, IDC_CHAN_A, buf);
+
+  POINT pt = {x + 25, y};
+  pt.x = clamp<int>(pt.x, 0, width-1);
+  pt.y = clamp<int>(pt.y, 0, height-1);
+  ClientToScreen(hWnd, &pt);
+  SetWindowPos(hColorInfo, NULL, pt.x, pt.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+}
+
+void CWinDisplay::OnRButtonDown(int x, int y) {
+  m_rMouseDown = true;
+  UpdateColorInfo(x, y);
+  ShowWindow(hColorInfo, SW_SHOW);
+  SetCursor(curEyedropper);
+  SetCapture(hWnd);
+}
+
 void CWinDisplay::OnSize(int cx, int cy) {
   UNREFERENCED_PARAMETER(cx);
   UNREFERENCED_PARAMETER(cy);
   CenterImage();
 }
 
-void CWinDisplay::OnGetMinMaxInfo(MINMAXINFO *mmi) {
+void OnGetMinMaxInfo(MINMAXINFO *mmi) {
   // Restrict the minimum size of the window.
   mmi->ptMinTrackSize.x = 250;
   mmi->ptMinTrackSize.y = 150;
 }
 
-void CWinDisplay::OnMouseUp(int x, int y) {
-  mouseDown = false;
+void CWinDisplay::OnLButtonUp(int x, int y) {
+  m_lMouseDown = false;
   lastPos.X = (float)x;
   lastPos.Y = (float)y;
   ReleaseCapture();
 }
 
+void CWinDisplay::OnRButtonUp(int x, int y) {
+  m_rMouseDown = false;
+  ShowWindow(hColorInfo, SW_HIDE);
+  ReleaseCapture();
+}
+
 void CWinDisplay::OnMouseMove(int x, int y) {
-  if (mouseDown) {
+  if (m_lMouseDown) {
     float dx = (x - lastPos.X);
     float dy = (y - lastPos.Y);
 
@@ -421,17 +545,9 @@ void CWinDisplay::OnMouseMove(int x, int y) {
 
     lastPos.X = (float)x;
     lastPos.Y = (float)y;
+  } else if (m_rMouseDown) {
+    UpdateColorInfo(x, y);
   }
-}
-
-template<class T>
-inline T clamp(T x, T low, T high) {
-  if (x < low) {
-    x = low;
-  } else if (x > high) {
-    x = high;
-  }
-  return x;
 }
 
 void CWinDisplay::CenterOfViewport(PointF *p) {
@@ -486,7 +602,7 @@ void CWinDisplay::ZoomImage(float new_mag, const PointF &p) {
   new_mag = clamp(new_mag, MINZOOM, MAXZOOM);
 
   RectF rc(m_dest);
-  ScaleRectAboutPoint(&rc, p, 1.0/mag_fac);
+  ScaleRectAboutPoint(&rc, p, 1.0f/mag_fac);
   ScaleRectAboutPoint(&rc, p, new_mag);
   m_dest = rc;
 
@@ -643,8 +759,11 @@ void CWinDisplay::OnKeyDown(int vk) {
 }
 
 BOOL CWinDisplay::OnSetCursor() {
-  if (mouseDown) {
+  if (m_lMouseDown) {
     SetCursor(curPan);
+    return TRUE;
+  } else if (m_rMouseDown) {
+    SetCursor(curEyedropper);
     return TRUE;
   } else {
     return FALSE;
@@ -723,12 +842,12 @@ int	CWinDisplay::data(int x,int y,int w,int h,float *d) {
 		}
 	}
 
-	if (active) {
-    float dstx = m_panOffset.X + x;
-    float dsty = m_panOffset.Y + y;
-    RECT rc = { dstx, dsty, dstx + w*mag_fac , dsty + h*mag_fac };
-    InvalidateRect(hWnd, &rc, FALSE);
-	}
+    if (active) {
+      float dstx = m_panOffset.X + x;
+      float dsty = m_panOffset.Y + y;
+      RECT rc = { dstx, dsty, dstx + w*mag_fac , dsty + h*mag_fac };
+      InvalidateRect(hWnd, &rc, FALSE);
+    }
 
 	return active;
 }
@@ -755,15 +874,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
   CWinDisplay *dpy = (CWinDisplay *)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
   switch (message) {
+    case WM_CREATE: {
+      CREATESTRUCT *cs = (CREATESTRUCT*)lParam;
+      // Associate a pointer to our instance with this window.
+      SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)cs->lpCreateParams);
+      dpy = (CWinDisplay *)cs->lpCreateParams;
+      if (dpy->OnCreate(hWnd)) {
+        return 0;
+      } else {
+        return -1;  // Failed to create window.
+      }
+    }
     case WM_PAINT: {
       dpy->redraw();
-      break;
+      return 0;
     }
     case WM_LBUTTONDOWN:
-      dpy->OnMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      dpy->OnLButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      break;
+    case WM_RBUTTONDOWN:
+      dpy->OnRButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
       break;
     case WM_LBUTTONUP:
-      dpy->OnMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      dpy->OnLButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+      break;
+    case WM_RBUTTONUP:
+      dpy->OnRButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
       break;
     case WM_MOUSEMOVE:
       dpy->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -776,16 +912,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
       break;
     }
     case WM_KEYDOWN:
-      dpy->OnKeyDown(wParam);
+      dpy->OnKeyDown((int)wParam);
       break;
     case WM_SIZE:
       dpy->OnSize(LOWORD(lParam), HIWORD(lParam));
       break;
     case WM_GETMINMAXINFO:
-      dpy->OnGetMinMaxInfo((MINMAXINFO*)lParam);
+      // NOTE: Can't be a member function, since it arrives before WM_CREATE
+      // when we establish the 'this' pointer.
+      OnGetMinMaxInfo((MINMAXINFO*)lParam);
+      break;
+    case WM_CLOSE:
+      DestroyWindow(hWnd);
       break;
     case WM_DESTROY:
-      PostQuitMessage(0);
+      dpy->OnDestroy();
       break;
     case WM_SETCURSOR:
       if (dpy->OnSetCursor()) {
@@ -794,6 +935,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
   }
 
   return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+INT_PTR CALLBACK ColorInfoProc(HWND hWnd, UINT uMsg,
+                               WPARAM wParam, LPARAM lParam)
+{
+  return FALSE;
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
