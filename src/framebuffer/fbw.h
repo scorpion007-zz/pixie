@@ -61,7 +61,7 @@ public:
 	void			finish();
 	HANDLE			thread;
 
-  void      redraw();
+  void      OnPaint(HDC hdc);
   BOOL      OnCreate(HWND hwnd);
   void      OnDestroy();
   void      OnLButtonDown(int x, int y);

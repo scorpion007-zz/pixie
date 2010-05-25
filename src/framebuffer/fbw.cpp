@@ -621,7 +621,7 @@ void CWinDisplay::ZoomImage(float new_mag, const PointF &p) {
 /// \brief					Redraw the image
 // Return Value			:	-
 // Comments				:
-void	CWinDisplay::redraw() {
+void CWinDisplay::OnPaint(HDC hdc) {
   // Entire surface.
   RECT rcEntire;
   GetClientRect(hWnd, &rcEntire);
@@ -629,7 +629,7 @@ void	CWinDisplay::redraw() {
   RectF rc(m_dest);
   rc.Offset(m_panOffset);
 
-  Graphics graphics(hWnd);
+  Graphics graphics(hdc);
 
   // Set device parameters.
   graphics.SetInterpolationMode(InterpolationModeNearestNeighbor);
@@ -888,7 +888,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
       }
     }
     case WM_PAINT: {
-      dpy->redraw();
+      PAINTSTRUCT ps;
+      BeginPaint(hWnd, &ps);
+      dpy->OnPaint(ps.hdc);
+      EndPaint(hWnd, &ps);
       return 0;
     }
     case WM_LBUTTONDOWN:
