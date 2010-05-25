@@ -493,9 +493,11 @@ void CWinDisplay::UpdateColorInfo(int x, int y) {
   safe_stprintf(buf, ARRAY_COUNT(buf), _T("%f"), rgba[3]);
   SetDlgItemText(hColorInfo, IDC_CHAN_A, buf);
 
+  RECT rc;
+  GetClientRect(hWnd, &rc);
   POINT pt = {x + 25, y};
-  pt.x = clamp<int>(pt.x, 0, width-1);
-  pt.y = clamp<int>(pt.y, 0, height-1);
+  pt.x = clamp<int>(pt.x, 0, rc.right-rc.left);
+  pt.y = clamp<int>(pt.y, 0, rc.bottom-rc.top);
   ClientToScreen(hWnd, &pt);
   SetWindowPos(hColorInfo, NULL, pt.x, pt.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
