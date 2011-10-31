@@ -1,0 +1,18 @@
+# Pixie
+
+Pixie is a photorealistic renderer that uses a Pixar's RenderMan-like interface.
+
+Pixie is licensed under GNU LGPL. See COPYING file for details.
+
+This is a public distribution of the Pixie renderer. For more information on
+Pixie and its features, visit http://pixie.sourceforge.net .
+
+## Directory structure
+
+ * src                - The source code
+ * shaders            - The default shaders
+ * doc                - Documentation
+ * bin                - Release mode binaries (only after compilation)
+ * tmp                - Release mode object files (only after compilation)
+ * bind               - Debug mode binaries (only after compilation)
+ * tmpd               - Debug mode object files (only after compilation)
