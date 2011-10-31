@@ -4,4 +4,6 @@
 tmp/
 bin/
 *.vcproj.*
+*.vcxproj.*
 *.swp
+displays/   # display driver binaries

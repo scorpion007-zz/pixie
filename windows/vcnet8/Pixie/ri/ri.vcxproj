@@ -1,0 +1,576 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4B30FBEE-E194-4379-9523-F07DEA429A11}</ProjectGuid>
+    <RootNamespace>ri</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\pixie_deps.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\pixie_deps.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\pixie_deps.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\pixie_deps.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\tmp\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\tmp\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\tmp\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\tmp\$(ProjectName)\$(Configuration)\$(Platform)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
+    <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/D "_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\src;$(pixiedeps)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;RI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>common.lib;libtiff.lib;libjpeg.lib;zlib.lib;ws2_32.lib</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <OutputFile>$(OutDir)ri.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\bin\$(Platform)\$(Configuration);$(pixiedeps)\lib\$(platform)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <SetChecksum>true</SetChecksum>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)ri.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D "_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\src;$(pixiedeps)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;RI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>common.lib;libtiff.lib;libjpeg.lib;zlib.lib;ws2_32.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)ri.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\bin\$(Platform)\$(Configuration);$(pixiedeps)\lib\$(platform)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcd; libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <LargeAddressAware>true</LargeAddressAware>
+      <SetChecksum>true</SetChecksum>
+      <ImportLibrary>$(OutDir)ri.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/D "_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\src;$(pixiedeps)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;RI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>common.lib;libtiff.lib;libjpeg.lib;zlib.lib;ws2_32.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)ri.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\bin\$(Platform)\$(Configuration);$(pixiedeps)\lib\$(platform)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <SetChecksum>true</SetChecksum>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(OutDir)ri.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/D "_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\src;$(pixiedeps)\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;RI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>common.lib;libtiff.lib;libjpeg.lib;zlib.lib;ws2_32.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)ri.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\..\..\..\bin\$(Platform)\$(Configuration);$(pixiedeps)\lib\$(platform)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <SetChecksum>true</SetChecksum>
+      <ImportLibrary>$(OutDir)ri.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\ri\bundles.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\debug.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\depository.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\displayChannel.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\error.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\hcshader.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\linsys.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\memory.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\noise.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\occlusion.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\pl.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\ptcapi.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\random.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\remoteChannel.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\ri.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\ribOut.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\riInterface.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\stats.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\renderer.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererClipping.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererContext.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererDeclerations.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererDisplay.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererFiles.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererJobs.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererMutexes.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rendererNetwork.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\bsplinePatchgrid.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\curves.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\delayed.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\dlobject.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\implicitSurface.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\object.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\patches.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\patchgrid.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\points.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\polygons.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\quadrics.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\subdivision.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\subdivisionCreator.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\surface.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\photon.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\raytracer.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\reyes.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\show.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\stochastic.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\zbuffer.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\attributes.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\options.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\refCounter.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\resource.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\xform.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\dso.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\ifexpr.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\rib.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\sl.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\variable.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\execute.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <OmitFramePointers Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</OmitFramePointers>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+      <OmitFramePointers Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</OmitFramePointers>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ri\executeMisc.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\init.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\shader.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\shaderPl.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\shading.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\trace.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\brickmap.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\fileResource.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\irradiance.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\photonMap.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\pointCloud.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\pointHierarchy.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\texmake.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\texture.cpp" />
+    <ClCompile Include="..\..\..\..\src\ri\texture3d.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\ri\bundles.h" />
+    <ClInclude Include="..\..\..\..\src\ri\debug.h" />
+    <ClInclude Include="..\..\..\..\src\ri\depository.h" />
+    <ClInclude Include="..\..\..\..\src\ri\displayChannel.h" />
+    <ClInclude Include="..\..\..\..\src\ri\dlo.h" />
+    <ClInclude Include="..\..\..\..\src\ri\dso.h" />
+    <ClInclude Include="..\..\..\..\src\ri\dsply.h" />
+    <ClInclude Include="..\..\..\..\src\ri\error.h" />
+    <ClInclude Include="..\..\..\..\src\ri\harmonics.h" />
+    <ClInclude Include="..\..\..\..\src\ri\hcshader.h" />
+    <ClInclude Include="..\..\..\..\src\ri\linsys.h" />
+    <ClInclude Include="..\..\..\..\src\ri\map.h" />
+    <ClInclude Include="..\..\..\..\src\ri\memory.h" />
+    <ClInclude Include="..\..\..\..\src\ri\netFileMapping.h" />
+    <ClInclude Include="..\..\..\..\src\ri\noise.h" />
+    <ClInclude Include="..\..\..\..\src\ri\noiseTables.h" />
+    <ClInclude Include="..\..\..\..\src\ri\occlusion.h" />
+    <ClInclude Include="..\..\..\..\src\ri\pl.h" />
+    <ClInclude Include="..\..\..\..\src\ri\ptcapi.h" />
+    <ClInclude Include="..\..\..\..\src\ri\random.h" />
+    <ClInclude Include="..\..\..\..\src\ri\ray.h" />
+    <ClInclude Include="..\..\..\..\src\ri\remoteChannel.h" />
+    <ClInclude Include="..\..\..\..\src\ri\ri.h" />
+    <ClInclude Include="..\..\..\..\src\ri\ribOut.h" />
+    <ClInclude Include="..\..\..\..\src\ri\riInterface.h" />
+    <ClInclude Include="..\..\..\..\src\ri\shadeop.h" />
+    <ClInclude Include="..\..\..\..\src\ri\stats.h" />
+    <ClInclude Include="..\..\..\..\src\ri\tiff.h" />
+    <ClInclude Include="..\..\..\..\src\ri\renderer.h" />
+    <ClInclude Include="..\..\..\..\src\ri\rendererc.h" />
+    <ClInclude Include="..\..\..\..\src\ri\rendererContext.h" />
+    <ClInclude Include="..\..\..\..\src\ri\bsplinePatchgrid.h" />
+    <ClInclude Include="..\..\..\..\src\ri\curves.h" />
+    <ClInclude Include="..\..\..\..\src\ri\delayed.h" />
+    <ClInclude Include="..\..\..\..\src\ri\dlobject.h" />
+    <ClInclude Include="..\..\..\..\src\ri\implicit.h" />
+    <ClInclude Include="..\..\..\..\src\ri\implicitSurface.h" />
+    <ClInclude Include="..\..\..\..\src\ri\object.h" />
+    <ClInclude Include="..\..\..\..\src\ri\objectMisc.h" />
+    <ClInclude Include="..\..\..\..\src\ri\patches.h" />
+    <ClInclude Include="..\..\..\..\src\ri\patchgrid.h" />
+    <ClInclude Include="..\..\..\..\src\ri\patchUtils.h" />
+    <ClInclude Include="..\..\..\..\src\ri\points.h" />
+    <ClInclude Include="..\..\..\..\src\ri\polygons.h" />
+    <ClInclude Include="..\..\..\..\src\ri\quadrics.h" />
+    <ClInclude Include="..\..\..\..\src\ri\subdivision.h" />
+    <ClInclude Include="..\..\..\..\src\ri\subdivisionCreator.h" />
+    <ClInclude Include="..\..\..\..\src\ri\subdivisionData.h" />
+    <ClInclude Include="..\..\..\..\src\ri\surface.h" />
+    <ClInclude Include="..\..\..\..\src\ri\photon.h" />
+    <ClInclude Include="..\..\..\..\src\ri\raytracer.h" />
+    <ClInclude Include="..\..\..\..\src\ri\reyes.h" />
+    <ClInclude Include="..\..\..\..\src\ri\show.h" />
+    <ClInclude Include="..\..\..\..\src\ri\stochastic.h" />
+    <ClInclude Include="..\..\..\..\src\ri\stochasticPoint.h" />
+    <ClInclude Include="..\..\..\..\src\ri\stochasticPrimitives.h" />
+    <ClInclude Include="..\..\..\..\src\ri\stochasticQuad.h" />
+    <ClInclude Include="..\..\..\..\src\ri\zbuffer.h" />
+    <ClInclude Include="..\..\..\..\src\ri\zbufferPoint.h" />
+    <ClInclude Include="..\..\..\..\src\ri\zbufferQuad.h" />
+    <ClInclude Include="..\..\..\..\src\ri\atomic.h" />
+    <ClInclude Include="..\..\..\..\src\ri\attributes.h" />
+    <ClInclude Include="..\..\..\..\src\ri\options.h" />
+    <ClInclude Include="..\..\..\..\src\ri\refCounter.h" />
+    <ClInclude Include="..\..\..\..\src\ri\resource.h" />
+    <ClInclude Include="..\..\..\..\src\ri\userAttributes.h" />
+    <ClInclude Include="..\..\..\..\src\ri\variable.h" />
+    <ClInclude Include="..\..\..\..\src\ri\xform.h" />
+    <ClInclude Include="..\..\..\..\src\ri\rib.h" />
+    <ClInclude Include="..\..\..\..\src\ri\giFunctions.h" />
+    <ClInclude Include="..\..\..\..\src\ri\giOpcodes.h" />
+    <ClInclude Include="..\..\..\..\src\ri\scriptFunctions.h" />
+    <ClInclude Include="..\..\..\..\src\ri\scriptOpcodes.h" />
+    <ClInclude Include="..\..\..\..\src\ri\shader.h" />
+    <ClInclude Include="..\..\..\..\src\ri\shaderFunctions.h" />
+    <ClInclude Include="..\..\..\..\src\ri\shaderOpcodes.h" />
+    <ClInclude Include="..\..\..\..\src\ri\shaderPl.h" />
+    <ClInclude Include="..\..\..\..\src\ri\shading.h" />
+    <ClInclude Include="..\..\..\..\src\ri\slcode.h" />
+    <ClInclude Include="..\..\..\..\src\ri\brickmap.h" />
+    <ClInclude Include="..\..\..\..\src\ri\fileResource.h" />
+    <ClInclude Include="..\..\..\..\src\ri\irradiance.h" />
+    <ClInclude Include="..\..\..\..\src\ri\photonMap.h" />
+    <ClInclude Include="..\..\..\..\src\ri\pointCloud.h" />
+    <ClInclude Include="..\..\..\..\src\ri\pointHierarchy.h" />
+    <ClInclude Include="..\..\..\..\src\ri\texmake.h" />
+    <ClInclude Include="..\..\..\..\src\ri\texture.h" />
+    <ClInclude Include="..\..\..\..\src\ri\texture3d.h" />
+    <ClInclude Include="..\..\..\..\src\ri\ri_config.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\src\ri\dso.l">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.dso.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.dso.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.dso.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">flex -i -Pdso -o../../../../src/ri/lex.dso.cpp ../../../../src/ri/dso.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.dso.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\dso.y">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.dso.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/dso.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.dso.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/dso.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.dso.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/dso.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bison -p dso -o ../../../../src/ri/dso.cpp ../../../../src/ri/dso.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.dso.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/dso.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\ifexpr.l">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.if.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.if.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.if.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">flex -i -Pif -o../../../../src/ri/lex.if.cpp ../../../../src/ri/ifexpr.l</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.if.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\ifexpr.y">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.if.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/ifexpr.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.if.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/ifexpr.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.if.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/ifexpr.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bison -p if -o ../../../../src/ri/ifexpr.cpp ../../../../src/ri/ifexpr.y --debug --verbose</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.if.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/ifexpr.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\rib.l">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.rib.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.rib.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.rib.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">flex -i -Prib -o../../../../src/ri/lex.rib.cpp ../../../../src/ri/rib.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.rib.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\rib.y">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.rib.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/rib.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.rib.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/rib.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.rib.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/rib.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bison -p rib -o ../../../../src/ri/rib.cpp ../../../../src/ri/rib.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.rib.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/rib.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\sdr.l">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.sl.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.sl.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.sl.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">flex -i -Psl -o../../../../src/ri/lex.sl.cpp ../../../../src/ri/sdr.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.sl.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\sdr.y">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.sl.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/sl.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.sl.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/sl.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.sl.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/sl.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bison -p sl -o ../../../../src/ri/sl.cpp ../../../../src/ri/sdr.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.sl.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/sl.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\variable.l">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.var.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.var.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.var.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">flex -i -Pvar -o../../../../src/ri/lex.var.cpp ../../../../src/ri/variable.l
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.var.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\src\ri\variable.y">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/lex.var.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../../src/ri/variable.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/lex.var.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../../src/ri/variable.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/lex.var.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../../src/ri/variable.cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bison -p var -o ../../../../src/ri/variable.cpp ../../../../src/ri/variable.y --debug --verbose
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/lex.var.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../../src/ri/variable.cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common.vcxproj">
+      <Project>{9d01025f-82a2-4e47-9b37-7bde5430a087}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\file\file.vcxproj">
+      <Project>{999fbc26-4f20-4bef-b7dc-87db7aa47f72}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\framebuffer\framebuffer.vcxproj">
+      <Project>{4a7a7632-a6a5-423a-b498-a193030bbb6d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\precomp\precomp.vcxproj">
+      <Project>{190139ac-9fda-45df-9a1c-68394739c0e0}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\rgbe\rgbe.vcxproj">
+      <Project>{886855c6-811d-47cc-9172-b110a2318a9d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
