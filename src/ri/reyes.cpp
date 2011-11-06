@@ -565,28 +565,6 @@ void	CReyes::skip() {
 	flushObjects(objectsToDelete);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	drawObject
@@ -715,29 +693,6 @@ void		CReyes::drawObject(CObject *object) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	drawGrid
@@ -795,57 +750,6 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 	// Dispatch the lines to the renderer
 	insertGrid(nGrid,RASTER_POINT);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -1240,45 +1144,6 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes
 // Method				:	newObject
@@ -1305,16 +1170,27 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 	return nObject;
 }
 
+/**
+  \brief
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CReyes
-// Method				:	newGrid
-// Description			:
-/// \brief					Initialize a grid by copying the points
-// Return Value			:	-
-// Comments				:
-/// \note					Thread safe
-CReyes::CRasterGrid		*CReyes::newGrid(CSurface *object,int points,int numVerticesU,int numVerticesV) {
+    Initialize a grid by copying the points.
+
+  \return
+
+    A newly allocated raster grid.
+
+  \note
+
+    Thread safe
+*/
+CReyes::CRasterGrid*
+CReyes::newGrid(
+  CSurface    *object,
+  int          points,
+  int          numVerticesU,
+  int          numVerticesV
+)
+{
 	CRasterGrid		*grid;
 
 	const int numVertices = numVerticesU*numVerticesV;
@@ -1391,13 +1267,6 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 		delete dObject;
 	}
 }
-
-
-
-
-
-
-
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CReyes

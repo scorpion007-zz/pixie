@@ -21,17 +21,7 @@ mkdir Pixie\%platform%\displays
 mkdir Pixie\%platform%\modules
 mkdir Pixie\%platform%\doc
 
-REM Copy third party dependencies.
-if "%platform%" == "Win32" (
-  copy thirdparty\%platform%\libtiff3.dll Pixie\%platform%\bin
-) else (
-  copy thirdparty\%platform%\libtiff.dll Pixie\%platform%\bin
-)
-
-copy thirdparty\%platform%\jpeg62.dll Pixie\%platform%\bin
-copy thirdparty\%platform%\libpng12.dll Pixie\%platform%\bin
-copy thirdparty\%platform%\zlib1.dll Pixie\%platform%\bin
-copy thirdparty\%platform%\libmmd.dll Pixie\%platform%\bin
+REM TODO: Copy third party libs from pixie_deps repo to deploy dir.
 
 REM Copy our binaries.
 copy bin\%platform%\%ConfigType%\rndr.exe Pixie\%platform%\bin
