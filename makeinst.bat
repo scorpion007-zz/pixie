@@ -1,5 +1,12 @@
 @echo off
 
+REM ============================================================================
+REM   Pixie deployment script.
+REM ============================================================================
+REM
+REM NOTE: %PIXIEDEPS% must be set to point to your pixie_deps repo that you use
+REM to build the main project so that the dependencies can be copied.
+REM
 REM Default to x86 deployment
 SET platform=Win32
 if "%1" == "x64" (
@@ -21,17 +28,8 @@ mkdir Pixie\%platform%\displays
 mkdir Pixie\%platform%\modules
 mkdir Pixie\%platform%\doc
 
-REM Copy third party dependencies.
-if "%platform%" == "Win32" (
-  copy thirdparty\%platform%\libtiff3.dll Pixie\%platform%\bin
-) else (
-  copy thirdparty\%platform%\libtiff.dll Pixie\%platform%\bin
-)
-
-copy thirdparty\%platform%\jpeg62.dll Pixie\%platform%\bin
-copy thirdparty\%platform%\libpng12.dll Pixie\%platform%\bin
-copy thirdparty\%platform%\zlib1.dll Pixie\%platform%\bin
-copy thirdparty\%platform%\libmmd.dll Pixie\%platform%\bin
+REM Copy third party libs from pixie_deps repo to deploy dir.
+copy "%PIXIEDEPS%\%platform%\*.dll" "Pixie\%platform%\bin\"
 
 REM Copy our binaries.
 copy bin\%platform%\%ConfigType%\rndr.exe Pixie\%platform%\bin

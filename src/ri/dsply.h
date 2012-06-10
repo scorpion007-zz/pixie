@@ -47,7 +47,30 @@ typedef enum {
 	INTEGER_PARAMETER
 } ParameterType;
 
-typedef void	*(*TDisplayParameterFunction)(const char *,ParameterType,int);
+//------------------------------------------------------------------------------
+// Function: TDisplayParameterFunction
+//
+// Description:
+//
+//  Finds an optional extra parameter passed from RiDisplay, if present.
+//
+// Parameters:
+//
+//  paramName - name of parameter sought.
+//  paramType - type of param.
+//  numItems - for vector types, number of elements in vector. For scalar types,
+//   this should be 1.
+//
+// Returns:
+//
+//  Pointer to parameter value if found, else NULL.
+//
+typedef void*
+(*TDisplayParameterFunction)(
+	const char* paramName,
+	ParameterType paramType,
+	int numItems);
+
 typedef	void	*(*TDisplayStartFunction)(const char *,int,int,int,const char *,TDisplayParameterFunction);
 typedef int		(*TDisplayDataFunction)(void *,int,int,int,int,float *);
 typedef int		(*TDisplayRawDataFunction)(void *,int,int,int,int,void *);
