@@ -438,7 +438,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 	case 0:
 		if (umax <= umin)	break;
 
-		// Split along one direction
+		// Split along U direction
 		umid			=	(umin + umax)*0.5f;
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmax,depth+1,minDepth);
 		p2				=	new CPatch(attributes,xform,object,umid,umax,vmin,vmax,depth+1,minDepth);
@@ -456,7 +456,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 	case 1:
 		if (vmax <= vmin)	break;
 
-		// Split along one direction
+		// Split along V direction
 		vmid			=	(vmin + vmax)*0.5f;
 		p1				=	new CPatch(attributes,xform,object,umin,umax,vmin,vmid,depth+1,minDepth);	
 		p2				=	new CPatch(attributes,xform,object,umin,umax,vmid,vmax,depth+1,minDepth);	
@@ -475,7 +475,7 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		if (vmax <= vmin)	break;
 		if (umax <= umin)	break;
 
-		// Split along one direction
+		// Split along both directions
 		vmid			=	(vmin + vmax)*0.5f;
 		umid			=	(umin + umax)*0.5f;
 		p1				=	new CPatch(attributes,xform,object,umin,umid,vmin,vmid,depth+1,minDepth);
@@ -502,14 +502,6 @@ void	CPatch::splitToChildren(CShadingContext *r,int dir) {
 		break;
 	}
 }
-
-
-
-
-
-
-
-
 
 //////////////////////////////////////////////
 ///

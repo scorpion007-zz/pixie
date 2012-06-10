@@ -57,6 +57,59 @@ void							debugFunction(float *);
 void							convertColorFrom(float *,const float *,ECoordinateSystem);
 void							convertColorTo(float *,const float *,ECoordinateSystem);
 
+inline int
+MyStrCmp(const char *a, const char *b)
+{
+  return strcmp(a, b);
+}
+
+union RAYINFO
+{
+    const char *label;  // ray label
+    float (*origin)[3];
+    float direction[3];
+    float depth;
+    float length;
+};
+
+
+inline bool
+RayInfoExpr(
+    const char  *infoType,
+    int         *stepSize,
+    RAYINFO     *rayInfo
+)
+{
+    if (MyStrCmp(info_type,"label") == 0)
+    {   
+        rayInfo->label = currentRayLabel;
+    	*stepSize	=	1;
+        return true;
+        
+    } else if (MyStrCmp(info_type,"depth") == 0) {	
+    	*op2f		=	(float) currentRayDepth;
+    	*res		=	1;						
+    	stepSize	=	1;						
+    } else if (MyStrCmp(info_type,"origin") == 0) {	
+    	op2f[0]		=	P[0] - I[0];			
+    	op2f[1]		=	P[1] - I[1];			
+    	op2f[2]		=	P[2] - I[2];			
+    	*res		=	1;						
+    	*stepSize	=	3;						
+    } else if (MyStrCmp(info_type,"direction") == 0) {
+    	normalizev(op2f,I);						
+    	*res		=	1;						
+    	stepSize	=	3;						
+    } else if (MyStrCmp(info_type,"length") == 0) {	
+    	*op2f		=	lengthv(I);				
+    	*res		=	1;						
+    	*stepSize	=	1;						
+    } else {									
+    	*res		=	(float) 0;				
+    	*stepSize	=	1;						
+    }
+    
+}
 
 // Lighting helpers
 #define	saveLighting(__L)																	\

@@ -477,25 +477,30 @@ DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GAT
 							operand(2,op2f,float *);											\
 							operand(2,op2s,const char **);
 
-#define	RAYINFOEXPR			if (strcmp(*op1,"label") == 0) {									\
+#define	RAYINFOEXPR			RAYINFO rayInfo; \
+                            *res = RayInfoExpr(*op1, &stepSize, &rayInfo)
+                            
+
+#if 0
+                            if (MyStrCmp(*op1,"label") == 0) {									\
 								*op2s		=	currentRayLabel;								\
 								*res		=	1;												\
 								stepSize	=	1;												\
-							} else if (strcmp(*op1,"depth") == 0) {								\
+							} else if (MyStrCmp(*op1,"depth") == 0) {								\
 								*op2f		=	(float) currentRayDepth;						\
 								*res		=	1;												\
 								stepSize	=	1;												\
-							} else if (strcmp(*op1,"origin") == 0) {							\
+							} else if (MyStrCmp(*op1,"origin") == 0) {							\
 								op2f[0]		=	P[0] - I[0];									\
 								op2f[1]		=	P[1] - I[1];									\
 								op2f[2]		=	P[2] - I[2];									\
 								*res		=	1;												\
 								stepSize	=	3;												\
-							} else if (strcmp(*op1,"direction") == 0) {							\
+							} else if (MyStrCmp(*op1,"direction") == 0) {							\
 								normalizev(op2f,I);												\
 								*res		=	1;												\
 								stepSize	=	3;												\
-							} else if (strcmp(*op1,"length") == 0) {							\
+							} else if (MyStrCmp(*op1,"length") == 0) {							\
 								*op2f		=	lengthv(I);										\
 								*res		=	1;												\
 								stepSize	=	1;												\
@@ -503,7 +508,7 @@ DEFSHORTFUNC(GatherHeader		,"gatherHeader"	,"o=spnff!"	,GATHERHEADEREXPR_PRE,GAT
 								*res		=	(float) 0;										\
 								stepSize	=	1;												\
 							}
-
+#endif
 
 #define	RAYINFOEXPR_UPDATE	res++;																\
 							op1++;																\
