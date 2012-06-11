@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <pixiedeps>D:\dev\pixie_deps</pixiedeps>
+  </PropertyGroup>
   <PropertyGroup>
     <ExecutablePath>c:\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
@@ -13,5 +15,9 @@
       <AdditionalLibraryDirectories>$(pixiedeps)\lib\$(platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BuildMacro Include="pixiedeps">
+      <Value>$(pixiedeps)</Value>
+    </BuildMacro>
+  </ItemGroup>
 </Project>

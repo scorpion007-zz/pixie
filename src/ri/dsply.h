@@ -44,7 +44,8 @@ typedef enum {
 	VECTOR_PARAMETER,
 	MATRIX_PARAMETER,
 	STRING_PARAMETER,
-	INTEGER_PARAMETER
+	INTEGER_PARAMETER,
+	POINTER_PARAMETER,
 } ParameterType;
 
 //------------------------------------------------------------------------------

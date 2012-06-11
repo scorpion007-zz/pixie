@@ -42,6 +42,7 @@ htpoint												return	VAR_HTPOINT;
 hpoint												return	VAR_HTPOINT;
 double												return	VAR_DOUBLE;
 string												return	VAR_STRING;
+pointer                                             return  VAR_POINTER;
 \[													return	VAR_OPEN;
 \]													return	VAR_CLOSE;
 [a-zA-Z\_][a-zA-Z0-9\_]*							{	assert(strlen(yytext) < (VARIABLE_NAME_LENGTH-1));	strcpy(currentVariable->name,yytext); return VAR_IDENTIFIER; }

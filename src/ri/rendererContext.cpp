@@ -983,7 +983,15 @@ void	CRendererContext::RiQuantize(const char *type,int one,int qmin,int qmax,flo
 }
 
 
-void	CRendererContext::RiDisplayV(const char *name,const char *type,const char *mode,int n,const char *tokens[],const void *params[]) {
+void	
+CRendererContext::RiDisplayV(
+	const char *name,
+	const char *type,
+	const char *mode,
+	int n,
+	const char *tokens[],
+	const void *params[])
+{
 	COptions	*options;
 
 	if (strcmp(mode,RI_RGBZ) == 0) {
@@ -1048,7 +1056,8 @@ void	CRendererContext::RiDisplayV(const char *name,const char *type,const char *
 		cDisplay->numParameters			=	n;
 		cDisplay->parameters			=	new COptions::CDisplay::TDisplayParameter[n];
 
-		for (j=0,i=0;i<n;i++) {
+		for (j = 0, i=0; i < n; i++)
+		{
 			CVariable	*cVar;
 			CVariable	tVar;
 
@@ -1059,8 +1068,10 @@ void	CRendererContext::RiDisplayV(const char *name,const char *type,const char *
 				}
 
 			if (cVar != NULL) {
+				
 				cDisplay->parameters[j].name		=	strdup(cVar->name);
 				cDisplay->parameters[j].numItems	=	cVar->numItems;
+				
 				switch(cVar->type) {
 				case TYPE_FLOAT:
 					cDisplay->parameters[j].type	=	FLOAT_PARAMETER;
@@ -1098,6 +1109,22 @@ void	CRendererContext::RiDisplayV(const char *name,const char *type,const char *
 						src	= (float*)	params[i];
 						for(k=0;k<cVar->numItems;k++)	*dst++ = (int) *src++;
 					}
+					break;
+
+				// Pointer extension.
+				//
+				case TYPE_POINTER:
+					{
+						cDisplay->parameters[j].type	=	POINTER_PARAMETER;
+
+                        // For pointer-type params, we assume they will be shared
+                        // and modified. Constness is not necessary here.
+                        //
+						cDisplay->parameters[j].data = const_cast<void*>(params[i]);
+					}
+					break;
+				default:
+					assert(!"Invalid variable type.");
 					break;
 				}
 				j++;

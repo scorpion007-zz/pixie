@@ -207,6 +207,13 @@ COptions::CDisplay::~CDisplay() {
 			case STRING_PARAMETER:
 				free((char *) parameters[i].data);
 				break;
+            case POINTER_PARAMETER:
+                // Nothing to do.
+                //
+                break;
+            default:
+                assert(!"Invalid param type!");
+                break;
 			}
 
 			free(parameters[i].name);
