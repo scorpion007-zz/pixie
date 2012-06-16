@@ -6,4 +6,22 @@ bin/
 *.vcproj.*
 *.vcxproj.*
 *.swp
-displays/   # display driver binaries
+
+# Display driver binaries.
+displays/
+
+# Deployment location.
+Pixie/
+
+*.output
+
+# Flex/Bison-generated files.
+#
+src/ri/dso.cpp
+src/ri/ifexpr.cpp
+lex.*.cpp
+src/ri/rib.cpp
+src/sdrc/sl.cpp
+src/ri/sl.cpp
+src/ri/variable.cpp
+src/sdr/sdr.cpp
