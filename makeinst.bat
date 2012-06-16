@@ -8,6 +8,12 @@ REM NOTE: %PIXIEDEPS% must be set to point to your pixie_deps repo that you use
 REM to build the main project so that the dependencies can be copied.
 REM
 REM Default to x86 deployment
+
+if "%PIXIEDEPS%" == "" (
+	echo PIXIEDEPS is not set! Make sure it points to your pixie_deps repo!
+	exit /b
+)
+
 SET platform=Win32
 if "%1" == "x64" (
   SET platform=%1
