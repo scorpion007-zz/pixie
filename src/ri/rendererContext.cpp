@@ -199,48 +199,73 @@ CRendererContext::~CRendererContext() {
 	CRenderer::endRenderer();
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	getXform
-// Description			:
-/// \brief					Return the active Xform
-// Return Value			:
-// Comments				:
-CXform		*CRendererContext::getXform(int modify) {
-	assert(currentXform	!=	NULL);
-
-	if ((modify) && (currentXform->refCount > 1)) {
-		CXform	*nXform	=	new CXform(currentXform);
-
-		currentXform->detach();
-		currentXform	=	nXform;
-
-		nXform->attach();
+//-----------------------------------------------------------------------------
+// Function: GetWithCOW
+//
+// Description:
+//
+//  Returns a pointer to a refcounted object with COW semantics.
+//
+// Parameters:
+//
+//  modify - intention to modify.
+//
+template<class TRefC>
+TRefC*
+GetWithCOW(
+	__in TRefC** sharedObject,
+	__in bool intentToModify)
+{
+	// Copy if caller intends to modify and we're not the only ones looking at it.
+	// I.e. no need to make a copy if we're the only ones that have a pointer to
+	// it.
+	//
+	if (intentToModify && (*sharedObject)->refCount > 1)
+	{
+		TRefC* newObj = new TRefC(*sharedObject);
+		(*sharedObject)->detach();
+		
+		(*sharedObject) = newObj;
+		newObj->attach();
 	}
 
-	return currentXform;
+	return (*sharedObject);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Class				:	CRendererContext
-// Method				:	getAttributes
-// Description			:
-/// \brief					Return the active attributes
-// Return Value			:
-// Comments				:
-CAttributes	*CRendererContext::getAttributes(int modify) {
-	assert(currentAttributes	!=	NULL);
+//-----------------------------------------------------------------------------
+// Function: CRendererContext::getXform
+//
+// Description:
+//
+//  Returns a pointer to the active Xform with copy-on-write semantics.
+//
+// Parameters:
+//
+//  modify - intention to modify.
+//
+CXform*
+CRendererContext::getXform(
+	__in bool modify)
+{
+	return GetWithCOW(&currentXform, modify);
+}
 
-	if ((modify) && (currentAttributes->refCount > 1)) {
-		CAttributes	*nAttributes	=	new CAttributes(currentAttributes);
-
-		currentAttributes->detach();
-		currentAttributes	=	nAttributes;
-
-		nAttributes->attach();
-	}
-
-	return currentAttributes;
+//-----------------------------------------------------------------------------
+// Function: CRendererContext::getAttributes
+//
+// Description:
+//
+//  Returns a pointer to the active attributes with copy-on-write semantics.
+//
+// Parameters:
+//
+//  modify - intention to modify.
+//
+CAttributes*
+CRendererContext::getAttributes(
+	__in bool modify)
+{
+	return GetWithCOW(&currentAttributes, modify);
 }
 
 
@@ -513,32 +538,6 @@ void	CRendererContext::addInstance(const void *d) {
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////
 // Function				:	addMotion
 // Description			:
@@ -577,7 +576,11 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,const char 
 		}
 	}
 
-	memcpy(motionParameters+parameterSize*numMotions,parameters,parameterSize*sizeof(float));
+	memcpy(
+		motionParameters + parameterSize * numMotions,
+		parameters,
+		parameterSize * sizeof(float));
+	
 	numMotions++;
 
 	if (numExpectedMotions == numMotions) {
@@ -590,7 +593,10 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,const char 
 		for (i=0;i<parameterSize;i++) {
 			float	s,e,d;
 
+			// Slope.
+			//
 			d		=	(p1[i] - p0[i]) / (keyTimes[numMotions-1] - keyTimes[0]);
+			
 			s		=	p0[i] + (currentOptions->shutterOpen - keyTimes[0])*d;
 			e		=	p1[i] + (currentOptions->shutterClose - keyTimes[numMotions-1])*d;
 			p0[i]	=	s;
@@ -2087,12 +2093,17 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 	}
 }
 
-void	CRendererContext::RiConcatTransform(float transform[][4]) {
-	CXform	*xform;
-	matrix	tmp;
-	matrix	to0,to1,from;
-	float	*p0,*p1;
-	int		nflip;
+void	
+CRendererContext::RiConcatTransform(float transform[][4])
+{
+	CXform	*xform = NULL;
+	matrix	tmp = {0};
+	matrix	to0 = {0};
+	matrix  to1 = {0};
+	matrix  from = {0};
+	float	*p0 = NULL;
+	float   *p1 = NULL;
+	int		nflip = 0;
 
 	// Save the elements
 	from[element(0,0)]	=	transform[0][0];
@@ -2117,6 +2128,9 @@ void	CRendererContext::RiConcatTransform(float transform[][4]) {
 		break;
 	case 1:
 		if (invertm(to0,p0) == TRUE) {
+            // BUGBUG: This codepath does not initialize xform, which is used
+            // below.
+            //
 			error(CODE_MATH,"Singular transformation matrix detected\n");
 		} else {
 			xform	=	getXform(TRUE);

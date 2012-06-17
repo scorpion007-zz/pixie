@@ -6,10 +6,13 @@
   </PropertyGroup>
   <PropertyGroup>
     <ExecutablePath>c:\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(pixiedeps)\inc</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(pixiedeps)\lib\$(platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

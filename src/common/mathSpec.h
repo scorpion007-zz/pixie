@@ -115,10 +115,33 @@ inline	SCALAR_TYPE	dotvv(const SCALAR_TYPE *s1,const SCALAR_TYPE *s2) {
 	return (SCALAR_TYPE) (s1[0]*s2[0] + s1[1]*s2[1] + s1[2]*s2[2]);
 }
 
-inline	void	interpolatev(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *s2,const SCALAR_TYPE alpha) {
-	result[0]	=	(float) (s1[0]*(1.0-(double)alpha) + s2[0]*(double)alpha);
-	result[1]	=	(float) (s1[1]*(1.0-(double)alpha) + s2[1]*(double)alpha);
-	result[2]	=	(float) (s1[2]*(1.0-(double)alpha) + s2[2]*(double)alpha);
+//-----------------------------------------------------------------------------
+// Function: interpolatev
+//
+// Description:
+//
+//  Performs a linear interpolation between 's1' and 's2' given the parameter
+//  'alpha' between [0, 1].
+//
+// Returns:
+//
+//  void.
+//
+// Notes:
+//
+//  Vectors are assumed to be 3-dimensional.
+//
+inline void
+interpolatev(
+	__out_ecount(3) SCALAR_TYPE *result,
+	__in_ecount(3) const SCALAR_TYPE *s1,
+	__in_ecount(3) const SCALAR_TYPE *s2,
+	__in const SCALAR_TYPE alpha)
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		result[i] = s1[i] * (1 - alpha) + s2[i] * alpha;
+	}
 }
 
 inline	SCALAR_TYPE	interpolatea(const SCALAR_TYPE s1,const SCALAR_TYPE s2,const SCALAR_TYPE alpha) {
@@ -612,7 +635,11 @@ void	rotatem(SCALAR_TYPE *,const SCALAR_TYPE *,const SCALAR_TYPE);						// Const
 void	rotatem(SCALAR_TYPE *,SCALAR_TYPE,SCALAR_TYPE,SCALAR_TYPE,const SCALAR_TYPE);		// Construct rotate matrix (the arguments are: result,x,y,z coordinates of the rotation vector and angle to rotate)
 void	rotatem(SCALAR_TYPE *,const SCALAR_TYPE *);
 void	skewm(SCALAR_TYPE *,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE);
-int		invertm(SCALAR_TYPE *,const SCALAR_TYPE *);											// Invert a matrix. Returns 0 if the inversion is successful 1 otherwise (i.e. matrix is singular)
+
+bool	
+invertm(
+	SCALAR_TYPE *d,
+	const SCALAR_TYPE *s);
 
 
 

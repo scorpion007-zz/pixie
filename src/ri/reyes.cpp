@@ -855,7 +855,11 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 /// \brief					Shade a grid
 // Return Value			:	-
 // Comments				:
-void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
+void		
+CReyes::shadeGrid(
+	__in CRasterGrid *grid,
+	__in int Ponly) 
+{
 
 	// Make sure we shade a grid only once
 	if (Ponly == FALSE) {
@@ -877,7 +881,8 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 		const CAttributes	*attributes		=	object->attributes;
 		float				*sizes;
 
-		if (Ponly) {
+		if (Ponly) 
+		{
 			// Set the flags
 			grid->flags	=	extraPrimitiveFlags | RASTER_POINT | RASTER_UNSHADED;
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN) 		grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
@@ -1026,33 +1031,67 @@ void		CReyes::shadeGrid(CRasterGrid *grid,int Ponly) {
 			}
 		}
 
-		if (Ponly) {
-		
-			// Set the flags
-			if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) {
-				grid->flags	=	RASTER_DRAW_FRONT | RASTER_DRAW_BACK | RASTER_UNSHADED | extraPrimitiveFlags;
-			} else {
-				if (attributes->flags & ATTRIBUTES_FLAGS_INSIDE) {	// Flip
-					grid->flags	=	RASTER_DRAW_FRONT | RASTER_UNSHADED | extraPrimitiveFlags;
-				} else {
-					grid->flags	=	RASTER_DRAW_BACK | RASTER_UNSHADED | extraPrimitiveFlags;
-				}
-			}
-			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN)	 grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
-			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE) grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+		if (Ponly) 
+		{
+			// Set the flags.
+			//
 
-			// Do we have motion blur ?
-			if ((CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION) && (object->moving())) grid->flags		|=	RASTER_MOVING;
-
-			// Displace the sucker
-			displace(object,udiv+1,vdiv+1,SHADING_2D_GRID,PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
-
-			// Project the P into samples
-			camera2samples(numVertices,varying[VARIABLE_P]);
+			// Common flags.
+			//
+			grid->flags = RASTER_UNSHADED | extraPrimitiveFlags;
 			
-			// Save the vertex data
-			copyPoints(numVertices,varying,grid->vertices,0);
-		} else {
+			if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) 
+			{
+				grid->flags	|= RASTER_DRAW_FRONT | RASTER_DRAW_BACK;
+			} 
+			else if (attributes->flags & ATTRIBUTES_FLAGS_INSIDE) 
+			{	
+				// Flip.
+				//
+				grid->flags	|=	RASTER_DRAW_FRONT;
+			} 
+			else 
+			{
+				grid->flags	|=	RASTER_DRAW_BACK;
+			}
+			
+			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN)
+			{
+				grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
+			}
+			
+			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)
+			{
+				grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
+			}
+
+			// Do we have motion blur?
+			//
+			if (CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION &&
+				object->moving())
+			{
+				grid->flags |= RASTER_MOVING;
+			}
+
+			// Displace the sucker.
+			//
+			displace(
+				object,
+				udiv+1,
+				vdiv+1,
+				SHADING_2D_GRID,
+				PARAMETER_BEGIN_SAMPLE | PARAMETER_P);
+
+			// Project the P into samples.
+			//
+			camera2samples(numVertices, varying[VARIABLE_P]);
+			
+			// Save the vertex data.
+			//
+			copyPoints(numVertices, varying, grid->vertices, 0);
+		}
+		else
+		{
 			// Sanity check
 			numGridsShaded++;
 
@@ -1407,7 +1446,11 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 // Return Value			:	-
 // Comments				:
 /// \note					Thread safe
-void		CReyes::insertGrid(CRasterGrid *grid,int flags) {
+void
+CReyes::insertGrid(
+	__in CRasterGrid *grid,
+	__in int flags)
+{
 	// Compute the grid bound and insert it
 	int				i;
 	const float		*cVertex;

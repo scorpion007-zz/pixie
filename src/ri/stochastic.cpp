@@ -141,28 +141,49 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	bottom				=	top + sampleHeight;
 
 	// Early-out if we have no data
-	if (!(CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket) return;
+	if (!(CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING) && nullBucket)
+	{
+		return;
+	}
 
 	assert(sampleWidth <= totalWidth);
 	assert(sampleHeight <= totalHeight);
 
-	// Init the occlusion culler to zero
+	// Init the occlusion culler to zero.
+	//
 	initToZero();
-	for (i=0,pxi=CRenderer::pixelYsamples-CRenderer::ySampleOffset;i<sampleHeight;i++,pxi++) {
+	
+	for (i = 0, pxi = CRenderer::pixelYsamples - CRenderer::ySampleOffset;
+		 i < sampleHeight;
+		 i++, pxi++)
+	{
 		CPixel	*pixel	=	fb[i];
 		
-		if (pxi >= CRenderer::pixelYsamples)	pxi = 0;
+		if (pxi >= CRenderer::pixelYsamples)
+		{
+			pxi = 0;
+		}
 		
-		for (j=0,pxj=CRenderer::pixelXsamples-CRenderer::xSampleOffset;j<sampleWidth;j++,pxj++,pixel++) {
+		for (j = 0, pxj = CRenderer::pixelXsamples - CRenderer::xSampleOffset;
+			 j < sampleWidth;
+			 j++, pxj++, pixel++)
+		{
 			float	aperture[2];
 
-			// The stratified sample
-			pixel->jx					=	(CRenderer::jitter*(urand()-0.5f) + 0.5001011f);
-			pixel->jy					=	(CRenderer::jitter*(urand()-0.5f) + 0.5001017f);
+			// The stratified sample.
+			//
+			pixel->jx = (CRenderer::jitter*(urand()-0.5f) + 0.5001011f);
+			pixel->jy = (CRenderer::jitter*(urand()-0.5f) + 0.5001017f);
 
-			// Time of the sample for motion blur
-			if (pxj >= CRenderer::pixelXsamples)	pxj = 0;
-			pixel->jt					=	( pxi*CRenderer::pixelXsamples + pxj + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/(float)(CRenderer::pixelXsamples*CRenderer::pixelYsamples);
+			if (pxj >= CRenderer::pixelXsamples)
+			{
+				pxj = 0;
+			}
+			
+			// Time of the sample for motion blur.
+			//
+			pixel->jt = (pxi * CRenderer::pixelXsamples + pxj + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/
+				(float)(CRenderer::pixelXsamples * CRenderer::pixelYsamples);
 			
 			// Importance blend / jitter
 			pixel->jimp					=	1.0f - ( pxj*CRenderer::pixelYsamples + pxi + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/(float)(CRenderer::pixelXsamples*CRenderer::pixelYsamples);

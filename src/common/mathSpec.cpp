@@ -91,29 +91,47 @@ static	inline void adjoint( SCALAR_TYPE *out,const SCALAR_TYPE *in) {
     out[element(3,3)]  = (SCALAR_TYPE)  det3x3( a1, a2, a3, b1, b2, b3, c1, c2, c3);
 }
 
-///////////////////////////////////////////////////////////////////////
-// Function				:	invert
-// Description			:
-/// \brief					invert a 4 by 4 matrix
-// Return Value			:	Determinant
-// Comments				:
-int			invertm(SCALAR_TYPE *d,const SCALAR_TYPE *s)	{
+//-----------------------------------------------------------------------------
+// Function: invertm
+//
+// Description:
+//
+//  Inverts a 4 by 4 matrix.
+//
+// Parameters:
+//
+//  d - destination.
+//  s - source matrix.
+//
+// Returns:
+//
+//  'true' if the matrix was singular, in which case the identity matrix is
+//  returned.
+//  'false' otherwise.
+//
+bool			
+invertm(
+	SCALAR_TYPE *d,
+	const SCALAR_TYPE *s)
+{
 	int		i;
     double	det;
 
-    adjoint(d,s);
+    adjoint(d, s);
 
     det = det4x4(s);
 
+	// Determinant was 0 => singular. Return the identity.
+	//
 	if (det == 0) {
 		identitym(d);
-        return TRUE;
+        return true;
 	}
 
     for (i=0; i<16; i++)
 		d[i]		=	(SCALAR_TYPE) (d[i] / det);
 
-	return FALSE;
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////

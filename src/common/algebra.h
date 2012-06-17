@@ -57,8 +57,11 @@ typedef double	dquaternion[4];								// an array of 4 doubles
 typedef double	dhtpoint[4];								// an array of 4 floats
 typedef double	dmatrix[16];								// an array of 16 doubles
 
-// Row major matrix element order (compatible with openGL)
-#define	element(row,column)	(row+(column<<2))
+// Row major matrix element order (compatible with openGL).
+//
+// NOTE(alexbud): Hmm, isn't this column-major?
+//
+#define	element(row,column)	((row) + (column)*4)
 
 extern const matrix	identityMatrix;						// Points to the identity matrix
 

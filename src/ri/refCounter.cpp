@@ -37,8 +37,9 @@
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CRefCounter::CRefCounter() {
-	refCount	=	0;
+CRefCounter::CRefCounter():
+	refCount(0)
+{
 }
 
 ///////////////////////////////////////////////////////////////////////

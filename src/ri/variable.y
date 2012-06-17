@@ -252,7 +252,7 @@ parseVariable(
     const char *name, // in
     const char *decl) // in
 {
-#if YYDEBUG
+#if YYDEBUG=1
 	// Turn on parser debug output.
 	//
     vardebug = 1;

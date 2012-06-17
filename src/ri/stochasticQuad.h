@@ -395,118 +395,124 @@ xmax					=	min(xmax,xres);
 ymax					=	min(ymax,yres);
 
 int	x,y;
-for (y=ymin;y<=ymax;y++) for (x=xmin;x<=xmax;x++) {
-	CPixel		*pixel		=	fb[y] + x;
-	int			i,j;
 
-	const int	*bounds		=	grid->bounds;
+for (y = ymin; y <= ymax; y++) 
+{
+	for (x = xmin; x <= xmax; x++) 
+	{
+		CPixel		*pixel		=	fb[y] + x;
+		int			i,j;
 
-	const float	*vertices	=	grid->vertices;
-	const	int	udiv		=	grid->udiv;
+		const int	*bounds		=	grid->bounds;
 
-	const	int	vdiv		=	grid->vdiv;
-	const	int	flags		=	grid->flags;
+		const float	*vertices	=	grid->vertices;
+		const	int	udiv		=	grid->udiv;
 
-	for (j=0;j<vdiv;j++) {
-		for (i=0;i<udiv;i++,bounds+=4,vertices+=numVertexSamples) {
+		const	int	vdiv		=	grid->vdiv;
+		const	int	flags		=	grid->flags;
 
-			if (x+left < bounds[0])		continue;
-			if (x+left > bounds[1])		continue;
-			if (y+top < bounds[2])		continue;
-			if (y+top > bounds[3])		continue;
+		for (j = 0; j < vdiv; j++)
+		{
+			for (i = 0; i < udiv; i++, bounds += 4, vertices += numVertexSamples)
+			{
+				if (x+left < bounds[0])		continue;
+				if (x+left > bounds[1])		continue;
+				if (y+top < bounds[2])		continue;
+				if (y+top > bounds[3])		continue;
 
-			lodCheck();
+				lodCheck();
 
-			const float	*v0	=	vertices;
-			const float	*v1	=	vertices + numVertexSamples;
-			const float	*v2	=	v1 + udiv*numVertexSamples;
-			const float	*v3	=	v2 + numVertexSamples;
+				const float	*v0	=	vertices;
+				const float	*v1	=	vertices + numVertexSamples;
+				const float	*v2	=	v1 + udiv*numVertexSamples;
+				const float	*v3	=	v2 + numVertexSamples;
 
 #ifdef STOCHASTIC_FOCAL_BLUR
-				const float v0d =	v0[9];
-				const float v1d =	v1[9];
-				const float v2d =	v2[9];
-				const float v3d =	v3[9];
+					const float v0d =	v0[9];
+					const float v1d =	v1[9];
+					const float v2d =	v2[9];
+					const float v3d =	v3[9];
 #endif
 
 #ifdef STOCHASTIC_MOVING
-			vector	v0movTmp;
-			vector	v1movTmp;
-			vector	v2movTmp;
-			vector	v3movTmp;
-			interpolatev(v0movTmp,v0,v0+displacement,pixel->jt);
-			interpolatev(v1movTmp,v1,v1+displacement,pixel->jt);
-			interpolatev(v2movTmp,v2,v2+displacement,pixel->jt);
-			interpolatev(v3movTmp,v3,v3+displacement,pixel->jt);
-			v0		=	v0movTmp;
-			v1		=	v1movTmp;
-			v2		=	v2movTmp;
-			v3		=	v3movTmp;
+				vector	v0movTmp;
+				vector	v1movTmp;
+				vector	v2movTmp;
+				vector	v3movTmp;
+				interpolatev(v0movTmp,v0,v0+displacement,pixel->jt);
+				interpolatev(v1movTmp,v1,v1+displacement,pixel->jt);
+				interpolatev(v2movTmp,v2,v2+displacement,pixel->jt);
+				interpolatev(v3movTmp,v3,v3+displacement,pixel->jt);
+				v0		=	v0movTmp;
+				v1		=	v1movTmp;
+				v2		=	v2movTmp;
+				v3		=	v3movTmp;
 #endif
 
 
 #ifdef STOCHASTIC_FOCAL_BLUR
-			vector	v0focTmp;
-			vector	v1focTmp;
-			vector	v2focTmp;
-			vector	v3focTmp;
-			v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
-			v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
-			v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
-			v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
+				vector	v0focTmp;
+				vector	v1focTmp;
+				vector	v2focTmp;
+				vector	v3focTmp;
+				v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
+				v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
+				v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
+				v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
 
-			v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
-			v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
-			v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
-			v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
+				v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
+				v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
+				v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
+				v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
 
-			v0focTmp[COMP_Z]	=	v0[COMP_Z];
-			v1focTmp[COMP_Z]	=	v1[COMP_Z];
-			v2focTmp[COMP_Z]	=	v2[COMP_Z];
-			v3focTmp[COMP_Z]	=	v3[COMP_Z];
+				v0focTmp[COMP_Z]	=	v0[COMP_Z];
+				v1focTmp[COMP_Z]	=	v1[COMP_Z];
+				v2focTmp[COMP_Z]	=	v2[COMP_Z];
+				v3focTmp[COMP_Z]	=	v3[COMP_Z];
 
-			v0					=	v0focTmp;
-			v1					=	v1focTmp;
-			v2					=	v2focTmp;
-			v3					=	v3focTmp;
+				v0					=	v0focTmp;
+				v1					=	v1focTmp;
+				v2					=	v2focTmp;
+				v3					=	v3focTmp;
 #endif
 
-			// Check the orientation of the quad
-			float a	= area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
-			if (fabsf(a) < C_EPSILON)  a = area(v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
-			if (a > 0) {
+				// Check the orientation of the quad
+				float a	= area(v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+				if (fabsf(a) < C_EPSILON)  a = area(v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+				if (a > 0) {
 
-				// Back face culling
-				if (!shouldDrawBack()) {
-					continue;
+					// Back face culling
+					if (!shouldDrawBack()) {
+						continue;
+					}
+
+					checkPixel(<);
+
+					v0	=	vertices;
+					v1	=	v0 + numVertexSamples;
+					v2	=	v1 + udiv*numVertexSamples;
+					v3	=	v2 + numVertexSamples;
+
+					drawPixelCheck();
+				} else {
+
+					// Back face culling
+					if (!shouldDrawFront()) {
+						continue;
+					}
+
+					checkPixel(>);
+
+					v0	=	vertices;
+					v1	=	v0 + numVertexSamples;
+					v2	=	v1 + udiv*numVertexSamples;
+					v3	=	v2 + numVertexSamples;
+
+					drawPixelCheck();
 				}
-
-				checkPixel(<);
-
-				v0	=	vertices;
-				v1	=	v0 + numVertexSamples;
-				v2	=	v1 + udiv*numVertexSamples;
-				v3	=	v2 + numVertexSamples;
-
-				drawPixelCheck();
-			} else {
-
-				// Back face culling
-				if (!shouldDrawFront()) {
-					continue;
-				}
-
-				checkPixel(>);
-
-				v0	=	vertices;
-				v1	=	v0 + numVertexSamples;
-				v2	=	v1 + udiv*numVertexSamples;
-				v3	=	v2 + numVertexSamples;
-
-				drawPixelCheck();
 			}
+			vertices	+=	numVertexSamples;
 		}
-		vertices	+=	numVertexSamples;
 	}
 }
 
@@ -624,11 +630,12 @@ for (j=0;j<vdiv;j++) {
 		// Do the slow rasterization
 
 		int	x,y;
-		for (y=ymin;y<=ymax;y++) {
+		for (y = ymin; y <= ymax; y++)
+		{
 			CPixel		*pixel;
 
-			for (pixel=fb[y]+xmin,x=xmin;x<=xmax;x++,pixel++) {
-	
+			for (pixel = fb[y] + xmin, x = xmin; x <= xmax; x++, pixel++)
+			{
 				lodCheck();
 
 				const float	*v0	=	vertices;

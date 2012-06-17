@@ -81,47 +81,78 @@
 	transform(oFrom,oDir,xform,rv);
 
 
-
-#define	transformPoints()																			\
-	if ((xform->next != NULL) && (!(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))) {		\
-																									\
-		transform(&varying[VARIABLE_P][start*3],numVertices,xform->from,xform->next->from,&varying[VARIABLE_TIME][start]);	\
-																									\
-		if (up & PARAMETER_DPDU) {																	\
-			vtransform(&varying[VARIABLE_DPDU][start*3],numVertices,xform->from,xform->next->from,&varying[VARIABLE_TIME][start]);	\
-		}																							\
-																									\
-		if (up & PARAMETER_DPDV) {																	\
-			vtransform(&varying[VARIABLE_DPDV][start*3],numVertices,xform->from,xform->next->from,&varying[VARIABLE_TIME][start]);	\
-		}																							\
-																									\
-		if (up & PARAMETER_NG) {																		\
-			ntransform(&varying[VARIABLE_NG][start*3],numVertices,xform->to,xform->next->to,&varying[VARIABLE_TIME][start]);	\
-		}																							\
-	} else {																						\
-		float	*from	=	xform->from;															\
-		float	*to		=	xform->to;																\
-																									\
-		if ((up & PARAMETER_END_SAMPLE) && (xform->next != NULL))	{								\
-			from	=	xform->next->from;															\
-			to		=	xform->next->to;															\
-		}																							\
-																									\
-		transform(&varying[VARIABLE_P][start*3],numVertices,from);									\
-																									\
-		if (up & PARAMETER_DPDU) {																	\
-			vtransform(&varying[VARIABLE_DPDU][start*3],numVertices,from);							\
-		}																							\
-																									\
-		if (up & PARAMETER_DPDV) {																	\
-			vtransform(&varying[VARIABLE_DPDV][start*3],numVertices,from);							\
-		}																							\
-																									\
-		if (up & PARAMETER_NG) {																	\
-			ntransform(&varying[VARIABLE_NG][start*3],numVertices,to);								\
-		}																							\
+static void
+transformPoints(
+	__in CXform* xform,
+	__in unsigned up,
+	__in_ecount(VARIABLE_LAST) float **varying,
+	__in int start,
+	__in int numVertices)
+{
+	if (xform->next && !(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))
+	{		
+		transform(
+			&varying[VARIABLE_P][start*3],
+			numVertices,
+			xform->from,
+			xform->next->from,
+			&varying[VARIABLE_TIME][start]);	
+																									
+		if (up & PARAMETER_DPDU) 
+		{																	
+			vtransform(
+				&varying[VARIABLE_DPDU][start*3],
+				numVertices,
+				xform->from,
+				xform->next->from,
+				&varying[VARIABLE_TIME][start]);	
+		}																							
+																									
+		if (up & PARAMETER_DPDV) 
+		{																	
+			vtransform(
+				&varying[VARIABLE_DPDV][start*3],
+				numVertices,
+				xform->from,
+				xform->next->from,
+				&varying[VARIABLE_TIME][start]);	
+		}																							
+																									
+		if (up & PARAMETER_NG) 
+		{																		
+			ntransform(
+				&varying[VARIABLE_NG][start*3],
+				numVertices,
+				xform->to,
+				xform->next->to,
+				&varying[VARIABLE_TIME][start]);	
+		}																							
 	}
-
+	else
+	{																						
+		float	*from	=	xform->from;															
+		float	*to		=	xform->to;																
+																									
+		if ((up & PARAMETER_END_SAMPLE) && (xform->next != NULL))	{								
+			from	=	xform->next->from;															
+			to		=	xform->next->to;															
+		}																							
+																									
+		transform(&varying[VARIABLE_P][start*3],numVertices,from);									
+																									
+		if (up & PARAMETER_DPDU) {																	
+			vtransform(&varying[VARIABLE_DPDU][start*3],numVertices,from);							
+		}																							
+																									
+		if (up & PARAMETER_DPDV) {																	
+			vtransform(&varying[VARIABLE_DPDV][start*3],numVertices,from);							
+		}																							
+																									
+		if (up & PARAMETER_NG) {																	
+			ntransform(&varying[VARIABLE_NG][start*3],numVertices,to);								
+		}																							
+	}
+}
 
 
 
@@ -309,7 +340,14 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 // Description			:	See object.h
 // Return Value			:	-
 // Comments				:
-void			CSphere::sample(int start,int numVertices,float **varying,float ***locals,unsigned int &up) const {
+void
+CSphere::sample(
+	int start,
+	int numVertices,
+	__in_ecount(VARIABLE_LAST) float **varying,
+	float ***locals,
+	unsigned int &up) const
+{
 	const float		*u		=	varying[VARIABLE_U] + start;
 	const float		*v		=	varying[VARIABLE_V] + start;
 	float			*sinu	=	(float *)	alloca(numVertices*4*sizeof(float));
@@ -488,21 +526,47 @@ void			CSphere::sample(int start,int numVertices,float **varying,float ***locals
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
 			}
-		} else {
+		} 
+		else
+		{
 			// Get the xform matrices
+			//
+			// NOTE(alexbud): Seems like it's using the last column;
+			// I.e. just the translation part. Looks pretty column-major to me.
+			//
 			const float	*fromStart	=	xform->from + element(0,3);
-			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from + element(0,3) : xform->from + element(0,3));
-			vector		D;
-			subvv(D,fromEnd,fromStart);
-			mulvf(D,CRenderer::invShutterTime);
+			
+			const float	*fromEnd	=	fromStart;
+
+			// If we have an end sample, use it.
+			//
+			if (xform->next)
+			{
+				fromEnd = xform->next->from + element(0,3);
+			}
+				
+			vector D;
+
+			// Compute the direction vector. (endPos - startPos).
+			//
+			subvv(D, fromEnd, fromStart);
+
+			// Divide it by the shutter duration.
+			//
+			mulvf(D, CRenderer::invShutterTime);
 			
 			// dPdtime is zero
-			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
+			//
+			for (int i = 0; i < numVertices; ++i, dest += 3)
+			{
+				movvv(dest, D);
+			}
 		}
 	}
 
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	// Turn off the parameters we computed
 	up	&=	~parametersF;
@@ -892,8 +956,9 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 		}
 	}
 	
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	// Turn off the parameters we computed
 	up	&=	~parametersF;
@@ -1326,8 +1391,9 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 	}
 
 
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	// Turn off the parameters we computed
 	up	&=	~parametersF;
@@ -1778,8 +1844,9 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 		}
 	}
 
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	up	&=	~parametersF;
 }
@@ -2210,8 +2277,9 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 		}
 	}
 	
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	// Turn off the parameters we computed
 	up	&=	~parametersF;
@@ -2734,8 +2802,9 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 	}
 
 
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	// Turn off the parameters we computed
 	up	&=	~parametersF;
@@ -3238,8 +3307,9 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 	}
 
 
-	// Transform the points
-	transformPoints();
+	// Transform the points.
+	//
+	transformPoints(xform, up, varying, start, numVertices);
 
 	// Note that the normals are computed by dPdu x dPdv, meaning that the normal vector may be degenerate
 	normalFix();

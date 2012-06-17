@@ -74,7 +74,7 @@ class	CEnvironment;
 typedef enum {
 	SHADING_0D,				// Shading points
 	SHADING_2D_GRID,		// Shading a 2D grid
-	SHADING_2D				// Shading a 2D surface that has been arbitraryly sampled
+	SHADING_2D				// Shading a 2D surface that has been arbitrarily sampled.
 } EShadingDim;
 
 // Predefined ray labels used during raytracing

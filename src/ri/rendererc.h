@@ -147,37 +147,47 @@ const	unsigned int		BOUND_PZ						=	4;
 const	unsigned int		BOUND_NZ						=	5;
 
 
-//	Entry points for the global variables
-//	Varying variables (this includes variables declared as vertex too)
-const	unsigned	int		VARIABLE_P					=	0;
-const	unsigned	int		VARIABLE_PS					=	1;
-const	unsigned	int		VARIABLE_N					=	2;
-const	unsigned	int		VARIABLE_NG					=	3;
-const	unsigned	int		VARIABLE_DPDU				=	4;
-const	unsigned	int		VARIABLE_DPDV				=	5;
-const	unsigned	int		VARIABLE_L					=	6;
-const	unsigned	int		VARIABLE_CS					=	7;
-const	unsigned	int		VARIABLE_OS					=	8;
-const	unsigned	int		VARIABLE_CL					=	9;
-const	unsigned	int		VARIABLE_OL					=	10;
-const	unsigned	int		VARIABLE_CI					=	11;
-const	unsigned	int		VARIABLE_OI					=	12;
-const	unsigned	int		VARIABLE_S					=	13;
-const	unsigned	int		VARIABLE_T					=	14;
-const	unsigned	int		VARIABLE_DU					=	15;
-const	unsigned	int		VARIABLE_DV					=	16;
-const	unsigned	int		VARIABLE_U					=	17;
-const	unsigned	int		VARIABLE_V					=	18;
-const	unsigned	int		VARIABLE_I					=	19;
-const	unsigned	int		VARIABLE_E					=	20;
-const	unsigned	int		VARIABLE_ALPHA				=	21;
-const	unsigned	int		VARIABLE_TIME				=	22;
-const	unsigned	int		VARIABLE_PW					=	23;
-const	unsigned	int		VARIABLE_NCOMPS				=	24;
-const	unsigned	int		VARIABLE_DTIME				=	25;
-const	unsigned	int		VARIABLE_DPDTIME			=	26;
-const	unsigned	int		VARIABLE_WIDTH				=	27;
-const	unsigned	int		VARIABLE_CONSTANTWIDTH		=	28;
+// Entry points for the global variables.
+//
+
+// Varying variables (this includes variables declared as vertex too).
+//
+enum VARYING_VARS
+{
+	VARIABLE_P,	
+	VARIABLE_PS,	
+	VARIABLE_N,	
+	VARIABLE_NG,	
+	VARIABLE_DPDU,
+	VARIABLE_DPDV,
+	VARIABLE_L,	
+	VARIABLE_CS,	
+	VARIABLE_OS,	
+	VARIABLE_CL,	
+	VARIABLE_OL,	
+	VARIABLE_CI,	
+	VARIABLE_OI,	
+	VARIABLE_S,	
+	VARIABLE_T,	
+	VARIABLE_DU,	
+	VARIABLE_DV,	
+	VARIABLE_U,	
+	VARIABLE_V,	
+	VARIABLE_I,	
+	VARIABLE_E,		
+	VARIABLE_ALPHA,	
+	VARIABLE_TIME,	
+	VARIABLE_PW,		
+	VARIABLE_NCOMPS,	
+	VARIABLE_DTIME,	
+	VARIABLE_DPDTIME,
+	VARIABLE_WIDTH,	
+	VARIABLE_CONSTANTWIDTH,
+
+	// Add vars before this one.
+	//
+	VARIABLE_LAST
+};
 
 //	Some shader parameters
 const	unsigned	int		PARAMETER_DERIVATIVE		=	1 << 14;
@@ -211,7 +221,7 @@ const	unsigned	int		PARAMETER_BEGIN_SAMPLE		=	1 << 27;
 const	unsigned	int		PARAMETER_END_SAMPLE		=	1 << 28;
 const	unsigned	int		PARAMETER_RAYTRACE			=	1 << 29;	// Requires raytracing
 const	unsigned	int		PARAMETER_NONAMBIENT		=	1 << 30;	// A non-ambient light source
-const	unsigned	int		PARAMETER_MESSAGEPASSING	=	1 << 31;	// Shader calls message passing functions
+const	unsigned	int		PARAMETER_MESSAGEPASSING	=	1U << 31;	// Shader calls message passing functions
 
 
 

@@ -71,7 +71,14 @@ inline	void	transform(float *src,int num,const float *from) {
 // Return Value			:
 // Comments				:
 /// \note					This one also interpolates with a time constant
-inline	void	transform(float *src,int num,const float *from0,const float *from1,const float *time) {
+inline void	
+transform(
+	float *src,
+	int num,
+	const float *from0,
+	const float *from1,
+	const float *time)
+{
 	int		i;
 	vector	tmp0,tmp1;
 

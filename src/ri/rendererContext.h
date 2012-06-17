@@ -206,8 +206,15 @@ public:
 
 
 	// The following functions provide access to the graphics state
-	CXform				*getXform(int);										// Get the active XForm
-	CAttributes			*getAttributes(int);								// Get the active Attributes
+	//
+	CXform*
+	getXform(
+		__in bool modify);
+	
+	CAttributes*
+	getAttributes(
+		__in bool modify);
+	
 	COptions			*getOptions();										// Get the active Options
 	CShaderInstance		*getShader(const char *,int,int,const char **,const void **);	// Load a shader
 
