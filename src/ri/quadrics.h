@@ -50,7 +50,11 @@ public:
 						~CSphere();
 
 		void			intersect(CShadingContext *,CRay *);
-		int				moving() const													{	return (nextData != NULL) | (xform->next != NULL);		}
+		int				moving() const
+		{
+			return (nextData != NULL) | (xform->next != NULL);		
+		}
+		
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;

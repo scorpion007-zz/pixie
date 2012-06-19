@@ -36,22 +36,39 @@
 #include "random.h"
 
 
-// This macro is used to allocate fragments
-#define	newFragment(__a)	if (freeFragments == NULL)	{						\
-								__a					=	new CFragment;			\
-								if (CRenderer::numExtraSamples > 0) {							\
-									__a->extraSamples = new float[CRenderer::numExtraSamples]; 	\
-								}																\
-							} else {											\
-								__a					=	freeFragments;			\
-								freeFragments		=	freeFragments->next;	\
-							}													\
-							numFragments++;
+// This function is used to allocate fragments.
+// Maintains a lookaside list so we don't allocate all the time.
+//
+void
+CStochastic::newFragment(
+	__out CFragment** ppSample)
+{
+	if (freeFragments == NULL)
+	{					
+		*ppSample					=	new CFragment;			
+		if (CRenderer::numExtraSamples > 0)
+		{							
+			(*ppSample)->extraSamples = new float[CRenderer::numExtraSamples]; 	
+		}																
+	}
+	else
+	{											
+		*ppSample =	freeFragments;			
+		freeFragments =	freeFragments->next;	
+	}													
+	numFragments++;
+}
 
-// And deallocate macro
-#define	deleteFragment(__a)	__a->next				=	freeFragments;			\
-							freeFragments			=	__a;					\
-							numFragments--;
+// And deallocate.
+//
+void
+CStochastic::deleteFragment(
+	__in CFragment* sample)
+{
+	sample->next = freeFragments;			
+	freeFragments = sample;					
+	numFragments--;
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -245,6 +262,580 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	resetHierarchy();
 }
 
+bool
+CStochastic::lodCheck(
+	__in CRasterGrid *grid,
+	__in CPixel* pixel)
+{
+	const float importance = grid->object->attributes->lodImportance;
+	
+	if (importance >= 0)
+	{							
+		if (pixel->jimp > importance)
+		{
+			return false;
+		}
+	}
+	else
+	{										
+		if (1 - pixel->jimp >= -importance)
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+static bool
+shouldDrawBack(unsigned flags)
+{
+	if (flags & RASTER_UNDERCULL)
+	{
+		return flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE);
+	}
+	else
+	{
+		return flags & RASTER_DRAW_BACK;
+	}
+}
+
+static bool
+shouldDrawFront(unsigned flags)
+{
+	if (flags & RASTER_UNDERCULL)
+	{
+		return flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE);
+	}
+	else
+	{
+		return flags & RASTER_DRAW_FRONT;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// This function is used to check whether the sample is inside the quad or not
+// TODO: fix name.
+//
+bool
+CStochastic::checkPixel(
+	__in bool useLessThan,
+	__in CPixel* pixel,
+	__in const float* v0,
+	__in const float* v1,
+	__in const float* v2,
+	__in const float* v3,
+	__out float* pZ,
+	__out float* pU,
+	__out float* pV)
+{
+	const float		xcent	=	pixel->xcent;																
+	const float		ycent	=	pixel->ycent;																
+	float			aleft,atop,aright,abottom;	
+
+	// Compute areas.
+	//
+	atop		= area(xcent,ycent,v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y]); 	
+	aright		= area(xcent,ycent,v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y]); 	
+	abottom	= area(xcent,ycent,v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]); 
+	aleft		= area(xcent,ycent,v2[COMP_X],v2[COMP_Y],v0[COMP_X],v0[COMP_Y]); 	
+
+	if (useLessThan)
+	{
+		if (atop < 0 ||
+			aright < 0 ||
+			abottom < 0	||
+			aleft < 0)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (atop > 0 ||
+			aright > 0 ||
+			abottom > 0	||
+			aleft > 0)
+		{
+			return false;
+		}
+	}
+																											
+	const float u	=	aleft / (aleft + aright);															
+	const float v	=	atop / (atop + abottom);															
+	const float	z	=	(v0[COMP_Z]*(1-u) + v1[COMP_Z]*u)*(1-v) + (v2[COMP_Z]*(1-u) + v3[COMP_Z]*u)*v;
+
+	// Fill caller param.
+	// TODO: clean this
+	//
+	*pZ = z;
+	*pU = u;
+	*pV = v;
+	
+	if (z < CRenderer::clipMin)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+// The following macros help various fragment operations
+// TODO: make CPixel not a nested class!
+//
+void
+CStochastic::depthFilterIfZMin(
+	__in CPixel* pixel)
+{
+	// nop
+}
+
+void
+CStochastic::depthFilterElseZMin(
+	__in CPixel* pixel,
+	__in float z)
+{
+	// nop
+}
+
+void
+CStochastic::depthFilterTouchNodeZMin(
+	__in CPixel* pixel,
+	__in float z)
+{
+	touchNode(pixel->node, z);
+}
+
+void
+CStochastic::depthFilterIfZMid(
+	__in CPixel* pixel)
+{
+	pixel->zold		=	pixel->z;
+}
+
+void
+CStochastic::depthFilterElseZMid(
+	__in CPixel* pixel,
+	__in float z)
+{
+	pixel->zold	=	min(pixel->zold, z);
+}
+
+void
+CStochastic::depthFilterTouchNodeZMid(
+	__in CPixel* pixel,
+	__in float z)
+{
+	touchNode(pixel->node, pixel->zold);
+}
+
+
+void
+CStochastic::updateTransparent(
+	__in CPixel* pixel,
+	__in CFragment* nSample,
+	__in bool useZMid)
+{															
+	vector O = {0};
+	vector rO = {0};											
+	const float *Oc = NULL;										
+	CFragment *cSample	=	nSample->prev;					
+	
+	movvv(O, cSample->accumulatedOpacity);					
+	
+	if (O[0] < CRenderer::opacityThreshold[0] &&
+		O[1] < CRenderer::opacityThreshold[1] &&
+		O[2] < CRenderer::opacityThreshold[2])
+	{	
+		/* not already opaque */																	
+		cSample = nSample;																			
+	}	
+	
+	/* adjust accumulated opacities and test against threshold */									
+	initv(rO,1-O[0],1-O[1],1-O[2]);																	
+	while(cSample) 
+	{																				
+		Oc = cSample->opacity;																		
+		if (Oc[0] < 0 || Oc[1] < 0 || Oc[2] < 0) {													
+			rO[0] *= 1+Oc[0];																		
+			rO[1] *= 1+Oc[1];																		
+			rO[2] *= 1+Oc[2];																		
+		} else {																					
+			O[0] += Oc[0]*rO[0];																	
+			O[1] += Oc[1]*rO[1];																	
+			O[2] += Oc[2]*rO[2];																	
+			rO[0] *= 1-Oc[0];																		
+			rO[1] *= 1-Oc[1];																		
+			rO[2] *= 1-Oc[2];																		
+		}																							
+		movvv(cSample->accumulatedOpacity,O);														
+																									
+		if (O[0] > CRenderer::opacityThreshold[0] &&
+			O[1] > CRenderer::opacityThreshold[1] &&
+			O[2] > CRenderer::opacityThreshold[2]) 
+		{	
+			/* opaque after this point */															
+			CFragment *dSample	=	cSample->next;													
+			if (dSample && dSample != &pixel->last) {												
+				while(dSample && dSample != &pixel->last) {											
+					CFragment *tSample	=	dSample->next;											
+					deleteFragment(dSample);														
+					dSample				=	tSample;												
+				}																					
+				cSample->next		=	&pixel->last;												
+				pixel->last.prev	=	cSample;													
+				pixel->update		=	cSample;													
+				/*initv(pixel->last.color,0);				*/	
+				/*initv(pixel->last.opacity,0);				*/	
+				/*initv(pixel->last.accumulatedOpacity,1);	*/	
+				/*pixel->last.z = CRenderer::clipMax;		*/	
+				/*initv(cSample->accumulatedOpacity,1);		*/	
+			}																						
+			const float z			=	cSample->z;													
+			if (z < pixel->z) {																		
+				useZMid ? depthFilterIfZMid(pixel) : depthFilterIfZMin(pixel);																				
+				pixel->z			=	z;															
+				useZMid ? depthFilterTouchNodeZMid(pixel, z) :
+						  depthFilterTouchNodeZMin(pixel, z);																
+			} 
+			else
+			{
+				useZMid ? depthFilterElseZMid(pixel, z) :
+						  depthFilterElseZMin(pixel, z);
+			}
+			break;																					
+		}																			
+		cSample = cSample->next;																	
+	}																							
+}
+
+
+// This function is used to insert a fragment into the linked list for a pixel.
+//
+void
+CStochastic::findSample(
+	__out CFragment** dest,
+	__in CPixel* pixel,
+	__in float z)
+{ 															
+	CFragment *lSample	=	pixel->update;														
+	if (z >= lSample->z)
+	{																	
+		CFragment		*cSample;																
+		for (cSample=lSample->next;z >= cSample->z;lSample=cSample,cSample=cSample->next);	
+		assert(z >= lSample->z);																
+		assert(z <= cSample->z);																
+		newFragment(dest);																	
+		(*dest)->next	=	cSample;															
+		(*dest)->prev	=	lSample;															
+		cSample->prev	=	*dest;																
+		lSample->next	=	*dest;																
+	}
+	else
+	{																					
+		CFragment		*cSample;																
+		for (cSample=lSample->prev;
+			 z < cSample->z;
+			 lSample = cSample, cSample=cSample->prev);
+			 
+		assert(z >= cSample->z);																
+		assert(z <= lSample->z);																
+		newFragment(dest);																	
+		(*dest)->next	=	lSample;															
+		(*dest)->prev	=	cSample;															
+		cSample->next	=	*dest;																
+		lSample->prev	=	*dest;																
+	}																							
+	pixel->update	=	*dest;																	
+}
+
+
+void
+CStochastic::colorOpacityUpdate(
+	__out CFragment* nSample,
+	__in CPixel* pixel,
+	__in CRasterGrid* grid,
+	__in float u,
+	__in float v,
+	__in const float* v0c,
+	__in const float* v1c,
+	__in const float* v2c,
+	__in const float* v3c,
+	__in int displacement)
+{
+	// Initialize the color to black and fully opaque opacity.
+	//
+	initv(nSample->color, 0);																
+	initv(nSample->opacity, 1);
+
+	const float jt = pixel->jt;
+	
+	for (int i = 0; i < 3; ++i)
+	{
+		const int opacityIdx = i + 3;
+
+		if (!(grid->flags & RASTER_MATTE))
+		{
+			if (grid->flags & RASTER_MOVING)
+			{
+				nSample->color[i]		=	
+					((v0c[i]*(1-jt) + v0c[displacement+i]*jt)*(1-u) +
+					( v1c[i]*(1-jt) + v1c[displacement+i]*jt)*u)*(1-v) +
+					((v2c[i]*(1-jt) + v2c[displacement+i]*jt)*(1-u) +
+					 (v3c[i]*(1-jt) + v3c[displacement+i]*jt)*u)*v; 
+			}
+			else
+			{
+				nSample->color[i]		=	
+					(v0c[i]*(1-u) + v1c[i]*u) * (1-v) +
+					(v2c[i]*(1-u) + v3c[i]*u) * v; 
+			}
+		}
+
+		if (grid->flags & RASTER_TRANSPARENT)
+		{
+			if (grid->flags & RASTER_MOVING)
+			{
+				nSample->opacity[i] 	=
+					((v0c[opacityIdx]*(1-jt) + v0c[displacement + opacityIdx]*jt)*(1-u) +
+					 (v1c[opacityIdx]*(1-jt) + v1c[displacement + opacityIdx]*jt)*u)*(1-v) +
+					((v2c[opacityIdx]*(1-jt) + v2c[displacement + opacityIdx]*jt)*(1-u) +
+					 (v3c[opacityIdx]*(1-jt) + v3c[displacement + opacityIdx]*jt)*u)*v;
+			}
+			else
+			{
+				nSample->opacity[i]		=	
+					(v0c[opacityIdx]*(1-u) + v1c[opacityIdx]*u) * (1-v) +
+					(v2c[opacityIdx]*(1-u) + v3c[opacityIdx]*u) * v; 
+			}
+		}
+
+	}
+
+	if (grid->flags & RASTER_MATTE)
+	{
+		// Negate it (for some reason). Figure out why.
+		//
+		mulvf(nSample->opacity, -1.0);
+		
+		movvv(pixel->first.opacity, nSample->opacity);
+	}
+}
+
+void
+CStochastic::drawPixel(
+	__in CRasterGrid* grid,
+	__in CPixel* pixel,
+	__in float z,
+	__in float u,
+	__in float v,
+	__in const float* v0,
+	__in const float* v1,
+	__in const float* v2,
+	__in const float* v3,
+	__in bool useZMid,
+	__in int displacement)
+{
+	CFragment *nSample = NULL; 
+	
+	if (z < pixel->z) 
+	{
+		if (!(grid->flags & RASTER_TRANSPARENT))
+		{
+			updateOpaque(pixel, z); 	
+			nSample 				=	&pixel->last;										
+		}
+		else
+		{
+			findSample(&nSample, pixel, z); 							
+		}
+		
+		nSample->z = z;		
+		
+		colorOpacityUpdate(nSample, pixel, grid, u, v, v0 + 3, v1 + 3, v2 + 3, v3 + 3, displacement);	
+
+		if (CRenderer::numExtraSamples > 0)
+		{
+			drawExtraSamples(nSample, pixel->jt, grid, u, v, v0, v1, v2, v3, displacement); 	
+		}
+		
+		if (grid->flags & RASTER_TRANSPARENT)
+		{
+			updateTransparent(pixel, nSample, useZMid);	
+		}
+		else
+		{
+			// Opaque.
+			//
+			useZMid ? depthFilterIfZMid(pixel) :
+					  depthFilterIfZMin(pixel);														
+			
+			pixel->z = z;		
+			
+			useZMid ? depthFilterTouchNodeZMid(pixel, z) :
+					  depthFilterTouchNodeZMin(pixel, z);														
+		}
+	}
+	else if (!(grid->flags & RASTER_TRANSPARENT))
+	{
+		// Failed Z-test and we're opaque:
+		//
+		useZMid ? depthFilterElseZMid(pixel, z) :
+				  depthFilterElseZMin(pixel, z);
+	}
+}
+
+void
+CStochastic::drawExtraSamples(
+	__out CFragment* nSample,
+	__in float jt,
+	__in CRasterGrid* grid,
+	__in float u,
+	__in float v,
+	__in const float* v0,
+	__in const float* v1,
+	__in const float* v2,
+	__in const float* v3,
+	__in int displacement)
+{													
+	const	float	*s0	=	v0+10;													
+	const	float	*s1	=	v1+10;													
+	const	float	*s2	=	v2+10;													
+	const	float	*s3	=	v3+10;													
+
+	for (int i = 0; i < CRenderer::numExtraSamples; ++i)
+	{
+		if (grid->flags & RASTER_MOVING)
+		{
+			// We have motion blur, interpolate in time as well as space.
+			//
+			nSample->extraSamples[i] =
+				((s0[i]*(1-jt)+s0[displacement]*jt)*(1-u) + (s1[i]*(1-jt)+s1[displacement]*jt)*u)*(1-v)	+
+				((s2[i]*(1-jt)+s2[displacement]*jt)*(1-u) + (s3[i]*(1-jt)+s3[displacement]*jt)*u)*v;
+		}
+		else
+		{
+			// No motion blur.
+			//
+			nSample->extraSamples[i] =
+				(s0[i]*(1-u) + s1[i]*u) * (1-v)	+
+				(s2[i]*(1-u) + s3[i]*u) * v;
+		}
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//This function is the entry point that checks if the pixel passes a depth test and if we need 
+// to shade the grid or not.
+// Returns:
+//
+//  true if execution should continue in caller.
+//
+bool
+CStochastic::drawPixelCheck(
+ 	__in CRasterGrid* grid,
+	__in CPixel* pixel,
+	__in float z,
+	__in float u,
+	__in float v,
+	__in const float* v0,
+	__in const float* v1,
+	__in const float* v2,
+	__in const float* v3,
+	__in int displacement)
+{
+	// Use ZMin or ZMid?
+	//
+	bool useZMid = false;
+
+	// TODO: figure out what the hell this means.
+	//
+	if(grid->flags & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT))
+	{
+		useZMid = true;
+	}
+	
+	// We're not shaded yet, so if we pass the depth test, we need to go back
+	// and shade the grid.
+	//
+	if (grid->flags & RASTER_UNSHADED)
+	{
+		// Assume no-shade by default.
+		//
+		bool shouldShade = false;
+
+		// Do we pass the Z-test? (Are we nearer than the farthest opaque Z-value?)
+		//
+		if (z < pixel->z)
+		{
+			shouldShade = true;
+		}
+		else
+		{
+			// Didn't pass Z-test. Should we shade anyway?
+			//
+			if ((grid->flags & RASTER_UNDERCULL) && (grid->flags & RASTER_SHADE_HIDDEN))
+			{
+				shouldShade = true;
+			}
+		}
+
+		if (shouldShade)
+		{
+			shadeGrid(grid, FALSE);										
+			rasterDrawPrimitives(grid); 								
+			return false; // TODO													
+		}
+		else
+		{
+			// Failed the shading test:
+			//
+			if (useZMid)
+			{
+				depthFilterElseZMid(pixel, z);
+			}
+			else
+			{
+				depthFilterElseZMin(pixel, z);
+			}
+			return true;
+		}
+	}
+	else
+	{
+		drawPixel(grid, pixel, z, u, v,
+			v0, v1, v2, v3,
+			useZMid, displacement);
+		return true;
+	}
+}
+
+// This function is called when an opaque fragment is inserted
+// Note: On the assumption that the opacity really is nearly opaque, we don't really need
+// to bother messing with pixel->last though it might technicaly be more correct to do so
+// so these sections are commented out in updateOpaque and updateTransparent
+
+void
+CStochastic::updateOpaque(
+	__in CPixel* pixel,
+	__in float z) 
+{															
+	CFragment *cSample=pixel->last.prev;					
+	while(cSample->z > z) {									
+		CFragment *nSample	=	cSample->prev;				
+		nSample->next		=	&pixel->last;				
+		pixel->last.prev	=	nSample;					
+		assert(cSample != &pixel->first);					
+		deleteFragment(cSample);							
+		cSample				=	nSample;					
+	}														
+	/*initv(pixel->last.accumulatedOpacity,1);*/			
+	pixel->update			=	cSample;					
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	rasterDrawPrimitives
@@ -252,72 +843,241 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 /// \brief					Draw bunch of primitives
 // Return Value			:	-
 // Comments				:
-void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
+void		
+CStochastic::rasterDrawPrimitives(
+	__in CRasterGrid *grid)
+{
+	// TODO: REFACTOR to use a real function!
+	//
 
+// TODO
+	// Shade _very_ early if we know we are guaranteed to have to anyway
+	// This also solves issues with grids viewed exactly side-on never
+	// being shaded when baking
+	// Note: we retain the pre-rasterization method for the case where RASTER_SHADE_HIDDEN
+	// is not set, and for the cases where 1 sidedness must be respected
+	
+	if (grid->flags & RASTER_UNDERCULL &&
+		grid->flags & RASTER_UNSHADED)
+	{
+		const	int _flags = grid->flags;
+		if ((_flags & RASTER_SHADE_HIDDEN) &&
+			(_flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE)) &&
+			(_flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE))) {
+			
+			shadeGrid(grid,FALSE);
+			rasterDrawPrimitives(grid);
+			return;
+		}
+	}
+
+	// Offset in vertex data to displacement part. (i.e. to the next "logical" vertex image)
+	// TODO: redesign this.
+	//
+	int displacement = 10;
+	if (grid->flags & RASTER_EXTRASAMPLES)
+	{
+		displacement += CRenderer::numExtraSamples;
+	}
+
+	// Extreme motion blur/DOF.
+	//
+	if (grid->flags & RASTER_XTREME)
+	{
+		const int xres = sampleWidth - 1;
+		const int yres = sampleHeight - 1;
+		
+		int xmin =	grid->xbound[0] - left;
+		int xmax =	grid->xbound[1] - left;
+		int ymin =	grid->ybound[0] - top;
+		int ymax =	grid->ybound[1] - top;
+		
+		xmin	=	max(xmin,0);		// Clamp the bound in the current bucket
+		ymin	=	max(ymin,0);
+		xmax	=	min(xmax,xres);
+		ymax	=	min(ymax,yres);
+		
+		int x = 0;
+		int y = 0;
+		
+		for (y = ymin; y <= ymax; y++) 
+		{
+			for (x = xmin; x <= xmax; x++) 
+			{
+				CPixel		*pixel		=	fb[y] + x;
+				int 		i,j;
+		
+				const int	*bounds 	=	grid->bounds;
+		
+				const float *vertices	=	grid->vertices;
+				const	int udiv		=	grid->udiv;
+		
+				const	int vdiv		=	grid->vdiv;
+				const	int flags		=	grid->flags;
+		
+				for (j = 0; j < vdiv; j++)
+				{
+					for (i = 0;
+						 i < udiv;
+						 i++, bounds += 4, vertices += numVertexSamples)
+					{
+						if (x+left < bounds[0]) 	continue;
+						if (x+left > bounds[1]) 	continue;
+						if (y+top < bounds[2])		continue;
+						if (y+top > bounds[3])		continue;
+
+						if (grid->flags & RASTER_LOD)
+						{
+							// If failed the LOD check, skip this grid vertex.
+							//
+							if (!lodCheck(grid, pixel))
+							{
+								continue;
+							}
+						}
+
+						// focal blur stuff (DOF)
+						//
+						float v0d = 0;
+						float v1d = 0;
+						float v2d = 0;
+						float v3d = 0;
+
+						vector	v0focTmp = {0};
+						vector	v1focTmp = {0};
+						vector	v2focTmp = {0};
+						vector	v3focTmp = {0};
+
+						// mo blur stuff
+						vector	v0movTmp = {0};
+						vector	v1movTmp = {0};
+						vector	v2movTmp = {0};
+						vector	v3movTmp = {0};
+						// --------------
+						
+						const float *v0 =	vertices;
+						const float *v1 =	vertices + numVertexSamples;
+						const float *v2 =	v1 + udiv*numVertexSamples;
+						const float *v3 =	v2 + numVertexSamples;
+		
+						if (grid->flags & RASTER_FOCALBLUR)
+						{
+							v0d =	v0[9];
+							v1d =	v1[9];
+							v2d =	v2[9];
+							v3d =	v3[9];
+						}
+		
+						if (grid->flags & RASTER_MOVING)
+						{
+							interpolatev(v0movTmp,v0,v0+displacement,pixel->jt);
+							interpolatev(v1movTmp,v1,v1+displacement,pixel->jt);
+							interpolatev(v2movTmp,v2,v2+displacement,pixel->jt);
+							interpolatev(v3movTmp,v3,v3+displacement,pixel->jt);
+							v0		=	v0movTmp;
+							v1		=	v1movTmp;
+							v2		=	v2movTmp;
+							v3		=	v3movTmp;
+						}
+		
+						if (grid->flags & RASTER_FOCALBLUR)
+						{
+							v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
+							v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
+							v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
+							v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
+			
+							v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
+							v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
+							v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
+							v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
+			
+							v0focTmp[COMP_Z]	=	v0[COMP_Z];
+							v1focTmp[COMP_Z]	=	v1[COMP_Z];
+							v2focTmp[COMP_Z]	=	v2[COMP_Z];
+							v3focTmp[COMP_Z]	=	v3[COMP_Z];
+			
+							v0					=	v0focTmp;
+							v1					=	v1focTmp;
+							v2					=	v2focTmp;
+							v3					=	v3focTmp;
+						}
+
+						// TODO: clean
+						float z = 0;
+						float u = 0;
+						float v = 0;
+		
+						// Check the orientation of the quad.
+						//
+						float a = area(
+							v0[COMP_X],
+							v0[COMP_Y],
+							v1[COMP_X],
+							v1[COMP_Y],
+							v2[COMP_X],
+							v2[COMP_Y]);
+						
+						if (fabsf(a) < C_EPSILON) 
+						{
+							a = area(
+								v1[COMP_X],
+								v1[COMP_Y],
+								v3[COMP_X],
+								v3[COMP_Y],
+								v2[COMP_X],
+								v2[COMP_Y]);
+						}
+						
+						// Back face culling.
+						//
+						if (!shouldDrawBack(grid->flags))
+						{
+							continue;
+						}
+
+						// Use less-than (<) in the comparison of checkPixel
+						// if the area 'a' is positive.
+						//
+						if (!checkPixel(a > 0, pixel, v0, v1, v2, v3, &z, &u, &v))
+						{
+							continue;
+						}
+	
+						v0	=	vertices;
+						v1	=	v0 + numVertexSamples;
+						v2	=	v1 + udiv*numVertexSamples;
+						v3	=	v2 + numVertexSamples;
+	
+						if (!drawPixelCheck(grid, pixel, z, u, v, v0, v1, v2, v3, displacement))
+						{
+							return;
+						}
+					}
+					vertices	+=	numVertexSamples;
+				}
+			}
+		}
+	}
+	else
+	{
+		// Not so extreme motion blur or DOF.
+		//
+		assert(!"Not yet implemented");
+	}
+
+	// etc. etc.
+	
+#if 0
 // Instantiate the dispatch switch
 #define DEFINE_STOCHASTIC_SWITCH
 	#include "stochasticPrimitives.h"
 #undef DEFINE_STOCHASTIC_SWITCH
+#endif
+
 }
 
 
-
-// The following macros help various fragment operations
-#define depthFilterIfZMin()
-#define depthFilterElseZMin()
-#define depthFilterTouchNodeZMin()	touchNode(pixel->node,z);
-
-#define depthFilterIfZMid()			pixel->zold		=	pixel->z;
-#define depthFilterElseZMid()		else {	pixel->zold	=	min(pixel->zold,z);	}
-#define depthFilterTouchNodeZMid()	touchNode(pixel->node,pixel->zold);
-
-
-// This macro is used to insert a fragment into the linked list for a pixel
-#define	findSample(__dest,__z) { 																	\
-	CFragment *lSample	=	pixel->update;															\
-	if (__z >= lSample->z)	{																		\
-		CFragment		*cSample;																	\
-		for (cSample=lSample->next;__z >= cSample->z;lSample=cSample,cSample=cSample->next);		\
-		assert(__z >= lSample->z);																	\
-		assert(__z <= cSample->z);																	\
-		newFragment(__dest);																		\
-		__dest->next	=	cSample;																\
-		__dest->prev	=	lSample;																\
-		cSample->prev	=	__dest;																	\
-		lSample->next	=	__dest;																	\
-	} else {																						\
-		CFragment		*cSample;																	\
-		for (cSample=lSample->prev;__z < cSample->z;lSample=cSample,cSample=cSample->prev);			\
-		assert(__z >= cSample->z);																	\
-		assert(__z <= lSample->z);																	\
-		newFragment(__dest);																		\
-		__dest->next	=	lSample;																\
-		__dest->prev	=	cSample;																\
-		cSample->next	=	__dest;																	\
-		lSample->prev	=	__dest;																	\
-	}																								\
-	pixel->update	=	__dest;																		\
-}
-
-// This macro is called when an opaque fragment is inserted
-// Note: On the assumption that the opacity really is nearly opaque, we don't really need
-// to bother messing with pixel->last though it might technicaly be more correct to do so
-// so these sections are commented out in updateOpaque and updateTransparent
-
-
-#define updateOpaque() {																			\
-	CFragment *cSample=pixel->last.prev;															\
-	while(cSample->z > z) {																			\
-		CFragment *nSample	=	cSample->prev;														\
-		nSample->next		=	&pixel->last;														\
-		pixel->last.prev	=	nSample;															\
-		assert(cSample != &pixel->first);															\
-		deleteFragment(cSample);																	\
-		cSample				=	nSample;															\
-	}																								\
-	/*initv(pixel->last.accumulatedOpacity,1);*/													\
-	pixel->update			=	cSample;															\
-}
 
 // Note: due to the way we insert samples, we may have inserted a new one behind the 
 // maximum opaque depth - in which case we must flush the new sample and everything
@@ -341,73 +1101,14 @@ void		CStochastic::rasterDrawPrimitives(CRasterGrid *grid) {
 	printf("\n");												\
 }
 
-#define updateTransparent(dfIf,dfElse) {															\
-	vector O,rO;																					\
-	const float *Oc;																				\
-	CFragment *cSample	=	nSample->prev;															\
-	movvv(O,cSample->accumulatedOpacity);															\
-	if (O[0] < CRenderer::opacityThreshold[0] && O[1] < CRenderer::opacityThreshold[1] && O[2] < CRenderer::opacityThreshold[2]) {	\
-		/* not already opaque */																	\
-		cSample = nSample;																			\
-	}																								\
-	/* adjust accumulated opacities and test against threshold */									\
-	initv(rO,1-O[0],1-O[1],1-O[2]);																	\
-	while(cSample) {																				\
-		Oc = cSample->opacity;																		\
-		if (Oc[0] < 0 || Oc[1] < 0 || Oc[2] < 0) {													\
-			rO[0] *= 1+Oc[0];																		\
-			rO[1] *= 1+Oc[1];																		\
-			rO[2] *= 1+Oc[2];																		\
-		} else {																					\
-			O[0] += Oc[0]*rO[0];																	\
-			O[1] += Oc[1]*rO[1];																	\
-			O[2] += Oc[2]*rO[2];																	\
-			rO[0] *= 1-Oc[0];																		\
-			rO[1] *= 1-Oc[1];																		\
-			rO[2] *= 1-Oc[2];																		\
-		}																							\
-		movvv(cSample->accumulatedOpacity,O);														\
-																									\
-		if (O[0] > CRenderer::opacityThreshold[0] && O[1] > CRenderer::opacityThreshold[1] && O[2] > CRenderer::opacityThreshold[2]) {	\
-			/* opaque after this point */															\
-			CFragment *dSample	=	cSample->next;													\
-			if (dSample && dSample != &pixel->last) {												\
-				while(dSample && dSample != &pixel->last) {											\
-					CFragment *tSample	=	dSample->next;											\
-					deleteFragment(dSample);														\
-					dSample				=	tSample;												\
-				}																					\
-				cSample->next		=	&pixel->last;												\
-				pixel->last.prev	=	cSample;													\
-				pixel->update		=	cSample;													\
-				/*initv(pixel->last.color,0);				*/	\
-				/*initv(pixel->last.opacity,0);				*/	\
-				/*initv(pixel->last.accumulatedOpacity,1);	*/	\
-				/*pixel->last.z = CRenderer::clipMax;		*/	\
-				/*initv(cSample->accumulatedOpacity,1);		*/	\
-			}																						\
-			const float z			=	cSample->z;													\
-			if (z < pixel->z) {																		\
-				dfIf();																				\
-				pixel->z			=	z;															\
-				depthFilterTouchNode();																\
-			} dfElse();																				\
-			break;																					\
-		}																							\
-		cSample = cSample->next;																	\
-	}																								\
-}
-
 #define DEFINE_STOCHASTIC_FUNCTIONS
-#include "stochasticPrimitives.h"
+//#include "stochasticPrimitives.h"
 #undef DEFINE_STOCHASTIC_FUNCTIONS
 
 #undef depthFilterIfZMin
 #undef depthFilterElseZMin
 #undef depthFilterIfZMid
 #undef depthFilterElseZMid
-#undef findSample
-#undef updateOpaque
 
 
 ///////////////////////////////////////////////////////////////////////

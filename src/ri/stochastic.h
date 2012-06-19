@@ -85,7 +85,7 @@ private:
 		float			jx,jy;					// The sampling jitter
 		float			jt;						// The time jitter
 		float			jdx,jdy;				// The aperture jitter	(Gaussian)
-		float			jimp;					// The relative important // GSHHACK
+		float			jimp;					// The relative importance // GSHHACK
 		float			z;						// The farthest opaque z value
 		float			zold;					// This is the old Z value (for depth filtering)
 		int				numSplats;				// The number of splats to this pixel (used by the avg. depth filter);
@@ -97,6 +97,129 @@ private:
 
 	void		filterSamples(int,CFragment **,float *);
 	void		deepShadowCompute();
+	
+	void
+	newFragment(
+		__out CFragment** ppSample);
+	
+	void
+	deleteFragment(
+		__in CFragment* sample);
+	
+	void
+	drawExtraSamples(
+		__out CFragment* nSample,
+		__in float jt,
+		__in CRasterGrid* grid,
+		__in float u,
+		__in float v,
+		__in const float* v0,
+		__in const float* v1,
+		__in const float* v2,
+		__in const float* v3,
+		__in int displacement);
+	
+	void
+	findSample(
+		__out CFragment** dest,
+		__in CPixel* pixel,
+		__in float z);
+	
+	bool
+	lodCheck(
+		__in CRasterGrid *grid,
+		__in CPixel* pixel);
+	
+	void
+	updateOpaque(
+		__in CPixel* pixel,
+		__in float z);
+	
+	bool
+	checkPixel(
+		__in bool useLessThan,
+		__in CPixel* pixel,
+		__in const float* v0,
+		__in const float* v1,
+		__in const float* v2,
+		__in const float* v3,
+		__out float* pZ,
+		__out float* pU,
+		__out float* pV);
+	
+	void
+	depthFilterIfZMin(
+		__in CPixel* pixel);
+	
+	void
+	depthFilterElseZMin(
+		__in CPixel* pixel,
+		__in float z);
+	
+	void
+	depthFilterTouchNodeZMin(
+		__in CPixel* pixel,
+		__in float z);
+	
+	void
+	depthFilterIfZMid(
+		__in CPixel* pixel);
+	
+	void
+	depthFilterElseZMid(
+		__in CPixel* pixel,
+		__in float z);
+	
+	void
+	depthFilterTouchNodeZMid(
+		__in CPixel* pixel,
+		__in float z);
+
+	void
+	updateTransparent(
+		__in CPixel* pixel,
+		__in CFragment* nSample,
+		__in bool useZMid);
+	
+	void
+	colorOpacityUpdate(
+		__out CFragment* nSample,
+		__in CPixel* pixel,
+		__in CRasterGrid* grid,
+		__in float u,
+		__in float v,
+		__in const float* v0c,
+		__in const float* v1c,
+		__in const float* v2c,
+		__in const float* v3c,
+		__in int displacement);
+	
+	void
+	drawPixel(
+		__in CRasterGrid* grid,
+		__in CPixel* pixel,
+		__in float z,
+		__in float u,
+		__in float v,
+		__in const float* v0,
+		__in const float* v1,
+		__in const float* v2,
+		__in const float* v3,
+		__in bool useZMid,
+		__in int displacement);
+	
+	bool
+	drawPixelCheck(
+		__in CRasterGrid* grid,
+		__in CPixel* pixel,
+		__in float z,
+		__in float u,
+		__in float v,
+		__in const float* v0,
+		__in const float* v1,
+		__in const float* v2,
+		__in const float* v3,
+		__in int displacement);
 
 	int			totalWidth,totalHeight;
 	CPixel		**fb;

@@ -206,9 +206,16 @@ CReyes::CReyes(int thread) : CShadingContext(thread) {
 		}
 	}
 
-	// The length of a raster vertex
-	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION)	numVertexSamples	=	(CRenderer::numExtraSamples + 10)*2;
-	else												numVertexSamples	=	(CRenderer::numExtraSamples + 10);
+	// The length of a raster vertex.
+	//
+	if (CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION)
+	{
+		numVertexSamples = (CRenderer::numExtraSamples + 10) * 2;
+	}
+	else
+	{
+		numVertexSamples = CRenderer::numExtraSamples + 10;
+	}
 
 	extraPrimitiveFlags	=	0;
 	if (CRenderer::numExtraSamples > 0)	extraPrimitiveFlags	|=	RASTER_EXTRASAMPLES;
@@ -871,8 +878,10 @@ CReyes::shadeGrid(
 		}
 	}
 
-	if (grid->dim == SHADING_0D) {
-		// This is a 0 dimensional point cloud
+	if (grid->dim == SHADING_0D) 
+	{
+		// This is a 0 dimensional point cloud.
+		//
 		int					i;
 		float				**varying		=	currentShadingState->varying;
 		int					numPoints		=	grid->vdiv;
@@ -889,7 +898,11 @@ CReyes::shadeGrid(
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)	grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
 
 			// Do we have motion blur?
-			if ((CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION) && (object->moving())) grid->flags	|= RASTER_MOVING;
+			if (CRenderer::flags & OPTIONS_FLAGS_SAMPLEMOTION &&
+				object->moving())
+			{
+				grid->flags	|= RASTER_MOVING;
+			}
 
 			// Reset the size variable
 			varying[VARIABLE_WIDTH][0]			=	-C_INFINITY;
@@ -923,7 +936,9 @@ CReyes::shadeGrid(
 				sizes[0]	=	(*sizeArray++*0.5f);
 			}
 
-		} else {
+		}
+		else
+		{
 			float			*Oi;
 
 			// Sanity check
@@ -994,7 +1009,8 @@ CReyes::shadeGrid(
 	} else {
 		assert(grid->dim == SHADING_2D_GRID);
 
-		// This is a 2 dimensional surface
+		// This is a 2 dimensional surface.
+		//
 		int					i,j;
 		int					k;
 		float				**varying	=	currentShadingState->varying;
@@ -1173,15 +1189,25 @@ CReyes::shadeGrid(
 /// \brief					Copy the point data
 // Return Value			:	-
 // Comments				:
-void			CReyes::copyPoints(int numVertices,float **varying,float *vertices,int stage) {
+void			
+CReyes::copyPoints(
+	__in int numVertices,
+	__in_ecount(VARIABLE_LAST) float **varying,
+	__out_ecount(numVertexSamples*numVertices) float *vertices,
+	__in int stage) 
+{
 	const	float	*P		=	varying[VARIABLE_P];
 	const	int		disp	=	(CRenderer::numExtraSamples + 10)*stage;
 	int				i;
 
 	// Copy the samples
 	vertices	+=	disp;
-	for (i=numVertices;i>0;i--,P+=3,vertices+=numVertexSamples) {
-		movvv(vertices,P);
+	
+	for (i = numVertices;
+		 i > 0;
+		 i--, P += 3, vertices += numVertexSamples)
+	{
+		movvv(vertices, P);
 	}
 
 	// If we have depth of field, compute that
@@ -1462,7 +1488,11 @@ CReyes::insertGrid(
 	float xmax	=	-C_INFINITY;
 	float ymax	=	-C_INFINITY;
 	float zmax	=	-C_INFINITY;
-	for (cVertex=grid->vertices,i=grid->numVertices;i>0;i--,cVertex+=numVertexSamples) {
+
+	for (cVertex = grid->vertices, i = grid->numVertices;
+		 i > 0;
+		 i--, cVertex += numVertexSamples)
+	{
 		if (cVertex[0] < xmin)	xmin	=	cVertex[0];
 		if (cVertex[1] < ymin)	ymin	=	cVertex[1];
 		if (cVertex[2] < zmin)	zmin	=	cVertex[2];
@@ -1474,7 +1504,10 @@ CReyes::insertGrid(
 	// Account for the motion if applicable
 	if (grid->flags & RASTER_MOVING) {
 
-		for (cVertex=grid->vertices+CRenderer::numExtraSamples+10,i=grid->numVertices;i>0;i--,cVertex+=numVertexSamples) {
+		for (cVertex = grid->vertices + CRenderer::numExtraSamples + 10, i = grid->numVertices;
+			 i > 0;
+			 i--, cVertex += numVertexSamples)
+		{
 			if (cVertex[0] < xmin)	xmin	=	cVertex[0];
 			if (cVertex[1] < ymin)	ymin	=	cVertex[1];
 			if (cVertex[2] < zmin)	zmin	=	cVertex[2];
