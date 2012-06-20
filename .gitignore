@@ -11,7 +11,7 @@ bin/
 displays/
 
 # Deployment location.
-Pixie/
+/Pixie/
 
 *.output
 
@@ -25,3 +25,9 @@ src/sdrc/sl.cpp
 src/ri/sl.cpp
 src/ri/variable.cpp
 src/sdr/sdr.cpp
+
+*.old
+*.sdf
+*.opensdf
+ipch/
+*.aps

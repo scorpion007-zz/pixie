@@ -328,6 +328,7 @@
     <ClInclude Include="..\..\..\..\src\ri\pl.h" />
     <ClInclude Include="..\..\..\..\src\ri\ptcapi.h" />
     <ClInclude Include="..\..\..\..\src\ri\random.h" />
+    <ClInclude Include="..\..\..\..\src\ri\rastervertex.h" />
     <ClInclude Include="..\..\..\..\src\ri\ray.h" />
     <ClInclude Include="..\..\..\..\src\ri\remoteChannel.h" />
     <ClInclude Include="..\..\..\..\src\ri\ri.h" />
@@ -365,6 +366,7 @@
     <ClInclude Include="..\..\..\..\src\ri\stochasticPoint.h" />
     <ClInclude Include="..\..\..\..\src\ri\stochasticPrimitives.h" />
     <ClInclude Include="..\..\..\..\src\ri\stochasticQuad.h" />
+    <ClInclude Include="..\..\..\..\src\ri\windows\resource.h" />
     <ClInclude Include="..\..\..\..\src\ri\zbuffer.h" />
     <ClInclude Include="..\..\..\..\src\ri\zbufferPoint.h" />
     <ClInclude Include="..\..\..\..\src\ri\zbufferQuad.h" />
@@ -397,7 +399,6 @@
     <ClInclude Include="..\..\..\..\src\ri\texture.h" />
     <ClInclude Include="..\..\..\..\src\ri\texture3d.h" />
     <ClInclude Include="..\..\..\..\src\ri\ri_config.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\..\src\ri\dso.l">
@@ -576,7 +577,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ri.rc" />
+    <ResourceCompile Include="..\..\..\..\src\ri\windows\ri.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
