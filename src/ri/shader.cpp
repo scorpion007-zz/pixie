@@ -45,7 +45,7 @@
 #include	"common/align.h"
 
 
-///////////////////////////////////////////////////////////////////////	
+///////////////////////////////////////////////////////////////////////
 // Class				:	CShader
 // Method				:	CShader
 // Description			:
@@ -115,7 +115,7 @@ void CShader::analyse() {
 	CVariable	*cVariable;
 	int			varIndex	=	numGlobals-1;
 
-	// BEWARE that this is reversed compareed to the instance order 
+	// BEWARE that this is reversed compareed to the instance order
 	// hence the reversed counting of globalIndex
 	for (cVariable=parameters;cVariable!=NULL;cVariable=cVariable->next) {
 		// Check for special parameters
@@ -124,10 +124,10 @@ void CShader::analyse() {
 				if (!strcmp(cVariable->name,"__nondiffuse")) {
 					if ((cVariable->numItems == 1) && cVariable->type == TYPE_FLOAT) {
 						flags				|=	 SHADERFLAGS_NONDIFFUSE;
-						
+
 						if (data == NULL)	data = new CLightShaderData;
 						CLightShaderData *lightData = (CLightShaderData*) data;
-						
+
 						lightData->nonDiffuseIndex	=	varIndex;
 						lightData->nonDiffuseStep	=	((cVariable->container == CONTAINER_CONSTANT) || (cVariable->container == CONTAINER_UNIFORM)) ? 0 : 1;
 					} else {
@@ -136,10 +136,10 @@ void CShader::analyse() {
 				} else if (!strcmp(cVariable->name,"__nonspecular")) {
 					if ((cVariable->numItems == 1) && cVariable->type == TYPE_FLOAT) {
 						flags				|=	 SHADERFLAGS_NONSPECULAR;
-						
+
 						if (data == NULL)	data = new CLightShaderData;
 						CLightShaderData *lightData = (CLightShaderData*) data;
-						
+
 						lightData->nonSpecularIndex	=	varIndex;
 						lightData->nonSpecularStep	=	((cVariable->container == CONTAINER_CONSTANT) || (cVariable->container == CONTAINER_UNIFORM)) ? 0 : 1;
 					} else {
@@ -171,7 +171,7 @@ CShaderInstance::CShaderInstance(CAttributes *a,CXform *x) {
 
 	xform		=	x;
 	xform->attach();
-	
+
 	categories	=	NULL;
 	parameters	=	NULL;	// The children class may want to clone the parent's parameters here
 }
@@ -187,11 +187,11 @@ CShaderInstance::~CShaderInstance() {
 	atomicDecrement(&stats.numShaderInstances);
 
 	xform->detach();
-	
+
 	if (categories != NULL)	delete[] categories;
 
 	// Note: data is not owned by the instance
-	
+
 	// The children class must clear the parameter list here
 }
 
@@ -249,23 +249,23 @@ void CShaderInstance::createCategories() {
 
 	if (getParameter("__category",&categoryString,NULL,NULL) == TRUE) {
 		tmp = categoryString = strdup(categoryString);
-		
+
 		numCategories = 2;
 		while (*tmp!='\0') {
 			if (*tmp == ',') numCategories++;
 			tmp++;
 		}
 		tmp = categoryString;
-		
+
 		categories = new int[numCategories];
-		
+
 		i=0;
 		do {
 			cCat = token(&tmp,",\t ");
 			if (*cCat != '\0') categories[i++] = CRenderer::getGlobalID(cCat);
 		} while (tmp != NULL);
 		categories[i++] = 0;	// terminate the list
-		
+
 		free(categoryString);
 	}
 }
@@ -528,7 +528,7 @@ int		CProgrammableShaderInstance::getParameter(const char *name,void *dest,CVari
 	// parent shader parameters.  The counting scheme for globals used here must
 	// match that used when saving lights.  In both cases, we loop the instance
 	// not the parent parameters
-	
+
 	for (cParameter=parameters;cParameter!=NULL;cParameter=cParameter->next) {
 
 		// retrieve the storage in which the parameter lives
@@ -706,7 +706,7 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 		const float	*srcf;
 		const char	**dests;
 		const char	**srcs;
-		
+
 		// Find where we're writing
 		if (cVariable->storage == STORAGE_GLOBAL)	{
 			destf					=	(float *) varying[cVariable->entry];
@@ -736,7 +736,7 @@ float			**CProgrammableShaderInstance::prepare(CMemPage *&namedMemory,float **va
 		} else {
 
 			//assert(cVariable->numFloats == parent->varyingSizes[cVariable->entry]);
-			
+
 			if (cVariable->type == TYPE_STRING) {
 				if ((srcs = (const char **) cVariable->defaultValue) != NULL) {
 					int			n;

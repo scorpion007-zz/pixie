@@ -449,7 +449,7 @@ void	CShadingContext::duVector(float *dest,const float *src) {
 			assert(u[1] > u[0]);
 
 			const double	invDu1		=	1.0 / ((double)u[1] - (double)u[0]);
-			const double	invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));			
+			const double	invDu2		=	1.0 / (2.0*((double)u[1] - (double)u[0]));
 
 			for (int j=vVertices;j>0;--j) {
 
@@ -632,7 +632,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 			}
 		}
 		break;
-		
+
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
@@ -646,7 +646,7 @@ void	CShadingContext::dvVector(float *dest,const float *src) {
 
 			const double	invDv1		=	1.0 / ((double)v[uVertices] - (double)v[0]);
 			const double	invDv2		=	1.0 / (2.0*((double)v[uVertices] - (double)v[0]));
-			
+
 			for (int j=0;j<uVertices;++j) {
 				float		*cRes	=	dest + j*3;
 				const float	*cOp	=	src + j*3;
@@ -735,7 +735,7 @@ void	CShadingContext::DvVector(float *dest,const float *src) {
 			}
 		}
 		break;
-		
+
 		// Dv executing on a 2D grid
 		case SHADING_2D_GRID:
 		{
@@ -878,7 +878,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 
 	// Are we sampling the motion in the reflections?
 	const int	sampleMotion	=	currentShadingState->currentObject->attributes->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
-	
+
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {
 		const int			numSamples		=	rays->numSamples;
@@ -953,7 +953,7 @@ void	CShadingContext::traceTransmission(int numRays,CTraceLocation *rays,int pro
 		bundle.postShader	=	NULL;
 		traceEx(&bundle);
 	}
-	
+
 	inShadow		=	FALSE;			// We're no longer in shadow
 }
 
@@ -978,7 +978,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 	CAttributes *cAttr				=	currentShadingState->currentObject->attributes;
 	CShaderInstance *interiorShader	=	cAttr->interior;
 	CShaderInstance *exteriorShader	=	cAttr->exterior;
-	
+
 	// Set the ray label
 	if (scratch->traceParams.label == NULL)	{
 		exteriorBundle.label	=	rayLabelTransmission;
@@ -987,26 +987,26 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 		exteriorBundle.label	=	scratch->traceParams.label;
 		interiorBundle.label	=	scratch->traceParams.label;
 	}
-	
+
 	// Allocate temp memory
 	cExteriorRay	=	exteriorRayBase			=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
 	cExteriorRays	=	exteriorRaysBase		=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
-	
+
 	if (interiorShader != exteriorShader) {
 		cInteriorRay	=	interiorRayBase		=	(CTraceRay *) ralloc(shootStep*sizeof(CTraceRay),threadMemory);
 		cInteriorRays	=	interiorRaysBase	=	(CTraceRay **) ralloc(shootStep*sizeof(CTraceRay*),threadMemory);
 	}
-	
+
 	// Are we sampling the motion in the reflections?
 	const int	sampleMotion	=	cAttr->flags & ATTRIBUTES_FLAGS_SAMPLEMOTION;
-	
+
 	// For each ray
 	for (int i=numRays;i>0;--i,++rays) {
 		const int			numSamples		=	rays->numSamples;
 		const float			coneAngle		=	rays->coneAngle;
 		const float			tanConeAngle	=	min(fabsf(tanf(coneAngle)),1.0f);
 		const float			multiplier		=	1 / (float) numSamples;
-		
+
 		// Compute the ray differentials
 		computeRayDifferentials;
 
@@ -1017,7 +1017,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 		// Sample
 		for (int currentSample=numSamples;currentSample>0;--currentSample) {
 			vector	from,D,dir;
-			
+
 			sampleRay(from,D);
 
 			normalizev(D);
@@ -1025,11 +1025,11 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 			sampleHemisphere(dir,D,coneAngle,random4d);
 			if (dotvv(dir,dir) > C_EPSILON) {
 				CTraceRay *cRay;
-				int isExterior = (dotvv(dir,rays->N) > 0) || (interiorShader == exteriorShader);			
-				
+				int isExterior = (dotvv(dir,rays->N) > 0) || (interiorShader == exteriorShader);
+
 				if (isExterior) cRay = cExteriorRay;
 				else			cRay = cInteriorRay;
-				
+
 				movvv(cRay->dir,dir);
 				movvv(cRay->from,from);
 				if (sampleMotion)	cRay->time		=	(urand() + currentSample - 1) * multiplier;
@@ -1050,7 +1050,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 					if (isExterior) {
 						*cExteriorRays++	=	cRay;
 						cExteriorRay++;
-						
+
 						if (--numExteriorRemaining == 0) {
 							numReflectionRays			+=	shootStep;
 							exteriorBundle.numRays		=	shootStep;
@@ -1058,7 +1058,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 							exteriorBundle.depth		=	0;
 							exteriorBundle.last			=	0;
 							exteriorBundle.postShader	=	exteriorShader;
-							traceEx(&exteriorBundle);	
+							traceEx(&exteriorBundle);
 							cExteriorRay				=	exteriorRayBase;
 							cExteriorRays				=	exteriorRaysBase;
 							numExteriorRemaining		=	shootStep;
@@ -1066,7 +1066,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 					} else {
 						*cInteriorRays++	=	cRay;
 						cInteriorRay++;
-						
+
 						if (--numInteriorRemaining == 0) {
 							numReflectionRays	+=	shootStep;
 							interiorBundle.numRays		=	shootStep;
@@ -1093,7 +1093,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 		exteriorBundle.depth		=	0;
 		exteriorBundle.last			=	0;
 		exteriorBundle.postShader	=	exteriorShader;
-		traceEx(&exteriorBundle);	
+		traceEx(&exteriorBundle);
 	}
 	if (numInteriorRemaining != shootStep) {
 		numReflectionRays			+=	shootStep-numInteriorRemaining;
@@ -1102,7 +1102,7 @@ void	CShadingContext::traceReflection(int numRays,CTraceLocation *rays,int probe
 		interiorBundle.depth		=	0;
 		interiorBundle.last			=	0;
 		interiorBundle.postShader	=	interiorShader;
-		traceEx(&interiorBundle);	
+		traceEx(&interiorBundle);
 	}
 }
 
@@ -1178,7 +1178,7 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 
 			for (j=0;j<vVertices;j++) {
 				for (i=0;i<uVertices;i++) {
-					
+
 					const int	ii		=	min(i,uVertices-2);
 					const int	jj		=	min(j,vVertices-2);
 
@@ -1224,18 +1224,18 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 
 					ab[0]				=	tanf(min(ab[0],((float) C_PI)*0.5f - C_EPSILON));
 					ab[0]				=	min(ab[0],DEFAULT_RAY_DA);
-					
+
 					// guard against bad differentials
-				
+
 					if(ab[0] != ab[0]) ab[0]	= 	DEFAULT_RAY_DA;
-				
+
 					assert(ab[0] >= 0);
 					assert(ab[1] >= 0);
 
 					ab					+=	2;
 				}
 			}
-			
+
 			return ab - uVertices*vVertices*2;
 		}
 		break;
@@ -1272,14 +1272,14 @@ float		*CShadingContext::rayDiff(const float *from,const float *dir,const float 
 				ab[0]				+=	acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir,ddir) + C_EPSILON)));
 				a					=	dotvv(dir,ddir+3);
 				ab[0]				+=	acosf(sqrtf(a*a / (dotvv(dir,dir)*dotvv(ddir+3,ddir+3) + C_EPSILON)));
-				
+
 				ab[0]				*=	0.5f;
 				ab[1]				*=	0.5f;
 				ab[0]				=	tanf(min(ab[0],((float) C_PI)*0.5f - C_EPSILON));
 				ab[0]				=	min(ab[0],DEFAULT_RAY_DA);
-				
+
 				// guard against bad differentials
-				
+
 				if(ab[0] != ab[0]) ab[0]	= 	DEFAULT_RAY_DA;
 
 				assert(ab[0] >= 0);
@@ -1351,7 +1351,7 @@ float		*CShadingContext::rayDiff(const float *from) {
 
 			for (j=0;j<vVertices;j++) {
 				for (i=0;i<uVertices;i++) {
-					
+
 					const int	ii		=	min(i,uVertices-2);
 					const int	jj		=	min(j,vVertices-2);
 
@@ -1377,7 +1377,7 @@ float		*CShadingContext::rayDiff(const float *from) {
 					b++;
 				}
 			}
-			
+
 			return b - uVertices*vVertices;
 		}
 		break;

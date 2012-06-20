@@ -47,9 +47,9 @@ class	CPhotonHider : public CShadingContext {
 public:
 									CPhotonHider(int thread,CAttributes *);
 			virtual					~CPhotonHider();
-			
+
 			static void				preDisplaySetup();
-			
+
 			// The main hider interface
 			// The following functions are commented out for we want the CShadingContext to handle those
 			void					renderingLoop();		// Right after world end to force rendering of the entire frame
@@ -71,7 +71,7 @@ protected:
 			int						numTracedPhotons;
 private:
 			void					tracePhoton(float *,float *,float *,float);
-	
+
 			float					bias;					// The initial intersection bias
 
 			float					powerScale;				// The scaling factor for individual photon powers

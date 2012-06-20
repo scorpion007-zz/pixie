@@ -434,11 +434,11 @@ EXTERN(RtVoid)
     RiCoordinateSystem (RtToken space),
     RiCoordSysTransform (RtToken space);
 
-EXTERN(RtPoint *) 
+EXTERN(RtPoint *)
 	RiTransformPoints (RtToken fromspace, RtToken tospace, RtInt npoints, RtPoint *points);
 
-EXTERN(RtVoid) 
-	RiTransformBegin (void), 
+EXTERN(RtVoid)
+	RiTransformBegin (void),
 	RiTransformEnd (void);
 
 EXTERN(RtVoid)
@@ -494,17 +494,17 @@ EXTERN(RtVoid)
     RiBlobby (RtInt nleaf, RtInt ncode, RtInt code[], RtInt nflt, RtFloat flt[], RtInt nstr, RtString str[], ...),
     RiBlobbyV (RtInt nleaf, RtInt ncode, RtInt code[], RtInt nflt, RtFloat flt[], RtInt nstr, RtString str[], RtInt n, RtToken tokens[], RtPointer params[]);
 
-EXTERN(RtVoid) 
+EXTERN(RtVoid)
 	RiProcDelayedReadArchive (void *data, RtFloat detail),
     RiProcRunProgram (void *data, RtFloat detail),
     RiProcDynamicLoad (void *data, RtFloat detail),
 	RiProcFree(void *);
 
 EXTERN(RtVoid)
-	RiSolidBegin(RtToken type), 
+	RiSolidBegin(RtToken type),
 	RiSolidEnd(void);
 
-EXTERN(RtObjectHandle) 
+EXTERN(RtObjectHandle)
 	RiObjectBegin (void);
 
 EXTERN(RtVoid)
@@ -560,7 +560,7 @@ EXTERN(RtVoid)
     RiReadArchive (RtString filename, RtArchiveCallback callback, ...),
     RiReadArchiveV (RtString filename, RtArchiveCallback callback, int n, RtToken tokens[], RtPointer params[]);
 
-			
+
 
 
 /*

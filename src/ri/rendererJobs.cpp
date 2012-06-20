@@ -56,7 +56,7 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 		// Receive the bucket to render from the client
 		osLock(networkMutex);
 		rcRecv(netClient,netBuffer,3*sizeof(T32));
-		
+
 		// Process the render order
 		if (netBuffer[0].integer == NET_RENDER_BUCKET) {
 			job.type				=	CJob::BUCKET;
@@ -67,10 +67,10 @@ void			CRenderer::dispatchReyes(int thread,CJob &job) {
 			// We have finished the frame, so terminate
 			netBuffer[0].integer	=	NET_ACK;
 			rcSend(netClient,netBuffer,1*sizeof(T32));
-			
+
 			// send end of frame channel data
 			sendFrameDataChannels();
-			
+
 			job.type				=	CJob::TERMINATE;
 		} else {
 			error(CODE_BUG,"Unrecognized network request\n");
@@ -167,7 +167,7 @@ void			CRenderer::dispatchPhoton(int thread,CJob &job) {
 		job.type		=	CJob::PHOTON_BUNDLE;
 		job.numPhotons	=	min(1000,numEmitPhotons-currentPhoton);	// Shoot 1000 photons at a time
 		currentPhoton	+=	job.numPhotons;
-		
+
 		if (CRenderer::flags & OPTIONS_FLAGS_PROGRESS)	{
 			stats.progress		=	(currentPhoton*100) / (float) (numEmitPhotons);
 			if (currentPhoton == numEmitPhotons)	info(CODE_PROGRESS,"Done %d photons            	            \r\n",numEmitPhotons);
@@ -221,7 +221,7 @@ int				CRenderer::advanceBucket(int index,int &x,int &y) {
 	} else {
 		advance(x,y);		// Advance the bucket by one
 	}
-	
+
 	// Scan forward from (cx,cy) to find the first bucket to render
 	while(TRUE) {
 
@@ -330,10 +330,10 @@ void		CRenderer::serverThread(void *w) {
 
 			// Commit the bucket
 			osLock(commitMutex);
-			
+
 			commit(header[0].integer,header[1].integer,header[2].integer,header[3].integer,buffer);
 			recvBucketDataChannels(netServers[index],x,y);
-			
+
 			osUnlock(commitMutex);
 
 			delete[] buffer;
@@ -347,11 +347,11 @@ void		CRenderer::serverThread(void *w) {
 			netBuffer[2].integer	=	0;
 			rcSend(netServers[index],netBuffer,3*sizeof(T32));
 			rcRecv(netServers[index],netBuffer,1*sizeof(T32));	// Expect ACK
-			
+
 			osLock(commitMutex);
-			
+
 			recvFrameDataChannels(netServers[index]);
-			
+
 			osUnlock(commitMutex);
 		}
 	}
@@ -384,7 +384,7 @@ void			CRenderer::processServerRequest(T32 req,int index) {
 
 		fileName	=	(char *) alloca(nameLength);
 		rcRecv(netServers[index],fileName,nameLength,FALSE);
-		
+
 		// Figure out what type of file it is
 		if (strstr(fileName,".sdr") != NULL)		search	=	shaderPath;
 		else if (strstr(fileName,".dll") != NULL)	search	=	proceduralPath;

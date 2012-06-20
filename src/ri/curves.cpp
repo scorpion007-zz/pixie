@@ -104,7 +104,7 @@ static	inline	void	makeCubicBound(float *bmin,float *bmax,const float *v0,const 
 // Description			:
 /// \brief					Ctor
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CCurve::CCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CSurface(a,x) {
 	atomicIncrement(&stats.numGprims);
 
@@ -192,10 +192,10 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
 	int		i;
-	
+
 	// Take care of the motion first
 	if ((CRenderer::flags & OPTIONS_FLAGS_MOTIONBLUR) && moving()) {
-		
+
 		// Sample 6 points on the curve
 
 		// Top
@@ -220,16 +220,16 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 		for (i=0;i<6;i++) 	timev[i]    =   1;
 
 		rasterizer->displaceEstimate(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_END_SAMPLE);
-		
+
 		for (i=0;i<6;i++) 	addBox(bmin,bmax,P + i*3);
-		
+
 		// The u,v from the end sample will not have changed
-		
+
 		u				=	varying[VARIABLE_U];
 		v				=	varying[VARIABLE_V];
 		timev			=	varying[VARIABLE_TIME];
 	}
-	
+
 
 	// Sample 6 points on the curve
 
@@ -250,10 +250,10 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 	*u++	=	0;
 	*v++	=	vmax;
 	*u++	=	1;
-	
+
 	// Time 0
 	for (i=0;i<6;i++)		timev[i]	=	0;
-	
+
 	// Sample the curves
 	rasterizer->displaceEstimate(this,2,3,SHADING_2D_GRID,PARAMETER_P | PARAMETER_BEGIN_SAMPLE);
 
@@ -266,7 +266,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 
 		} else if (CRenderer::inFrustrum(bmin,bmax) == FALSE) {
 			// The curve is out of the viewing frustrum
-			
+
 		} else {
 			// Split the curve into two pieces
 			splitToChildren(rasterizer);
@@ -322,7 +322,7 @@ void			CCurve::dice(CShadingContext *rasterizer) {
 // Description			:
 /// \brief					Ctor
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
 
 	// Compute the bounding box
@@ -342,7 +342,7 @@ CCubicCurve::CCubicCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,f
 	mulmm(geometryMatrix,attributes->vBasis,invBezier);
 
 	makeCubicBound(bmin,bmax,v0,v1,v2,v3,geometryMatrix,NULL);
-	
+
 	if (variables->moving) {
 		v0	+=	vertexSize;
 		v1	+=	vertexSize;
@@ -399,7 +399,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		v2		=	v1 + vs;
 		v3		=	v2 + vs;
 	}
-	
+
 	// We should start from beginning
 	assert(start == 0);
 
@@ -495,11 +495,11 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
-	
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME];
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			const float	*v	=	varying[VARIABLE_V];
@@ -507,7 +507,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 			v1		=	v0 + vs;
 			v2		=	v1 + vs;
 			v3		=	v2 + vs;
-		
+
 			for (int i=0;i<numVertices;++i,dest+=3) {
 				const	float	cv				=	*v++;
 				float			vb[4];
@@ -527,7 +527,7 @@ void			CCubicCurve::sample(int start,int numVertices,float **varying,float ***lo
 				for (int k=0;k<3;++k) {
 					dest[k]	=	(tmp[0]*v0[vertexSize+k] + tmp[1]*v1[vertexSize+k] + tmp[2]*v2[vertexSize+k] + tmp[3]*v3[vertexSize+k]) - (tmp[0]*v0[k] + tmp[1]*v1[k] + tmp[2]*v2[k] + tmp[3]*v3[k]);
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest,CRenderer::invShutterTime);
 			}
@@ -583,7 +583,7 @@ void			CCubicCurve::splitToChildren(CShadingContext *rasterizer) {
 // Description			:
 /// \brief					Ctor
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CLinearCurve::CLinearCurve(CAttributes *a,CXform *x,CBase *b,float vmi,float vma,float gvmi,float gvma) : CCurve(a,x,b,vmi,vma,gvmi,gvma) {
 
 	// Compute the bounding box
@@ -640,7 +640,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 		v0					=	base->vertex + vertexSize;
 		v1					=	v0 + vs;
 	}
-	
+
 	assert(start == 0);
 
 	const	float	*v = varying[VARIABLE_V];
@@ -671,17 +671,17 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 		crossvv(N,dPdv,dPdu);
 		normalizevf(dPdu);
 	}
-	
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME];
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			const float	*v	=	varying[VARIABLE_V];
 			v0		=	base->vertex;
 			v1		=	v0 + vs;
-		
+
 			// Compute the dPdtime
 			for (int i=0;i<numVertices;++i,dest+=3) {
 				const	double	cv	=	*v++;
@@ -690,7 +690,7 @@ void			CLinearCurve::sample(int start,int numVertices,float **varying,float ***l
 				for (int k=0;k<3;++k) {
 					dest[k]	= (float) ((v0[vertexSize+k]*(1.0-cv) + v1[vertexSize+k]*cv) - (v0[k]*(1.0-cv) + v1[k]*cv));
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest,CRenderer::invShutterTime);
 			}
@@ -946,7 +946,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 	// Multiply the curve width by the expansion in the coordinate system
 	{
 		const float expansion	=	powf(fabsf(determinantm(xform->from)), 1.0f / 3.0f);
-		
+
 		for (i=0;i<pl->numParameters;i++) {
 			const CVariable	*cVar	=	pl->parameters[i].variable;
 
@@ -1010,7 +1010,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 				cCurve				=	new CCubicCurve(attributes,xform,base,0,1,vmin,vmax);
 				cCurve->sibling		=	allChildren;
-				allChildren			=	cCurve;	
+				allChildren			=	cCurve;
 			}
 
 			cVertex					+=	nverts[i];
@@ -1035,7 +1035,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 				CCurve::CBase	*base	=	new CCurve::CBase;
 				const float		vmin	=	j / (float) ncsegs;
 				const float		vmax	=	(j+1) / (float) ncsegs;
-				
+
 				parameters			=	pl->uniform(i,NULL);
 				parameters			=	pl->varying(t+j,t+(j+1)%nvars,parameters);
 
@@ -1062,7 +1062,7 @@ void	CCurveMesh::create(CShadingContext *context) {
 
 	// Set the child objects
 	setChildren(context,allChildren);
-	
+
 	osUnlock(mutex);
 }
 

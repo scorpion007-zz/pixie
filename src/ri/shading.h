@@ -207,7 +207,7 @@ public:
 
 		CShaderInstance			*currentShaderInstance;				// The current shader instance that's executing
 		CShaderInstance			*currentLightInstance;				// The current light instance that's executing
-		
+
 		float					**locals[NUM_ACCESSORS];			// The local variables for each shader type
 
 		CShadingScratch			scratch;							// The scratch pad that holds PL data
@@ -289,7 +289,7 @@ public:
 		void					deleteState(CShadingState *);							// Delete a shading state
 		void					*saveState();											// Save the shading state
 		void					restoreState(void *state);								// Restore a saved shading state
-	
+
 		// Memory from which we allocate the temp thread stuff
 		CMemPage				*threadMemory;
 
@@ -312,7 +312,7 @@ public:
 
 									return y;
 								}
-      
+
 		// Thread safe random number generator for floats
 		inline	float			urand() {
 									register uint32_t y;
@@ -368,7 +368,7 @@ private:
 		int						inShadow;											// TRUE if we're in a shadow
 
 		TObjectHash				*traceObjectHash;									// An object hash array for raytraced objects
-	
+
 		void					execute(CProgrammableShaderInstance *,float **);	// Execute a shader
 
 		// The following functions are used in the shaders
@@ -428,10 +428,10 @@ private:
 		// implementation of  Takuji Nishimura and Makoto Matsumoto's
 		// MT19937 (Mersenne Twister pseudorandom number generator)
 		// with optimizations by Shawn Cokus, Matthe Bellew.
-		// This generator is not cryptoraphically secure. 
+		// This generator is not cryptoraphically secure.
 		//
 		// M. Matsumoto and T. Nishimura,
-		// "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform  
+		// "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform
 		// Pseudo-Random Number Generator",
 		// ACM Transactions on Modeling and Computer Simulation,
 		// Vol. 8, No. 1, January 1998, pp 3--30.

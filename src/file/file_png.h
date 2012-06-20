@@ -46,10 +46,10 @@
 class	CFileFramebufferPNG: public CFileFramebuffer {
 public:
 	CFileFramebufferPNG(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter);
-	virtual ~CFileFramebufferPNG();	
+	virtual ~CFileFramebufferPNG();
 	virtual void write(int x,int y,int w,int h,float *data);
 	virtual bool success() { return !!fhandle; };
-	
+
 	unsigned char	**scanlines;
 	int				*scanlineUsage;
 	int				width,height;
@@ -57,7 +57,7 @@ public:
 	int				numSamples;
 	int				lastSavedLine;
 	TMutex			fileMutex;
-	
+
 	float			qmin,qmax,qone,qzero,qamp;
 	float			gamma,gain;
 	int				bitspersample,sampleformat;

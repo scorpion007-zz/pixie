@@ -66,7 +66,7 @@ typedef struct {
 } TArgument;
 
 // This structure holds a code
-// In the future, we may want to make this a class 
+// In the future, we may want to make this a class
 //    and have the shading language opcodes subclass from it
 typedef struct {
 	int					opcode;					// The opcode
@@ -156,7 +156,7 @@ public:
 		int						initEntryPoint;					// Index into code array where the init code starts
 
 		int						usedParameters;
-		
+
 		unsigned int			flags;							// shadows of parent data (to support hcShaders)
 		CShaderData				*data;							// Additional data (owned by CShader)
 
@@ -183,7 +183,7 @@ public:
 		virtual	unsigned int	requiredParameters()									=	0;
 		virtual	const char		*getName()												=	0;
 		virtual	float			**prepare(CMemPage*&,float **,int)						=	0;
-		
+
 		void					createCategories();
 
 		CVariable				*parameters;				// The list of parameter (cloned from the parent)

@@ -124,7 +124,7 @@ public:
 	virtual	void		RiTransformEnd(void);
 
 	virtual	void		RiAttributeV(const char *name,int n,const char *tokens[],const void *params[]);
-	
+
 	virtual	void		RiPolygonV(int nvertices,int n,const char *tokens[],const void *params[]);
 	virtual	void		RiGeneralPolygonV(int nloops,int *nverts,int n,const char *tokens[],const void *params[]);
 	virtual	void		RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n,const char *tokens[],const void *params[]);
@@ -179,7 +179,7 @@ public:
 
 	virtual	void		*RiArchiveBeginV(const char *name, int n,const char *tokens[],const void *parms[]);
 	virtual	void		RiArchiveEnd(void);
-	
+
 	virtual	void		RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]);
 	virtual	void		RiResourceBegin(void);
 	virtual	void		RiResourceEnd(void);
@@ -188,7 +188,7 @@ public:
 	virtual	void		RiElseIfV(const char *expr,int n,const char *tokens[],const void *parms[]);
 	virtual	void		RiElse(void);
 	virtual	void		RiIfEnd(void);
-		
+
 	virtual	void		RiError(int,int,const char *);
 
 protected:

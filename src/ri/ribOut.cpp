@@ -100,8 +100,8 @@ CRibOut::CRibOut(const char *n) : CRiInterface() {
 
 #ifdef HAVE_ZLIB
 
-		if (	(strstr(outName,".Z") != NULL)		|| 
-				(strstr(outName,".zip") != NULL)	|| 
+		if (	(strstr(outName,".Z") != NULL)		||
+				(strstr(outName,".zip") != NULL)	||
 				(strstr(outName,".z") != NULL)		||
 				(preferCompressedRibOut == TRUE) ) {
 			outFile				=	(FILE *) gzopen(outName,"wb");
@@ -114,7 +114,7 @@ CRibOut::CRibOut(const char *n) : CRiInterface() {
 		outFile				=	fopen(outName,"w");
 		outputCompressed	=	FALSE;
 #endif
-		
+
 		outputIsPipe		=	FALSE;
 	}
 	declaredVariables	=	new CTrie<CVariable *>;
@@ -679,9 +679,9 @@ void		CRibOut::RiAttributeV(const char *name,int n,const char *tokens[],const vo
 			if (FALSE) {
 			attributeCheckInt(RI_NUMPROBES,2)
 			attributeCheckInt(RI_MINSUBDIVISION,1)
-			attributeCheckInt(RI_MAXSUBDIVISION,1)				
-			attributeCheckInt(RI_MINSPLITS,1)				
-			attributeCheckFloat(RI_BOUNDEXPAND,1)				
+			attributeCheckInt(RI_MAXSUBDIVISION,1)
+			attributeCheckInt(RI_MINSPLITS,1)
+			attributeCheckFloat(RI_BOUNDEXPAND,1)
 			attributeCheckInt(RI_BINARY,1)
 			attributeCheckInt(RI_RASTERORIENT,1)
 			attributeEndCheck
@@ -845,7 +845,7 @@ void		CRibOut::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nverts,int *
 void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) {
 	if ((ubasis == RiBezierBasis || ubasis == RiBSplineBasis || ubasis == RiCatmullRomBasis || ubasis == RiHermiteBasis || ubasis == RiPowerBasis) &&
 		(vbasis == RiBezierBasis || vbasis == RiBSplineBasis || vbasis == RiCatmullRomBasis || vbasis == RiHermiteBasis || vbasis == RiPowerBasis)) {
-	
+
 		const char *ubasis_str;
 		if (ubasis == RiBezierBasis)
 			ubasis_str = "bezier";
@@ -857,7 +857,7 @@ void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) 
 			ubasis_str = "hermite";
 		else if (ubasis == RiPowerBasis)
 			ubasis_str = "power";
-		
+
 		const char *vbasis_str;
 		if (vbasis == RiBezierBasis)
 			vbasis_str = "bezier";
@@ -869,7 +869,7 @@ void		CRibOut::RiBasis(float ubasis[][4],int ustep,float vbasis[][4],int vstep) 
 			vbasis_str = "hermite";
 		else if (vbasis == RiPowerBasis)
 			vbasis_str = "power";
-		
+
 		out("Basis \"%s\" %d \"%s\" %d\n",
 			ubasis_str,ustep,
 			vbasis_str,vstep);
@@ -1135,13 +1135,13 @@ void		CRibOut::RiCurvesV(const char * degree,int ncurves,int nverts[],const char
 	int	nvertices	=	0;
 	int	nvaryings	=	0;
 	int	wrapadd;
-	
+
 	if (strcmp(wrap,RI_PERIODIC) == 0) {
 		wrapadd	=	0;
 	} else {
 		wrapadd	=	1;
 	}
-					
+
 	out("Curves \"%s\" [",degree);
 
 	if (strcmp(degree,RI_LINEAR) == 0) {
@@ -1341,7 +1341,7 @@ void		*CRibOut::RiArchiveBeginV(const char *name,int n,const char *tokens[],cons
 void		CRibOut::RiArchiveEnd(void) {
 	out("ArchiveEnd\n");
 }
-	
+
 void		CRibOut::RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]) {
 	out("Resource \"%s\" \"%s\" ",handle,type);
 	writePL(n,tokens,parms);
@@ -1671,7 +1671,7 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable(RI_CAMERAHITMODE,		"string");
 
 	declareVariable(RI_NAME,				"string");
-	
+
 	declareVariable(RI_HIDDEN,				"int");
 	declareVariable(RI_BACKFACING,			"backfacing");
 
@@ -1687,7 +1687,7 @@ void		CRibOut::declareDefaultVariables() {
 	declareVariable("compression",			"string");
 	declareVariable("NP",					"float[16]");
 	declareVariable("Nl",					"float[16]");
-	
+
 	// Declare the rest
 	declareVariable("P",	"global vertex point");
 	declareVariable("Ps",	"global vertex point");
@@ -1725,7 +1725,7 @@ void		CRibOut::declareDefaultVariables() {
 
 	// Misc. variables
 	declareVariable("fov",	"float");
-	
+
 	// Standard RI variables
 	declareVariable("Ka",				"float");
 	declareVariable("Kd",				"float");

@@ -190,7 +190,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 		// Do we have a grid ?
 		if (children == NULL) {
 			osLock(CRenderer::tesselateMutex);
-	
+
 			if (children == NULL) {
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
 
@@ -198,7 +198,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 				tesselation->attach();
 				children				=	tesselation;
 			}
-	
+
 			osUnlock(CRenderer::tesselateMutex);
 		}
 		return;
@@ -216,7 +216,7 @@ void		CPolygonTriangle::intersect(CShadingContext *context,CRay *cRay) {
 		interpolatev(t0,vert0,vertices + this->v0*3,cRay->time);	vert0	=	t0;
 		interpolatev(t1,vert1,vertices + this->v1*3,cRay->time);	vert1	=	t1;
 		interpolatev(t2,vert2,vertices + this->v2*3,cRay->time);	vert2	=	t2;
-	} 
+	}
 
 	// The ray triangle intersection code
 	// Hacked away from the article titled "Fast, Minimum Storage Ray-Triangle Intersection"
@@ -313,10 +313,10 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 				if (dest != NULL) {
 					const float	*data0	=	pl->data0 + pl->parameters[j].index;
 					const float	*data1	=	pl->data1 + pl->parameters[j].index;
-					
+
 					assert(isAligned64(data0));
 					assert(isAligned64(data1));
-					
+
 					const float	*sv00	=	data0 + this->v0*variable->numFloats;
 					const float	*sv01	=	data0 + this->v1*variable->numFloats;
 					const float	*sv02	=	data0 + this->v2*variable->numFloats;
@@ -330,7 +330,7 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 						const	double	ctime	=	time[i];
 
 						for (int k=0;k<numFloats;++k) {
-							*dest++	=	(float) ((sv00[k]*(1.0-cu) + sv01[k]*cu*cv + sv02[k]*cu*(1.0-cv))*(1.0-ctime) + 
+							*dest++	=	(float) ((sv00[k]*(1.0-cu) + sv01[k]*cu*cv + sv02[k]*cu*(1.0-cv))*(1.0-ctime) +
 												 (sv10[k]*(1.0-cu) + sv11[k]*cu*cv + sv12[k]*cu*(1.0-cv))*ctime);
 						}
 					}
@@ -409,7 +409,7 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 				if (dest != NULL) {
 					dest += start*numFloats;
 					assert(isAligned64(data + pl->parameters[j].index));
-					
+
 					const float	*sv0	=	data + pl->parameters[j].index + this->v0*variable->numFloats;
 					const float	*sv1	=	data + pl->parameters[j].index + this->v1*variable->numFloats;
 					const float	*sv2	=	data + pl->parameters[j].index + this->v2*variable->numFloats;
@@ -425,7 +425,7 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 				}
 			}
 		}
-		
+
 		// Get the vertex corners
 		const float	*v0	=	data + this->v0*3;
 		const float	*v1	=	data + this->v1*3;
@@ -470,11 +470,11 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 			for (int i=0;i<numVertices;++i,dest+=3)		movvv(dest,normal);
 		}
 	}
-	
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (pl->data1 != NULL) {
 			const float *v00	=	pl->data0 + this->v0*3;
@@ -491,9 +491,9 @@ void		CPolygonTriangle::sample(int start,int numVertices,float **varying,float *
 
 				// Do the interpolation
 				for (int k=0;k<3;k++) {
-					*dest++	=	(float) ((v10[k]*(1.0-cu) + v11[k]*cu*cv + v12[k]*cu*(1.0-cv)) - (v00[k]*(1.0-cu) + v01[k]*cu*cv + v02[k]*cu*(1.0-cv)));					
+					*dest++	=	(float) ((v10[k]*(1.0-cu) + v11[k]*cu*cv + v12[k]*cu*(1.0-cv)) - (v00[k]*(1.0-cu) + v01[k]*cu*cv + v02[k]*cu*(1.0-cv)));
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest-3,CRenderer::invShutterTime);
 			}
@@ -519,7 +519,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 	const float	*u				=	varying[VARIABLE_U];
 	const float	*v				=	varying[VARIABLE_V];
 	const CPl	*pl				=	mesh->pl;
-	
+
 	for (i=0;i<pl->numParameters;i++) {
 		const CPlParameter	*cParameter	=	pl->parameters+i;
 		const CVariable		*cVariable	=	cParameter->variable;
@@ -555,7 +555,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
 						const char ** dests		=	(const char **) dest;
-						
+
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
 
@@ -565,10 +565,10 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 					} else {
 						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
 						const char ** dests		=	(const char **) dest;
-						
+
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
-						
+
 						// premote
 						for(j=0;j<numVertices;j++) {
 							const char **csrcs	=	srcs;
@@ -618,7 +618,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
-						
+
 						for (j=numFloats;j>0;j--) {
 							*dests++	=	*srcs++;
 						}
@@ -628,7 +628,7 @@ void			CPolygonTriangle::interpolate(int numVertices,float **varying,float ***lo
 
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
-						
+
 						// premote
 						for(j=0;j<numVertices;j++) {
 							const char **csrcs	=	srcs;
@@ -768,7 +768,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 		// Do we have a grid ?
 		if (children == NULL) {
 			osLock(CRenderer::tesselateMutex);
-	
+
 			if (children == NULL) {
 				CTesselationPatch	*tesselation	=	new CTesselationPatch(attributes,xform,this,0,1,0,1,0,0,-1);
 
@@ -776,7 +776,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 				tesselation->attach();
 				children				=	tesselation;
 			}
-	
+
 			osUnlock(CRenderer::tesselateMutex);
 		}
 		return;
@@ -795,7 +795,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 		interpolatev(t1,P10,vertices + this->v1*3,cRay->time);	P10	=	t1;
 		interpolatev(t2,P01,vertices + this->v2*3,cRay->time);	P01	=	t2;
 		interpolatev(t3,P11,vertices + this->v3*3,cRay->time);	P11	=	t3;
-	} 
+	}
 
 	const float	*r			=	cRay->from;
 	const float	*q			=	cRay->dir;
@@ -816,7 +816,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 	const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
 	const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
 	const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
-	
+
 
 #define solve()														\
 	if ((v > 0) && (v < 1)) {										\
@@ -870,7 +870,7 @@ void		CPolygonQuad::intersect(CShadingContext *context,CRay *cRay) {
 			}														\
 		}															\
 	}
-	
+
 
 
 	double			roots[2];
@@ -911,7 +911,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 
 		// Interpolate the vertex variables accross the triangle
 		for (int j=0;j<pl->numParameters;j++) {
-			
+
 			// Is this a vertex variable that needs to be interpolated?
 			if (pl->parameters[j].container == CONTAINER_VERTEX) {
 				const CVariable	*variable	=	pl->parameters[j].variable;
@@ -921,7 +921,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 				if (dest != NULL) {
 					const float	*data0	=	pl->data0 + pl->parameters[j].index;
 					const float	*data1	=	pl->data1 + pl->parameters[j].index;
-					
+
 					assert(isAligned64(data0));
 					assert(isAligned64(data1));
 
@@ -940,7 +940,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 						const	double	ctime	=	time[i];
 
 						for (int k=0;k<numFloats;k++) {
-							*dest++	=	(float) (((sv00[k]*(1.0-cu) + sv01[k]*cu)*(1.0-cv) + (sv02[k]*(1.0-cu) + sv03[k]*cu)*cv)*(1.0-ctime) + 
+							*dest++	=	(float) (((sv00[k]*(1.0-cu) + sv01[k]*cu)*(1.0-cv) + (sv02[k]*(1.0-cu) + sv03[k]*cu)*cv)*(1.0-ctime) +
 												 ((sv10[k]*(1.0-cu) + sv11[k]*cu)*(1.0-cv) + (sv12[k]*(1.0-cu) + sv13[k]*cu)*cv)*ctime);
 						}
 					}
@@ -1028,13 +1028,13 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 				}
 			}
 		}
-		
+
 		// Get the quad corners
 		const float *v0	=	data + this->v0*3;
 		const float *v1	=	data + this->v1*3;
 		const float *v2	=	data + this->v2*3;
 		const float *v3	=	data + this->v3*3;
-		
+
 		// Compute surface derivatives and normal if required
 		if (up & (PARAMETER_DPDU | PARAMETER_NG)) {
 			float	*dest	=	varying[VARIABLE_DPDU]+start*3;
@@ -1074,11 +1074,11 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 			}
 		}
 	}
-	
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (pl->data1 != NULL) {
 			const float *v00	=	pl->data0 + this->v0*3;
@@ -1099,7 +1099,7 @@ void		CPolygonQuad::sample(int start,int numVertices,float **varying,float ***lo
 				for (int k=0;k<3;k++) {
 					dest[k]	=	(float) (((v10[k]*(1.0-cu) + v11[k]*cu)*(1.0-cv) + (v12[k]*(1.0-cu) + v13[k]*cu)*cv) - ((v00[k]*(1.0-cu) + v01[k]*cu)*(1.0-cv) + (v02[k]*(1.0-cu) + v03[k]*cu)*cv));
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest,CRenderer::invShutterTime);
 			}
@@ -1125,7 +1125,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 	const float	*u				=	varying[VARIABLE_U];
 	const float	*v				=	varying[VARIABLE_V];
 	const CPl	*pl				=	mesh->pl;
-	
+
 	for (i=0;i<pl->numParameters;i++) {
 		const CPlParameter	*cParameter	=	pl->parameters+i;
 		const CVariable		*cVariable	=	cParameter->variable;
@@ -1158,7 +1158,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 					if ((cVariable->container == CONTAINER_UNIFORM) || (cVariable->container == CONTAINER_CONSTANT)) {
 						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
 						const char ** dests		=	(const char **) dest;
-						
+
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
 
@@ -1168,10 +1168,10 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 					} else {
 						const char ** srcs		=	((const char **) data) + this->uniform*numFloats;
 						const char ** dests		=	(const char **) dest;
-						
+
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
-						
+
 						// premote
 						for(j=0;j<numVertices;j++) {
 							const char **csrcs	=	srcs;
@@ -1222,7 +1222,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
-						
+
 						for (j=numFloats;j>0;j--) {
 							*dests++	=	*srcs++;
 						}
@@ -1232,7 +1232,7 @@ void			CPolygonQuad::interpolate(int numVertices,float **varying,float ***locals
 
 						assert(isAligned64(srcs));
 						assert(isAligned64(dests));
-						
+
 						// premote
 						for(j=0;j<numVertices;j++) {
 							const char **csrcs	=	srcs;
@@ -1319,7 +1319,7 @@ CPolygonMesh::CPolygonMesh(CAttributes *a,CXform *x,CPl *pl,int npoly,int *nhole
 
 	this->nholes		=	new int[npoly];		memcpy(this->nholes,nholes,npoly*sizeof(int));
 	this->nvertices		=	new int[nloops];	memcpy(this->nvertices,nvertices,nloops*sizeof(int));
-	this->vertices		=	new int[nverts];	memcpy(this->vertices,vertices,nverts*sizeof(int));	
+	this->vertices		=	new int[nverts];	memcpy(this->vertices,vertices,nverts*sizeof(int));
 
 	for (i=0,mVertex=-1;i<nverts;i++) {
 		mVertex	=	max(mVertex,vertices[i]);
@@ -1521,7 +1521,7 @@ inline	void	createTriangle(const int *vindices,const int vi0,const int vi1,const
 
 
 int check_tri_clock_dir(const float *pt1, const float *pt2, const float *pt3) {
-  const double test = (((pt2[0] - pt1[0])*(pt3[1] - pt1[1])) - ((pt3[0] - pt1[0])*(pt2[1] - pt1[1]))); 
+  const double test = (((pt2[0] - pt1[0])*(pt3[1] - pt1[1])) - ((pt3[0] - pt1[0])*(pt2[1] - pt1[1])));
   if (test > 0) return COUNTER_CLOCKWISE;
   else if(test < 0) return CLOCKWISE;
   else return LINE;
@@ -1564,9 +1564,9 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 	do{
 
 		// If we are sharing a vertex, keep going
-		if (	(sVertex->xy != to->xy) && 
-				(sVertex->xy != from->xy) && 
-				(sVertex->next->xy != to->xy) && 
+		if (	(sVertex->xy != to->xy) &&
+				(sVertex->xy != from->xy) &&
+				(sVertex->next->xy != to->xy) &&
 				(sVertex->next->xy != from->xy)) {
 
 			const float	*s1	=	sVertex->xy;
@@ -1596,7 +1596,7 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 				(area(b[0],b[1],s2[0],s2[1],c[0],c[1]) > 0) &&
 				(area(c[0],c[1],s2[0],s2[1],a[0],a[1]) > 0)	)	return FALSE;
 		}
-		
+
 		/*
 		const double a1 = area(c[0],c[1],s1[0],s1[1],b[0],b[1]);
 		const double a2 = area(c[0],c[1],s1[0],s1[1],a[0],a[1]);
@@ -1618,7 +1618,7 @@ static	inline	int		valid(const CTriVertex *loop,const CTriVertex *from,const CTr
 
 		if(	(a1*area(c[0],c[1],a[0],a[1],b[0],b[1]) > 0) &&
 			(a2*area(c[0],c[1],b[0],b[1],a[0],a[1]) > 0) &&
-			(a3*area(b[0],b[1],c[0],c[1],a[0],a[1]) > 0)) return FALSE;	
+			(a3*area(b[0],b[1],c[0],c[1],a[0],a[1]) > 0)) return FALSE;
 
 			*/
 		sVertex = sVertex->next;
@@ -1804,7 +1804,7 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 
 		k			+=	nv;
 	}
-	
+
 
 	// Correct the orientation
 	reverse	=	orientationCheck(loops[0],TRUE,data);
@@ -1850,7 +1850,7 @@ inline	void	triangulatePolygon(int nloops,int *nverts,int *vindices,CMeshData &d
 		data.meshUniformNumber++;
 		data.meshFacevaryingNumber	+=	4;
 
-		return; 
+		return;
 	}
 #endif
 
@@ -2066,7 +2066,7 @@ void				CPolygonMesh::create(CShadingContext *context) {
 	data.meshContext			=	context;
 
 	memBegin(context->threadMemory);
-	
+
 	// Triangulate the individual polygons
 	for (cnholes=nholes,cvertices=vertices,cnvertices=nvertices,i=0;i<npoly;i++) {
 		// Triangulate the current polygon
@@ -2079,12 +2079,12 @@ void				CPolygonMesh::create(CShadingContext *context) {
 		cnvertices	+=	cnholes[0];
 		cnholes++;
 	}
-	
+
 	memEnd(context->threadMemory);
 
 	// Set the children
 	setChildren(context,data.meshChildren);
-	
+
 	osUnlock(mutex);
 }
 

@@ -107,7 +107,7 @@ public:
 								CBrickMap(FILE *in,const char *name,const float *from,const float *to);
 								CBrickMap(const char *name,const float *bmin,const float *bmax,const float *from,const float *to,const float *toNDC,CChannel *channels,int numChannels,int maxDepth);
 			virtual				~CBrickMap();
-			
+
 								///////////////////////////////////////////////////////////////////////
 								// Class				:	CBrickMap
 								// Method				:	findBrick
@@ -142,14 +142,14 @@ public:
 											}
 
 											if (n != NULL) *n = cNode;
-											
+
 											// Return the brick
 											cNode->brick->referenceNumber	=	referenceNumber;
 											return cNode->brick;
 										}
 									}
-							
-									
+
+
 									if (forceCreate) {
 										// Allocate a new node and brick
 										cNode				=	new CBrickNode;
@@ -161,7 +161,7 @@ public:
 										cNode->fileIndex	=	-1;					// We're not in the file yet
 										cNode->next			=	activeBricks[key];
 										activeBricks[key]	=	cNode;
-								
+
 										// Return this new brick
 										cNode->brick->referenceNumber	=	referenceNumber;
 										return cNode->brick;
@@ -170,7 +170,7 @@ public:
 										return NULL;
 									}
 								}
-								
+
 								///////////////////////////////////////////////////////////////////////
 								// Class				:	CBrickMap
 								// Method				:	checkBrick
@@ -202,7 +202,7 @@ public:
 											}
 
 											if (n != NULL) *n = cNode;
-											
+
 											return TRUE;
 										}
 									}
@@ -212,7 +212,7 @@ public:
 			void				lookup(float *data,const float *P,const float *N,float dP);
 			void				lookup(float *,const float *,const float *,const float *,const float *,CShadingContext *) {	assert(FALSE);	}
 			void				store(const float *data,const float *P,const float *N,float dP);
-				
+
 			void				finalize();
 			void				compact(const char*,float);
 
@@ -229,7 +229,7 @@ protected:
 			void				flushBricks(int allBricks);		// Free memory by flushing bricks
 			CBrick				*newBrick(int clear);			// Allocate a brick
 			CBrick				*loadBrick(int fileIndex);		// Load a brick
-			
+
 			float				normalThreshold;				// The normal threshold for incoherent normals
 			FILE				*file;							// The file where we keep the hierarchy (may be NULL)
 			vector				bmin,bmax;						// The bounding box of the scene (has to be a cube)
@@ -254,7 +254,7 @@ protected:
 
 
 	static	void				brickQuickSort(CBrickNode **nodes,int start,int end);
-	
+
 	friend class CBrickMapGeometry;
 };
 

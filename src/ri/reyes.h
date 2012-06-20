@@ -86,8 +86,8 @@ protected:
 			int					xbound[2],ybound[2];	// The bound of the object on the screen, in samples
 			float				zmin;					// The minimum z coordinate of the object (used for occlusion culling)
 			TMutex				mutex;					// To secure the object
-			
-	};	
+
+	};
 
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CRasterGrid
@@ -137,7 +137,7 @@ protected:
 										allItems		=	newItems;
 										stepSize		*=	2;
 									}
-					
+
 									// Insert the item
 									i	= numItems++;
 									j	= i >> 1;
@@ -150,18 +150,18 @@ protected:
 
 									allItems[i]		=	cObject;
 								}
-					
+
 				CRasterObject	*get(TMutex &mutex) {
 									int				i = 1, j;
 									CRasterObject	*lItem,*cItem;
-								
+
 									osLock(mutex);
 
 									if (numItems <= 1) {
 										cItem	=	NULL;
 									} else {
 										cItem	=	allItems[1];
-									
+
 										numItems--;
 										lItem	=	allItems[numItems];
 
@@ -217,7 +217,7 @@ public:
 	virtual	void				rasterBegin(int,int,int,int,int)			=	0;
 	virtual	void				rasterDrawPrimitives(CRasterGrid *)			=	0;
 	virtual	void				rasterEnd(float *,int)						=	0;
-	
+
 								// The following can be called from the "dice" function to insert an object into the scene
 	void						drawObject(CObject *);									// Draw an object
 	void						drawGrid(CSurface *,int,int,float,float,float,float);	// Draw a grid
@@ -233,7 +233,7 @@ protected:
 	float						maxDepth;										// The maximum opaque depth in the current bucket
 
 	static	int					extraPrimitiveFlags;							// These are the extra primitive flags
-	static	int					numVertexSamples;								// The number of samples per pixel	
+	static	int					numVertexSamples;								// The number of samples per pixel
 
 	void						shadeGrid(CRasterGrid *,int);					// Called by the child to force the shading of a grid
 
@@ -251,7 +251,7 @@ private:
 	CRasterObject				*newObject(CObject *);							// Create a new object
 	CRasterGrid					*newGrid(CSurface *,int,int,int);				// Create a new grid
 	void						deleteObject(CRasterObject *);					// Delete an object (the object can also be a grid)
-	
+
 	void						render();										// Render the current bucket
 	void						skip();											// Skip the current bucket
 
@@ -266,7 +266,7 @@ private:
 	int							tbucketTop;										// Right of the current bucket in samples
 	int							tbucketRight;
 	int							tbucketBottom;
-	
+
 
 				///////////////////////////////////////////////////////////////////////
 				// Class				:	CReyes

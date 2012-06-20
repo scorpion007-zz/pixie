@@ -74,7 +74,7 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 
 	assert(dataSize == 7);
 	assert(numChannels == 3);
-	
+
 	memory				=	new CMemStack;		// Where we allocate our memory from
 	root				=	NULL;
 	maxDepth			=	1;
@@ -86,7 +86,7 @@ CIrradianceCache::CIrradianceCache(const char *name,unsigned int f,FILE *in,cons
 		if (in == NULL)	in	=	ropen(name,"rb",fileIrradianceCache);
 
 		if (in != NULL) {
-		
+
 			// Read the samples
 			fread(&maxDepth,	sizeof(int),1,in);
 			root	=	readNode(in);
@@ -134,7 +134,7 @@ CIrradianceCache::~CIrradianceCache() {
 			FILE	*out	=	ropen(name,"wb",fileIrradianceCache);
 
 			if (out != NULL) {
-			
+
 				// Write the samples
 				fwrite(&maxDepth,	sizeof(int),1,out);
 				writeNode(out,root);
@@ -192,7 +192,7 @@ CIrradianceCache::CCacheNode		*CIrradianceCache::readNode(FILE *in) {
 	fread(&cNode->side,		sizeof(float),1,in);
 
 	fread(&numSamples,		sizeof(int),1,in);
-	
+
 	for(cNode->samples=NULL;numSamples>0;numSamples--) {
 		CCacheSample	*cSample	=	(CCacheSample *) memory->alloc(sizeof(CCacheSample));
 		fread(cSample,sizeof(CCacheSample),1,in);
@@ -236,27 +236,27 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const 
 		float				coverage;
 		vector				irradiance,envdir;
 		vector				P,N;
-		
+
 		// A small value for discard-smoothing of irradiance
 		const float			smallSampleWeight = (flags & CACHE_SAMPLE) ? 0.1f : 0.0f;
 
 		// Transform the lookup point to the correct coordinate system
 		mulmp(P,to,cP);
 		mulmn(N,from,cN);
-		
+
 		// Init the result
 		coverage	=	0;
 		initv(irradiance,0);
 		initv(envdir,0);
 
 		// The weighting algorithm is that described in [Tabellion and Lamorlette 2004]
-		// We need to convert the max error as in Wald to Tabellion 
+		// We need to convert the max error as in Wald to Tabellion
 		// The default value of maxError is 0.4f
 		const float			K		=	0.4f / scratch->occlusionParams.maxError;
 
 		// Note, we do not need to lock the data for reading
 		// if word-writes are atomic
-		
+
 		// Prepare for the non recursive tree traversal
 		stack		=	stackBase;
 		*stack++	=	root;
@@ -288,7 +288,7 @@ void	CIrradianceCache::lookup(float *C,const float *cP,const float *cdPdu,const 
 					vector	ntmp;
 
 					crossvv(ntmp,cSample->N,N);
-					
+
 					// Sum the sample
 					totalWeight		+=	w;
 					coverage		+=	w*(cSample->coverage		+ dotvv(cSample->gP+0*3,D) + dotvv(cSample->gR+0*3,ntmp));
@@ -413,7 +413,7 @@ inline	void	posGradient(float *dP,int np,int nt,CHemisphereSample *h,const float
 	for (j=0;j<np;j++) {
 		dp			=	h + j;
 
-		for (k=0;k<7;k++) {	
+		for (k=0;k<7;k++) {
 			mag0[k]		=	mag1[k]	= 0.0;
 		}
 
@@ -576,12 +576,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 	const int				np				=	(int) (C_PI*nt + 0.5);
 	const int				numSamples		=	nt*np;
 	CHemisphereSample		*hemisphere		=	(CHemisphereSample *) alloca(numSamples*sizeof(CHemisphereSample));
-	
+
 	// initialize texture lookups if needed
 	if (scratch->occlusionParams.environment) {
 		CTextureLookup::staticInit(&(context->currentShadingState->scratch));
 	}
-	
+
 	// Create an orthanormal coordinate system
 	if (dotvv(dPdu,dPdu) > 0) {
 		normalizevf(X,dPdu);
@@ -600,11 +600,11 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 	initv(irradiance,0);
 	initv(envdir,0);
 	rMean							=	C_INFINITY;
-	
+
 	// Calculate the ray differentials (use average spread in theta and phi)
 	const float da					=	tanf((float) C_PI/(2*(nt+np)));
 	const float db					=	(lengthv(dPdu) + lengthv(dPdv))*0.5f;
-	
+
 	if (scratch->occlusionParams.occlusion == TRUE) {
 
 		// We're shading for occlusion
@@ -629,7 +629,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 
 				const float originJitterX = (rv[0] - 0.5f)*scratch->traceParams.sampleBase;
 				const float originJitterY = (rv[1] - 0.5f)*scratch->traceParams.sampleBase;
-				
+
 				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
 				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*dPdu[2] + originJitterY*dPdv[2];
@@ -663,7 +663,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 					hemisphere->coverage	=	0;
 					addvv(envdir,ray.dir);
 					movvv(hemisphere->envdir,ray.dir);
-					
+
 					// GSH : Texture lookup for misses
 					if(scratch->occlusionParams.environment != NULL){
 						CEnvironment *tex = scratch->occlusionParams.environment;
@@ -675,12 +675,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D1,ray.dir);
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
-						
+
 						float savedSamples = scratch->traceParams.samples;
 						context->currentShadingState->scratch.traceParams.samples = 1;
 						tex->lookup(color,D0,D1,D2,D3,context);
 						context->currentShadingState->scratch.traceParams.samples = savedSamples;
-						
+
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -692,7 +692,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 				hemisphere->invDepth		=	1 / ray.t;
 
 				if (tmp > horizonCutoff)	rMean =	min(rMean,ray.t);
-				
+
 				movvv(hemisphere->dir,ray.dir);
 
 				assert(hemisphere->invDepth > 0);
@@ -708,7 +708,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 			for (j=0;j<np;j++,hemisphere++) {
 				float rv[2];
 				context->random2d.get(rv);
-				
+
 				float		tmp			=	sqrtf((i+context->urand()) / (float) nt);
 				const float	phi			=	(float) (2*C_PI*(j+context->urand()) / (float) np);
 				const float	cosPhi		=	(cosf(phi)*tmp);
@@ -722,7 +722,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 
 				const float originJitterX = (rv[0] - 0.5f)*scratch->traceParams.sampleBase;
 				const float originJitterY = (rv[1] - 0.5f)*scratch->traceParams.sampleBase;
-				
+
 				ray.from[COMP_X]		=	P[COMP_X] + originJitterX*dPdu[0] + originJitterY*dPdv[0];
 				ray.from[COMP_Y]		=	P[COMP_Y] + originJitterX*dPdu[1] + originJitterY*dPdv[1];
 				ray.from[COMP_Z]		=	P[COMP_Z] + originJitterX*dPdu[2] + originJitterY*dPdv[2];
@@ -750,7 +750,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						normalizev(N,ray.N);
 						mulvf(P,ray.dir,ray.t);
 						addvv(P,ray.from);
-						
+
 						if(dotvv(ray.dir,N) > 0)
 							mulvf(N,-1);
 
@@ -759,7 +759,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						// HACK: Avoid too bright spots
 						tmp	=	max(max(C[0],C[1]),C[2]);
 						if (tmp > scratch->occlusionParams.maxBrightness)	mulvf(C,scratch->occlusionParams.maxBrightness/tmp);
-						
+
 						mulvv(C,attributes->surfaceColor);
 						addvv(irradiance,C);
 						movvv(hemisphere->irradiance,C);
@@ -779,7 +779,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 					hemisphere->coverage	=	0;
 					addvv(envdir,ray.dir);
 					movvv(hemisphere->envdir,ray.dir);
-					
+
 					// GSH : Texture lookup for misses
 					if(scratch->occlusionParams.environment != NULL){
 						CEnvironment *tex = scratch->occlusionParams.environment;
@@ -791,12 +791,12 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 						movvv(D1,ray.dir);
 						movvv(D2,ray.dir);
 						movvv(D3,ray.dir);
-						
+
 						float savedSamples = scratch->traceParams.samples;
 						context->currentShadingState->scratch.traceParams.samples = 1;
 						tex->lookup(color,D0,D1,D2,D3,context);
 						context->currentShadingState->scratch.traceParams.samples = savedSamples;
-						
+
 						addvv(irradiance,color);
 						movvv(hemisphere->irradiance,color);
 					} else{
@@ -817,7 +817,7 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 		}
 	}
 	hemisphere				-=	np*nt;
-	
+
 	// Normalize
 	const float	tmp			=	1 / (float) numSamples;
 	coverage				*=	tmp;
@@ -838,20 +838,20 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 
 		// We're modifying, lock the thing
 		osLock(mutex);
-		
+
 		// Create the sample
 		cSample					=	(CCacheSample *) memory->alloc(sizeof(CCacheSample));
 
 		// Compute the gradients of the illumination
 		posGradient(cSample->gP,np,nt,hemisphere,X,Y);
 		rotGradient(cSample->gR,np,nt,hemisphere,X,Y);
-		
+
 		// Compute the radius of validity
 		rMean					*=	0.5f;
 
 		// Clamp the radius of validity
 		rMean					=	min(rMean,db*scratch->occlusionParams.maxPixelDist);
-		
+
 		// Record the data (in the target coordinate system)
 		movvv(cSample->P,P);
 		movvv(cSample->N,N);
@@ -859,15 +859,15 @@ void		CIrradianceCache::sample(float *C,const float *P,const float *dPdu,const f
 		cSample->coverage		=	coverage;
 		movvv(cSample->envdir,envdir);
 		movvv(cSample->irradiance,irradiance);
-		
+
 		// Do the neighbour clamping trick
 		clamp(cSample);
 		rMean	=	cSample->dP;	// copy dP back so we get the right place in the octree
-		
+
 		// The error multiplier
 		const float		K		=	0.4f / scratch->occlusionParams.maxError;
 		rMean					/=	K;
-		
+
 		// Insert the new sample into the cache
 		cNode					=	root;
 		depth					=	0;

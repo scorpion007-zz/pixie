@@ -96,7 +96,7 @@ CImplicit::~CImplicit() {
 		osUnloadModule(handle);
 	}
 }
-	
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
 
 	// Do the freaking ray martching
 	if (! (ray->flags & attributes->flags) )	return;
-	
+
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		const float importance = attributes->lodImportance;
 		if (importance >= 0) {
@@ -139,7 +139,7 @@ void					CImplicit::intersect(CShadingContext *context,CRay *ray) {
 		lastP[0]	=	(float) (ray->from[0] + ray->dir[0]*lastT);
 		lastP[1]	=	(float) (ray->from[1] + ray->dir[1]*lastT);
 		lastP[2]	=	(float) (ray->from[2] + ray->dir[2]*lastT);
-		lastF		=	evalFunction(lastdF,data,lastP,ray->time);		
+		lastF		=	evalFunction(lastdF,data,lastP,ray->time);
 
 		dt			=	(float) fabs(lastF)*scaleFactor;
 

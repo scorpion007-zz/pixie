@@ -298,7 +298,7 @@ void		CReyes::renderingLoop() {
 
 		// Process the job
 		if (job.type == CRenderer::CJob::TERMINATE) {
-			
+
 			// End the context, cleanup of incomplete buckets
 			// is in the destructor
 			break;
@@ -372,13 +372,13 @@ void	CReyes::render() {
 
 		// Is the object behind the maximum opaque depth ?
 		if (cObject->zmin < maxDepth) {
-			
+
 			__logObjectRasterizeDice(cObject,currentXBucket,currentYBucket);
 
 			// Is this a grid ?
 			if (cObject->grid) {
 				CRasterGrid	*grid	=	(CRasterGrid *) cObject;
-				
+
 				// Update the stats
 				numGridsRendered++;
 				numQuadsRendered	+=	grid->udiv*grid->vdiv;
@@ -397,7 +397,7 @@ void	CReyes::render() {
 
 				// We rendered objects
 				noObjects	=	FALSE;
-				
+
 				continue;
 			} else {
 				// Dice the object
@@ -419,7 +419,7 @@ void	CReyes::render() {
 						// defer it
 						CRasterObject		*objectsToDelete	=	NULL;
 						osUnlock(cObject->mutex);
-						osLock(bucketMutex);				
+						osLock(bucketMutex);
 						objectDefer(cObject);
 						osUnlock(bucketMutex);
 						flushObjects(objectsToDelete);
@@ -440,14 +440,14 @@ void	CReyes::render() {
 				continue;
 			}
 
-			
+
 		} else {
 			osLock(bucketMutex);
 
 			CRasterObject	**allObjects		=	objectQueue.allItems + 1;
 			int				i					=	objectQueue.numItems - 1;
 			CRasterObject	*objectsToDelete	=	NULL;
-			
+
 			// We killed this bucket
 			buckets[currentYBucket][currentXBucket]	=	NULL;
 
@@ -493,7 +493,7 @@ void	CReyes::render() {
 
 		// Get the framebuffer
 		rasterEnd(pixelBuffer,noObjects);
-	
+
 		// Mark the first thread
 		#if 0
 		if (thread == 1) {
@@ -502,10 +502,10 @@ void	CReyes::render() {
 			pixelBuffer[6]	=	1;
 		}
 		#endif
-		
+
 		// Flush the data to the out devices
 		CRenderer::commit(bucketPixelLeft,bucketPixelTop,bucketPixelWidth,bucketPixelHeight,pixelBuffer);
-		
+
 		// Send bucket data if we're a netrender
 		if (CRenderer::netClient != INVALID_SOCKET) {
 			CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
@@ -523,7 +523,7 @@ void	CReyes::render() {
 
 	// Advance the bucket
 	currentXBucket++;
-	if (currentXBucket == CRenderer::xBuckets) {		
+	if (currentXBucket == CRenderer::xBuckets) {
 		currentXBucket	=	0;
 		currentYBucket++;
 	}
@@ -562,7 +562,7 @@ void	CReyes::skip() {
 
 	// Advance the bucket
 	currentXBucket++;
-	if (currentXBucket == CRenderer::xBuckets) {		
+	if (currentXBucket == CRenderer::xBuckets) {
 		currentXBucket	=	0;
 		currentYBucket++;
 	}
@@ -618,7 +618,7 @@ void		CReyes::drawObject(CObject *object) {
 	const float	zmax	=	min(bmax[COMP_Z],CRenderer::clipMax);
 
 	assert(zmin <= zmax);
-	
+
 	// Compute the projected extend of the bound in the pixel space
 	if (CRenderer::projection == OPTIONS_PROJECTION_PERSPECTIVE) {
 		if (zmin < C_EPSILON)	{					// Spanning the eye plane ?
@@ -758,7 +758,7 @@ void		CReyes::drawGrid(CSurface *object,int udiv,int vdiv,float umin,float umax,
 	CRasterGrid			*nGrid;
 
 	// Initialize the grid
-	nGrid			=	newGrid(object,FALSE,(udiv+1),(vdiv+1));	
+	nGrid			=	newGrid(object,FALSE,(udiv+1),(vdiv+1));
 	nGrid->dim		=	SHADING_2D_GRID;
 	nGrid->umin		=	umin;
 	nGrid->umax		=	umax;
@@ -840,7 +840,7 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 
 
 
- 
+
 
 
 
@@ -862,10 +862,10 @@ void		CReyes::drawPoints(CSurface *object,int numPoints) {
 /// \brief					Shade a grid
 // Return Value			:	-
 // Comments				:
-void		
+void
 CReyes::shadeGrid(
 	__in CRasterGrid *grid,
-	__in int Ponly) 
+	__in int Ponly)
 {
 
 	// Make sure we shade a grid only once
@@ -878,7 +878,7 @@ CReyes::shadeGrid(
 		}
 	}
 
-	if (grid->dim == SHADING_0D) 
+	if (grid->dim == SHADING_0D)
 	{
 		// This is a 0 dimensional point cloud.
 		//
@@ -890,7 +890,7 @@ CReyes::shadeGrid(
 		const CAttributes	*attributes		=	object->attributes;
 		float				*sizes;
 
-		if (Ponly) 
+		if (Ponly)
 		{
 			// Set the flags
 			grid->flags	=	extraPrimitiveFlags | RASTER_POINT | RASTER_UNSHADED;
@@ -957,7 +957,7 @@ CReyes::shadeGrid(
 					break;
 				}
 			}
-			
+
 			// We require matte and LOD flagged grids to have been shaded / displaced
 			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)				grid->flags	|= RASTER_MATTE;
 			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 				grid->flags	|= RASTER_LOD;
@@ -1047,7 +1047,7 @@ CReyes::shadeGrid(
 			}
 		}
 
-		if (Ponly) 
+		if (Ponly)
 		{
 			// Set the flags.
 			//
@@ -1055,27 +1055,27 @@ CReyes::shadeGrid(
 			// Common flags.
 			//
 			grid->flags = RASTER_UNSHADED | extraPrimitiveFlags;
-			
-			if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED) 
+
+			if (attributes->flags & ATTRIBUTES_FLAGS_DOUBLE_SIDED)
 			{
 				grid->flags	|= RASTER_DRAW_FRONT | RASTER_DRAW_BACK;
-			} 
-			else if (attributes->flags & ATTRIBUTES_FLAGS_INSIDE) 
-			{	
+			}
+			else if (attributes->flags & ATTRIBUTES_FLAGS_INSIDE)
+			{
 				// Flip.
 				//
 				grid->flags	|=	RASTER_DRAW_FRONT;
-			} 
-			else 
+			}
+			else
 			{
 				grid->flags	|=	RASTER_DRAW_BACK;
 			}
-			
+
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_HIDDEN)
 			{
 				grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_HIDDEN;
 			}
-			
+
 			if (attributes->flags & ATTRIBUTES_FLAGS_SHADE_BACKFACE)
 			{
 				grid->flags	|= RASTER_UNDERCULL | RASTER_SHADE_BACKFACE;
@@ -1101,7 +1101,7 @@ CReyes::shadeGrid(
 			// Project the P into samples.
 			//
 			camera2samples(numVertices, varying[VARIABLE_P]);
-			
+
 			// Save the vertex data.
 			//
 			copyPoints(numVertices, varying, grid->vertices, 0);
@@ -1128,7 +1128,7 @@ CReyes::shadeGrid(
 					break;
 				}
 			}
-			
+
 			// We require matte and LOD flagged grids to have been shaded / displaced
 			if (attributes->flags & ATTRIBUTES_FLAGS_MATTE)			 grid->flags	|= RASTER_MATTE;
 			if (attributes->flags & ATTRIBUTES_FLAGS_LOD) 			 grid->flags	|= RASTER_LOD;
@@ -1189,12 +1189,12 @@ CReyes::shadeGrid(
 /// \brief					Copy the point data
 // Return Value			:	-
 // Comments				:
-void			
+void
 CReyes::copyPoints(
 	__in int numVertices,
 	__in_ecount(VARIABLE_LAST) float **varying,
 	__out_ecount(numVertexSamples*numVertices) float *vertices,
-	__in int stage) 
+	__in int stage)
 {
 	const	float	*P		=	varying[VARIABLE_P];
 	const	int		disp	=	(CRenderer::numExtraSamples + 10)*stage;
@@ -1202,7 +1202,7 @@ CReyes::copyPoints(
 
 	// Copy the samples
 	vertices	+=	disp;
-	
+
 	for (i = numVertices;
 		 i > 0;
 		 i--, P += 3, vertices += numVertexSamples)
@@ -1212,9 +1212,9 @@ CReyes::copyPoints(
 
 	// If we have depth of field, compute that
 	if ((CRenderer::aperture != 0) && (stage == 0)) {
-	
+
 		assert(disp == 0);
-		
+
 		// Roll back to the beginning
 		vertices	-=	numVertices*numVertexSamples;
 
@@ -1259,10 +1259,10 @@ void			CReyes::copySamples(int numVertices,float **varying,float *vertices,int s
 
 		// This is the source
 		s			=	varying[outType];
-		
+
 		// This is where we want to save it
 		d			=	vertices + k;
-			
+
 		switch(channelSamples) {
 		case 0:
 			break;
@@ -1357,7 +1357,7 @@ CReyes::CRasterObject		*CReyes::newObject(CObject *cObject) {
 
 	nObject				=	new CRasterObject;
 	nObject->next		=	new CRasterObject*[CRenderer::numThreads];
-	nObject->object		=	cObject;	
+	nObject->object		=	cObject;
 	nObject->diced		=	FALSE;	// FIXME: Can combine diced and grid into one integer
 	nObject->grid		=	FALSE;
 	nObject->refCount	=	0;
@@ -1426,7 +1426,7 @@ void				CReyes::deleteObject(CRasterObject *dObject) {
 
 	// Detach from the object
 	dObject->object->detach();
-	
+
 	__logObjectDelete(dObject,currentXBucket,currentYBucket);
 	__recordObjectDelete(dObject);
 
@@ -1583,13 +1583,13 @@ CReyes::insertGrid(
 			// Expand the bound by the focal blur amount
 			if (CRenderer::aperture != 0) {
 				const float coc = vertices[9];
-				
+
 				xbound[0] -= coc;
 				xbound[1] += coc;
 				ybound[0] -= coc;
 				ybound[1] += coc;
 			}
-			
+
 			bounds[0]	=	(int) floor(xbound[0]);		// xmin
 			bounds[1]	=	(int) floor(xbound[1]);		// xmax
 			bounds[2]	=	(int) floor(ybound[0]);		// ymin
@@ -1728,7 +1728,7 @@ CReyes::insertGrid(
 // Return Value			:
 // Comments				:	* Called from parse thread *
 void	CReyes::insertObject(CRasterObject *object) {
-	
+
 	// For every thread
 	int			sx = xbucket(object->xbound[0]);
 	int			sy = ybucket(object->ybound[0]);
@@ -1736,7 +1736,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 	const int	ey = ybucketNext(object->ybound[1]);
 
 	// Trivial reject check
-	if (	(sx >= CRenderer::xBuckets) || 
+	if (	(sx >= CRenderer::xBuckets) ||
 			(sy >= CRenderer::yBuckets) ||
 			(ex < 0) ||
 			(ey < 0)) {
@@ -1814,11 +1814,11 @@ void	CReyes::insertObject(CRasterObject *object) {
 
 
 			if (cBucket != NULL) {
-				// Insert the object	
+				// Insert the object
 				refCount++;
-				
+
 				__logObjectInsert(cObject,cx,cy,i,cBucket->queue != NULL);
-				
+
 				if (cBucket->queue == NULL) {
 					// The thread has not processed this bucket yet
 					object->next[i]		=	cBucket->objects;
@@ -1838,7 +1838,7 @@ void	CReyes::insertObject(CRasterObject *object) {
 	osLock(object->mutex);
 
 	__recordObjectInsert(object,refCount);
-	
+
 	// Compute the reference count
 	refCount	=	refCount + object->refCount - (CRenderer::numThreads + 1);
 	assert(refCount >= 0);

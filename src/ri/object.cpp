@@ -58,7 +58,7 @@
 // Description			:
 /// \brief					Ctor
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CObject::CObject(CAttributes *a,CXform *x) {
 	atomicIncrement(&stats.numObjects);
 
@@ -68,7 +68,7 @@ CObject::CObject(CAttributes *a,CXform *x) {
 
 	attributes->attach();
 	xform->attach();
-	
+
 	children	=	NULL;
 	sibling		=	NULL;
 }
@@ -80,7 +80,7 @@ CObject::CObject(CAttributes *a,CXform *x) {
 // Description			:
 /// \brief					Dtor
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CObject::~CObject() {
 	atomicDecrement(&stats.numObjects);
 
@@ -95,16 +95,16 @@ CObject::~CObject() {
 // Description			:
 /// \brief					Dice the children objects
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 void			CObject::dice(CShadingContext *rasterizer) {
 	CObject	*cObject,*nObject;
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
 		nObject	=	cObject->sibling;
 
 		cObject->attach();
-		
+
 		rasterizer->drawObject(cObject);
-		
+
 		cObject->detach();
 	}
 }
@@ -132,7 +132,7 @@ static	float	getDisp(const float *mat,float disp) {
 		tmp[2]	=	tmp2[2]	/	alpha;
 		tmp[3]	=	tmp2[3]	/	alpha;
 	}
-	
+
 	return	alpha;
 
 #undef urand
@@ -149,7 +149,7 @@ static	float	getDisp(const float *mat,float disp) {
 void		CObject::cluster(CShadingContext *context) {
 	int		numChildren;
 	CObject	*cObject;
-	
+
 	// Count the number of children
 	for (numChildren=0,cObject=children;cObject!=NULL;cObject=cObject->sibling,numChildren++);
 
@@ -270,7 +270,7 @@ void		CObject::cluster(CShadingContext *context) {
 	// Recurse
 	front->children	=	frontChildren;
 	back->children	=	backChildren;
-	
+
 	front->attach();
 	back->attach();
 
@@ -292,7 +292,7 @@ void			CObject::setChildren(CShadingContext *context,CObject *allChildren) {
 	if (raytraced()) {
 		for (CObject *cObject=allChildren;cObject!=NULL;cObject=cObject->sibling)	cObject->attach();
 	}
-	
+
 	children	=	allChildren;
 }
 
@@ -374,7 +374,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	   // U stats
 	   cP  =   P;
 	   for (j=(vdiv+1);j>0;--j) {
-	
+
 		   float	total	=	0;
 		   for (i=udiv;i>0;--i,cP+=3) {
 			   dx		=   cP[3 + COMP_X] - cP[COMP_X];
@@ -385,7 +385,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 		   uMax	=	max(uMax,total);
 		   uMin	=	min(uMin,total);
 	   }
-	
+
 	   // V stats
 	   cP  =   P;
 	   for (i=(udiv+1);i>0;--i,cP+=3) {
@@ -397,7 +397,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 			   dy		=   tP[COMP_Y] - nP[COMP_Y];
 			   total	+=	sqrtf(dx*dx + dy*dy);
 		   }
-	
+
 		   vMax	=	max(vMax,total);
 		   vMin	=	min(vMin,total);
 	   }
@@ -426,7 +426,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 	   // U stats
 	   cP  =   P;
 	   for (j=(vdiv+1);j>0;--j) {
-	
+
 		   float	total	=	0;
 		   for (i=udiv;i>0;--i,cP+=3) {
 			   subvv(tmp,cP+3,cP);
@@ -436,7 +436,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 		   uMax	=	max(uMax,total);
 		   uMin	=	min(uMin,total);
 	   }
-	
+
 	   // V stats
 	   cP  =   P;
 	   for (i=(udiv+1);i>0;--i,cP+=3) {
@@ -447,7 +447,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
 			   subvv(tmp,tP,nP);
 			   total	+=	lengthv(tmp);
 		   }
-	
+
 		   vMax	=	max(vMax,total);
 		   vMin	=	min(vMin,total);
 	   }
@@ -457,7 +457,7 @@ void			   CObject::estimateDicing(float *P,int udiv,int vdiv,int &nudiv,int &nvd
    // Compute the new grid size based on the maximum size
    udivf   =	uMax / shadingRate;
    vdivf   =	vMax / shadingRate;
-   
+
    // Clamp the division amount
    udivf	=   max(1,udivf);
    vdivf	=   max(1,vdivf);
@@ -547,7 +547,7 @@ void				CSurface::intersect(CShadingContext *context,CRay *cRay) {
 	if (children == NULL) {
 		// Intersect with our bounding box
 		float t = nearestBox(bmin,bmax,cRay->from,cRay->invDir,cRay->tmin,cRay->t);
-	
+
 		// Bail out if the hit point is already further than the ray got
 		// Note: this avoids unneeded top level tesselations
 		if (!(t < cRay->t)) return;
@@ -585,7 +585,7 @@ void				CSurface::dice(CShadingContext *rasterizer) {
 	cSurface->attach();
 	cSurface->dice(rasterizer);
 	cSurface->detach();
-	
+
 	// Note we tesselate for raytracing on demand - so we do not automatically emit a CTesselationPatch here
 }
 

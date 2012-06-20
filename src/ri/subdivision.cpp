@@ -92,7 +92,7 @@ CSubdivision::CSubdivision(CAttributes *a,CXform *x,CVertexData *var,CParameter 
 CSubdivision::~CSubdivision() {
 	const int	K	=	2*N+8;
 
-	delete [] vertex;	
+	delete [] vertex;
 
 	if (parameters != NULL)	delete parameters;
 
@@ -127,7 +127,7 @@ void	CSubdivision::projectVertices(float *fvertex,float *vertexData,int disp) {
 	for (cVertex=vertex,i=0;i<K;i++,cVertex+=vertexSize) {
 		int		j,k;
 
-		for (j=0;j<K;j++) {	
+		for (j=0;j<K;j++) {
 			double	val	=	evecs[i+j*K];
 
 			for (k=0;k<vertexSize;k++) {
@@ -170,7 +170,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 	if (this->vertexData->moving == 0) {
 		vertexData		=	vertex;			// No need for interpolation
 		vertexDataStep	=	0;
-	} else {									
+	} else {
 		if (up & PARAMETER_BEGIN_SAMPLE) {
 			vertexData		=	vertex;		// No need for interpolation
 			vertexDataStep	=	0;
@@ -290,7 +290,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 				coef			*=	p;
 				ducoef			*=	p*normalScale;
 				dvcoef			*=	p*normalScale;
-			
+
 
 				// This is where we're getting our data
 				const float *Psrc	=	vertexData + j*vertexSize;
@@ -307,12 +307,12 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 				dPdu[0]			+=	(float) (Psrc[0]*ducoef);
 				dPdu[1]			+=	(float) (Psrc[1]*ducoef);
 				dPdu[2]			+=	(float) (Psrc[2]*ducoef);
-				
+
 				// Are we moving?
 				if (this->vertexData->moving) {
 					const float	*Psrc0	=	vertex + j*vertexSize;
 					const float	*Psrc1	=	Psrc0 +	K*vertexSize;
-					
+
 					dPdtime[0]	+=	(float) ((Psrc1[0] - Psrc0[0])*coef);
 					dPdtime[1]	+=	(float) ((Psrc1[1] - Psrc0[1])*coef);
 					dPdtime[2]	+=	(float) ((Psrc1[2] - Psrc0[2])*coef);
@@ -335,7 +335,7 @@ void		CSubdivision::sample(int start,int numVertices,float **varying,float ***lo
 
 	// Fix the degenerate normals
 	normalFix();
-	
+
 	// Turn off the parameters we computed
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | this->vertexData->parameters);
 }
@@ -369,7 +369,7 @@ void		CSubdivision::interpolate(int numVertices,float **varying,float ***locals)
 			mulvf(dPdv,vMult);	dPdv	+=	3;
 		}
 	}
-	
+
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 

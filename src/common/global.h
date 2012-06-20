@@ -48,7 +48,7 @@
 #ifndef GLOBAL_H
 #define	GLOBAL_H
 
-// The Pixie version 
+// The Pixie version
 #define	VERSION_RELEASE	2
 #define	VERSION_BETA	2
 #define	VERSION_ALPHA	6
@@ -155,7 +155,7 @@ typedef union {
 	#ifdef _WIN32
 		#include "../../config.windows.h"
 	#endif
-	
+
 	// Are we running under XCode?
 	#if defined(__APPLE__) || defined(__APPLE_CC__)
 		#include "../../config.xcode.h"

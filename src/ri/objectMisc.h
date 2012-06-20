@@ -71,7 +71,7 @@ inline	void	transform(float *src,int num,const float *from) {
 // Return Value			:
 // Comments				:
 /// \note					This one also interpolates with a time constant
-inline void	
+inline void
 transform(
 	float *src,
 	int num,

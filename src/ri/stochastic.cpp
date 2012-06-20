@@ -50,18 +50,18 @@ CStochastic::newFragment(
 	__out CFragment** ppSample)
 {
 	if (freeFragments == NULL)
-	{					
-		*ppSample					=	new CFragment;			
+	{
+		*ppSample					=	new CFragment;
 		if (CRenderer::numExtraSamples > 0)
-		{							
-			(*ppSample)->extraSamples = new float[CRenderer::numExtraSamples]; 	
-		}																
+		{
+			(*ppSample)->extraSamples = new float[CRenderer::numExtraSamples];
+		}
 	}
 	else
-	{											
-		*ppSample =	freeFragments;			
-		freeFragments =	freeFragments->next;	
-	}													
+	{
+		*ppSample =	freeFragments;
+		freeFragments =	freeFragments->next;
+	}
 	numFragments++;
 }
 
@@ -71,8 +71,8 @@ void
 CStochastic::deleteFragment(
 	__in CFragment* sample)
 {
-	sample->next = freeFragments;			
-	freeFragments = sample;					
+	sample->next = freeFragments;
+	freeFragments = sample;
 	numFragments--;
 }
 
@@ -148,7 +148,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	int			i,j,pxi,pxj;
 	float		zoldStart;
 	CFragment	*cFragment;
-	
+
 	assert(numFragments == 0);
 
 	zoldStart			=	CRenderer::clipMax;
@@ -175,18 +175,18 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 	// Init the occlusion culler to zero.
 	//
 	initToZero();
-	
+
 	for (i = 0, pxi = CRenderer::pixelYsamples - CRenderer::ySampleOffset;
 		 i < sampleHeight;
 		 i++, pxi++)
 	{
 		CPixel	*pixel	=	fb[i];
-		
+
 		if (pxi >= CRenderer::pixelYsamples)
 		{
 			pxi = 0;
 		}
-		
+
 		for (j = 0, pxj = CRenderer::pixelXsamples - CRenderer::xSampleOffset;
 			 j < sampleWidth;
 			 j++, pxj++, pixel++)
@@ -202,12 +202,12 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 			{
 				pxj = 0;
 			}
-			
+
 			// Time of the sample for motion blur.
 			//
 			pixel->jt = (pxi * CRenderer::pixelXsamples + pxj + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/
 				(float)(CRenderer::pixelXsamples * CRenderer::pixelYsamples);
-			
+
 			// Importance blend / jitter
 			pixel->jimp					=	1.0f - ( pxj*CRenderer::pixelYsamples + pxi + CRenderer::jitter*(urand()-0.5f) + 0.5001011f)/(float)(CRenderer::pixelXsamples*CRenderer::pixelYsamples);
 
@@ -227,7 +227,7 @@ void		CStochastic::rasterBegin(int w,int h,int l,int t,int nullBucket) {
 				pixel->jdx					=	0;
 				pixel->jdy					=	0;
 			}
-			
+
 			// Center location of the sample
 			pixel->xcent				=	(j+pixel->jx) + left;
 			pixel->ycent				=	(i+pixel->jy) + top;
@@ -274,22 +274,22 @@ CStochastic::lodCheck(
 	__in CPixel* pixel)
 {
 	const float importance = grid->object->attributes->lodImportance;
-	
+
 	if (importance >= 0)
-	{							
+	{
 		if (pixel->jimp > importance)
 		{
 			return false;
 		}
 	}
 	else
-	{										
+	{
 		if (1 - pixel->jimp >= -importance)
 		{
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -337,10 +337,10 @@ CStochastic::checkPixel(
 	__out float* pU,
 	__out float* pV)
 {
-	const float		xcent	=	pixel->xcent;																
+	const float		xcent	=	pixel->xcent;
 	const float		ycent	=	pixel->ycent;
-	
-	float			aleft, atop, aright, abottom;	
+
+	float			aleft, atop, aright, abottom;
 
 	// Compute areas.
 	//
@@ -351,17 +351,17 @@ CStochastic::checkPixel(
 		v0[COMP_Y],
 		v1[COMP_X],
 		v1[COMP_Y]);
-	
+
 	aright = area(
 		xcent,
 		ycent,
 		v1[COMP_X],
 		v1[COMP_Y],
 		v3[COMP_X],
-		v3[COMP_Y]); 	
-	
-	abottom	= area(xcent,ycent,v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]); 
-	aleft		= area(xcent,ycent,v2[COMP_X],v2[COMP_Y],v0[COMP_X],v0[COMP_Y]); 	
+		v3[COMP_Y]);
+
+	abottom	= area(xcent,ycent,v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]);
+	aleft		= area(xcent,ycent,v2[COMP_X],v2[COMP_Y],v0[COMP_X],v0[COMP_Y]);
 
 	if (useLessThan)
 	{
@@ -383,9 +383,9 @@ CStochastic::checkPixel(
 			return false;
 		}
 	}
-																											
-	const float u	=	aleft / (aleft + aright);															
-	const float v	=	atop / (atop + abottom);															
+
+	const float u	=	aleft / (aleft + aright);
+	const float v	=	atop / (atop + abottom);
 	const float	z	=	(v0[COMP_Z]*(1-u) + v1[COMP_Z]*u)*(1-v) + (v2[COMP_Z]*(1-u) + v3[COMP_Z]*u)*v;
 
 	// Fill caller param.
@@ -394,7 +394,7 @@ CStochastic::checkPixel(
 	*pZ = z;
 	*pU = u;
 	*pV = v;
-	
+
 	if (z < CRenderer::clipMin)
 	{
 		return false;
@@ -458,78 +458,78 @@ CStochastic::updateTransparent(
 	__in CPixel* pixel,
 	__in CFragment* nSample,
 	__in bool useZMid)
-{															
+{
 	vector O = {0};
-	vector rO = {0};											
-	const float *Oc = NULL;										
-	CFragment *cSample	=	nSample->prev;					
-	
-	movvv(O, cSample->accumulatedOpacity);					
-	
+	vector rO = {0};
+	const float *Oc = NULL;
+	CFragment *cSample	=	nSample->prev;
+
+	movvv(O, cSample->accumulatedOpacity);
+
 	if (O[0] < CRenderer::opacityThreshold[0] &&
 		O[1] < CRenderer::opacityThreshold[1] &&
 		O[2] < CRenderer::opacityThreshold[2])
-	{	
-		/* not already opaque */																	
-		cSample = nSample;																			
-	}	
-	
-	/* adjust accumulated opacities and test against threshold */									
-	initv(rO,1-O[0],1-O[1],1-O[2]);																	
-	while(cSample) 
-	{																				
-		Oc = cSample->opacity;																		
-		if (Oc[0] < 0 || Oc[1] < 0 || Oc[2] < 0) {													
-			rO[0] *= 1+Oc[0];																		
-			rO[1] *= 1+Oc[1];																		
-			rO[2] *= 1+Oc[2];																		
-		} else {																					
-			O[0] += Oc[0]*rO[0];																	
-			O[1] += Oc[1]*rO[1];																	
-			O[2] += Oc[2]*rO[2];																	
-			rO[0] *= 1-Oc[0];																		
-			rO[1] *= 1-Oc[1];																		
-			rO[2] *= 1-Oc[2];																		
-		}																							
-		movvv(cSample->accumulatedOpacity,O);														
-																									
+	{
+		/* not already opaque */
+		cSample = nSample;
+	}
+
+	/* adjust accumulated opacities and test against threshold */
+	initv(rO,1-O[0],1-O[1],1-O[2]);
+	while(cSample)
+	{
+		Oc = cSample->opacity;
+		if (Oc[0] < 0 || Oc[1] < 0 || Oc[2] < 0) {
+			rO[0] *= 1+Oc[0];
+			rO[1] *= 1+Oc[1];
+			rO[2] *= 1+Oc[2];
+		} else {
+			O[0] += Oc[0]*rO[0];
+			O[1] += Oc[1]*rO[1];
+			O[2] += Oc[2]*rO[2];
+			rO[0] *= 1-Oc[0];
+			rO[1] *= 1-Oc[1];
+			rO[2] *= 1-Oc[2];
+		}
+		movvv(cSample->accumulatedOpacity,O);
+
 		if (O[0] > CRenderer::opacityThreshold[0] &&
 			O[1] > CRenderer::opacityThreshold[1] &&
-			O[2] > CRenderer::opacityThreshold[2]) 
-		{	
-			/* opaque after this point */															
-			CFragment *dSample	=	cSample->next;													
-			if (dSample && dSample != &pixel->last) {												
-				while(dSample && dSample != &pixel->last) {											
-					CFragment *tSample	=	dSample->next;											
-					deleteFragment(dSample);														
-					dSample				=	tSample;												
-				}																					
-				cSample->next		=	&pixel->last;												
-				pixel->last.prev	=	cSample;													
-				pixel->update		=	cSample;													
-				/*initv(pixel->last.color,0);				*/	
-				/*initv(pixel->last.opacity,0);				*/	
-				/*initv(pixel->last.accumulatedOpacity,1);	*/	
-				/*pixel->last.z = CRenderer::clipMax;		*/	
-				/*initv(cSample->accumulatedOpacity,1);		*/	
-			}																						
-			const float z			=	cSample->z;													
-			if (z < pixel->z) {																		
-				useZMid ? depthFilterIfZMid(pixel) : depthFilterIfZMin(pixel);																				
-				pixel->z			=	z;															
+			O[2] > CRenderer::opacityThreshold[2])
+		{
+			/* opaque after this point */
+			CFragment *dSample	=	cSample->next;
+			if (dSample && dSample != &pixel->last) {
+				while(dSample && dSample != &pixel->last) {
+					CFragment *tSample	=	dSample->next;
+					deleteFragment(dSample);
+					dSample				=	tSample;
+				}
+				cSample->next		=	&pixel->last;
+				pixel->last.prev	=	cSample;
+				pixel->update		=	cSample;
+				/*initv(pixel->last.color,0);				*/
+				/*initv(pixel->last.opacity,0);				*/
+				/*initv(pixel->last.accumulatedOpacity,1);	*/
+				/*pixel->last.z = CRenderer::clipMax;		*/
+				/*initv(cSample->accumulatedOpacity,1);		*/
+			}
+			const float z			=	cSample->z;
+			if (z < pixel->z) {
+				useZMid ? depthFilterIfZMid(pixel) : depthFilterIfZMin(pixel);
+				pixel->z			=	z;
 				useZMid ? depthFilterTouchNodeZMid(pixel, z) :
-						  depthFilterTouchNodeZMin(pixel, z);																
-			} 
+						  depthFilterTouchNodeZMin(pixel, z);
+			}
 			else
 			{
 				useZMid ? depthFilterElseZMid(pixel, z) :
 						  depthFilterElseZMin(pixel, z);
 			}
-			break;																					
-		}																			
-		cSample = cSample->next;																	
-	}																							
+			break;
+		}
+		cSample = cSample->next;
+	}
 }
 
 
@@ -540,36 +540,36 @@ CStochastic::findSample(
 	__out CFragment** dest,
 	__in CPixel* pixel,
 	__in float z)
-{ 															
-	CFragment *lSample	=	pixel->update;														
+{
+	CFragment *lSample	=	pixel->update;
 	if (z >= lSample->z)
-	{																	
-		CFragment		*cSample;																
-		for (cSample=lSample->next;z >= cSample->z;lSample=cSample,cSample=cSample->next);	
-		assert(z >= lSample->z);																
-		assert(z <= cSample->z);																
-		newFragment(dest);																	
-		(*dest)->next	=	cSample;															
-		(*dest)->prev	=	lSample;															
-		cSample->prev	=	*dest;																
-		lSample->next	=	*dest;																
+	{
+		CFragment		*cSample;
+		for (cSample=lSample->next;z >= cSample->z;lSample=cSample,cSample=cSample->next);
+		assert(z >= lSample->z);
+		assert(z <= cSample->z);
+		newFragment(dest);
+		(*dest)->next	=	cSample;
+		(*dest)->prev	=	lSample;
+		cSample->prev	=	*dest;
+		lSample->next	=	*dest;
 	}
 	else
-	{																					
-		CFragment		*cSample;																
+	{
+		CFragment		*cSample;
 		for (cSample=lSample->prev;
 			 z < cSample->z;
 			 lSample = cSample, cSample=cSample->prev);
-			 
-		assert(z >= cSample->z);																
-		assert(z <= lSample->z);																
-		newFragment(dest);																	
-		(*dest)->next	=	lSample;															
-		(*dest)->prev	=	cSample;															
-		cSample->next	=	*dest;																
-		lSample->prev	=	*dest;																
-	}																							
-	pixel->update	=	*dest;																	
+
+		assert(z >= cSample->z);
+		assert(z <= lSample->z);
+		newFragment(dest);
+		(*dest)->next	=	lSample;
+		(*dest)->prev	=	cSample;
+		cSample->next	=	*dest;
+		lSample->prev	=	*dest;
+	}
+	pixel->update	=	*dest;
 }
 
 
@@ -588,11 +588,11 @@ CStochastic::colorOpacityUpdate(
 {
 	// Initialize the color to black and fully opaque opacity.
 	//
-	initv(nSample->color, 0);																
+	initv(nSample->color, 0);
 	initv(nSample->opacity, 1);
 
 	const float jt = pixel->jt;
-	
+
 	for (int i = 0; i < 3; ++i)
 	{
 		const int opacityIdx = i + 3;
@@ -601,17 +601,17 @@ CStochastic::colorOpacityUpdate(
 		{
 			if (grid->flags & RASTER_MOVING)
 			{
-				nSample->color[i]		=	
+				nSample->color[i]		=
 					((v0c[i]*(1-jt) + v0c[displacement+i]*jt)*(1-u) +
 					( v1c[i]*(1-jt) + v1c[displacement+i]*jt)*u)*(1-v) +
 					((v2c[i]*(1-jt) + v2c[displacement+i]*jt)*(1-u) +
-					 (v3c[i]*(1-jt) + v3c[displacement+i]*jt)*u)*v; 
+					 (v3c[i]*(1-jt) + v3c[displacement+i]*jt)*u)*v;
 			}
 			else
 			{
-				nSample->color[i]		=	
+				nSample->color[i]		=
 					(v0c[i]*(1-u) + v1c[i]*u) * (1-v) +
-					(v2c[i]*(1-u) + v3c[i]*u) * v; 
+					(v2c[i]*(1-u) + v3c[i]*u) * v;
 			}
 		}
 
@@ -627,9 +627,9 @@ CStochastic::colorOpacityUpdate(
 			}
 			else
 			{
-				nSample->opacity[i]		=	
+				nSample->opacity[i]		=
 					(v0c[opacityIdx]*(1-u) + v1c[opacityIdx]*u) * (1-v) +
-					(v2c[opacityIdx]*(1-u) + v3c[opacityIdx]*u) * v; 
+					(v2c[opacityIdx]*(1-u) + v3c[opacityIdx]*u) * v;
 			}
 		}
 
@@ -640,7 +640,7 @@ CStochastic::colorOpacityUpdate(
 		// Negate it (for some reason). Figure out why.
 		//
 		mulvf(nSample->opacity, -1.0);
-		
+
 		movvv(pixel->first.opacity, nSample->opacity);
 	}
 }
@@ -659,44 +659,44 @@ CStochastic::drawPixel(
 	__in bool useZMid,
 	__in int displacement)
 {
-	CFragment *nSample = NULL; 
-	
-	if (z < pixel->z) 
+	CFragment *nSample = NULL;
+
+	if (z < pixel->z)
 	{
 		if (!(grid->flags & RASTER_TRANSPARENT))
 		{
-			updateOpaque(pixel, z); 	
-			nSample 				=	&pixel->last;										
+			updateOpaque(pixel, z);
+			nSample 				=	&pixel->last;
 		}
 		else
 		{
-			findSample(&nSample, pixel, z); 							
+			findSample(&nSample, pixel, z);
 		}
-		
-		nSample->z = z;		
-		
-		colorOpacityUpdate(nSample, pixel, grid, u, v, v0 + 3, v1 + 3, v2 + 3, v3 + 3, displacement);	
+
+		nSample->z = z;
+
+		colorOpacityUpdate(nSample, pixel, grid, u, v, v0 + 3, v1 + 3, v2 + 3, v3 + 3, displacement);
 
 		if (CRenderer::numExtraSamples > 0)
 		{
-			drawExtraSamples(nSample, pixel->jt, grid, u, v, v0, v1, v2, v3, displacement); 	
+			drawExtraSamples(nSample, pixel->jt, grid, u, v, v0, v1, v2, v3, displacement);
 		}
-		
+
 		if (grid->flags & RASTER_TRANSPARENT)
 		{
-			updateTransparent(pixel, nSample, useZMid);	
+			updateTransparent(pixel, nSample, useZMid);
 		}
 		else
 		{
 			// Opaque.
 			//
 			useZMid ? depthFilterIfZMid(pixel) :
-					  depthFilterIfZMin(pixel);														
-			
-			pixel->z = z;		
-			
+					  depthFilterIfZMin(pixel);
+
+			pixel->z = z;
+
 			useZMid ? depthFilterTouchNodeZMid(pixel, z) :
-					  depthFilterTouchNodeZMin(pixel, z);														
+					  depthFilterTouchNodeZMin(pixel, z);
 		}
 	}
 	else if (!(grid->flags & RASTER_TRANSPARENT))
@@ -720,11 +720,11 @@ CStochastic::drawExtraSamples(
 	__in const float* v2,
 	__in const float* v3,
 	__in int displacement)
-{													
-	const	float	*s0	=	v0+10;													
-	const	float	*s1	=	v1+10;													
-	const	float	*s2	=	v2+10;													
-	const	float	*s3	=	v3+10;													
+{
+	const	float	*s0	=	v0+10;
+	const	float	*s1	=	v1+10;
+	const	float	*s2	=	v2+10;
+	const	float	*s3	=	v3+10;
 
 	for (int i = 0; i < CRenderer::numExtraSamples; ++i)
 	{
@@ -749,7 +749,7 @@ CStochastic::drawExtraSamples(
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-//This function is the entry point that checks if the pixel passes a depth test and if we need 
+//This function is the entry point that checks if the pixel passes a depth test and if we need
 // to shade the grid or not.
 // Returns:
 //
@@ -778,7 +778,7 @@ CStochastic::drawPixelCheck(
 	{
 		useZMid = true;
 	}
-	
+
 	// We're not shaded yet, so if we pass the depth test, we need to go back
 	// and shade the grid.
 	//
@@ -806,9 +806,9 @@ CStochastic::drawPixelCheck(
 
 		if (shouldShade)
 		{
-			shadeGrid(grid, FALSE);										
-			rasterDrawPrimitives(grid); 								
-			return false; // TODO													
+			shadeGrid(grid, FALSE);
+			rasterDrawPrimitives(grid);
+			return false; // TODO
 		}
 		else
 		{
@@ -842,19 +842,19 @@ CStochastic::drawPixelCheck(
 void
 CStochastic::updateOpaque(
 	__in CPixel* pixel,
-	__in float z) 
-{															
-	CFragment *cSample=pixel->last.prev;					
-	while(cSample->z > z) {									
-		CFragment *nSample	=	cSample->prev;				
-		nSample->next		=	&pixel->last;				
-		pixel->last.prev	=	nSample;					
-		assert(cSample != &pixel->first);					
-		deleteFragment(cSample);							
-		cSample				=	nSample;					
-	}														
-	/*initv(pixel->last.accumulatedOpacity,1);*/			
-	pixel->update			=	cSample;					
+	__in float z)
+{
+	CFragment *cSample=pixel->last.prev;
+	while(cSample->z > z) {
+		CFragment *nSample	=	cSample->prev;
+		nSample->next		=	&pixel->last;
+		pixel->last.prev	=	nSample;
+		assert(cSample != &pixel->first);
+		deleteFragment(cSample);
+		cSample				=	nSample;
+	}
+	/*initv(pixel->last.accumulatedOpacity,1);*/
+	pixel->update			=	cSample;
 }
 
 // returns true if we should bail out.
@@ -868,7 +868,7 @@ CStochastic::processPixel(
 	const	int udiv		=	grid->udiv;
 	const	int vdiv		=	grid->vdiv;
 	const	int flags		=	grid->flags;
-	
+
 	if (flags & RASTER_LOD)
 	{
 		// If failed the LOD check, skip this grid vertex.
@@ -878,32 +878,32 @@ CStochastic::processPixel(
 			return false;
 		}
 	}
-	
+
 	const float *v0 =	vertices;
 	const float *v1 =	vertices + numVertexSamples;
 	const float *v2 =	v1 + udiv*numVertexSamples;
 	const float *v3 =	v2 + numVertexSamples;
-	
+
 	// focal blur stuff (DOF)
 	//
 	float v0d = 0;
 	float v1d = 0;
 	float v2d = 0;
 	float v3d = 0;
-	
+
 	vector	v0focTmp = {0};
 	vector	v1focTmp = {0};
 	vector	v2focTmp = {0};
 	vector	v3focTmp = {0};
-	
+
 	// mo blur stuff
 	vector	v0movTmp = {0};
 	vector	v1movTmp = {0};
 	vector	v2movTmp = {0};
 	vector	v3movTmp = {0};
 	// --------------
-	
-	
+
+
 	if (flags & RASTER_FOCALBLUR)
 	{
 		v0d =	v0[9];
@@ -911,7 +911,7 @@ CStochastic::processPixel(
 		v2d =	v2[9];
 		v3d =	v3[9];
 	}
-	
+
 	if (flags & RASTER_MOVING)
 	{
 		interpolatev(v0movTmp,v0,v0+displacement,pixel->jt);
@@ -923,37 +923,37 @@ CStochastic::processPixel(
 		v2		=	v2movTmp;
 		v3		=	v3movTmp;
 	}
-	
+
 	if (flags & RASTER_FOCALBLUR)
 	{
 		v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
 		v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
 		v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
 		v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
-	
+
 		v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
 		v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
 		v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
 		v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
-	
+
 		v0focTmp[COMP_Z]	=	v0[COMP_Z];
 		v1focTmp[COMP_Z]	=	v1[COMP_Z];
 		v2focTmp[COMP_Z]	=	v2[COMP_Z];
 		v3focTmp[COMP_Z]	=	v3[COMP_Z];
-	
+
 		v0					=	v0focTmp;
 		v1					=	v1focTmp;
 		v2					=	v2focTmp;
 		v3					=	v3focTmp;
 	}
-	
+
 	// TODO: clean
 	float z = 0;
 	float u = 0;
 	float v = 0;
 
 	bool backFacing = checkQuadOrientation(v0, v1, v2, v3);
-	
+
 	// Back or front face culling.
 	//
 	bool cull = false;
@@ -965,12 +965,12 @@ CStochastic::processPixel(
 	{
 		cull = !shouldDrawFront(flags);
 	}
-	
+
 	if (cull)
 	{
 		return false;
 	}
-	
+
 	// Use less-than (<) in the comparison of checkPixel
 	// if quad is backfacing
 	//
@@ -978,12 +978,12 @@ CStochastic::processPixel(
 	{
 		return false;
 	}
-	
+
 	v0	=	vertices;
 	v1	=	v0 + numVertexSamples;
 	v2	=	v1 + udiv*numVertexSamples;
 	v3	=	v2 + numVertexSamples;
-	
+
 	if (!drawPixelCheck(grid, pixel, z, u, v, v0, v1, v2, v3, displacement))
 	{
 		// bail out
@@ -999,7 +999,7 @@ CStochastic::processPixel(
 /// \brief					Draw bunch of primitives
 // Return Value			:	-
 // Comments				:
-void		
+void
 CStochastic::rasterDrawPrimitives(
 	__in CRasterGrid *grid)
 {
@@ -1015,60 +1015,60 @@ CStochastic::rasterDrawPrimitives(
 	{
 		displacement += CRenderer::numExtraSamples;
 	}
-	
-	
+
+
 	// Shade _very_ early if we know we are guaranteed to have to anyway
 	// This also solves issues with grids viewed exactly side-on never
 	// being shaded when baking
 	// Note: we retain the pre-rasterization method for the case where RASTER_SHADE_HIDDEN
 	// is not set, and for the cases where 1 sidedness must be respected
-	
+
 	if (flags & RASTER_UNDERCULL &&
 		flags & RASTER_UNSHADED)
 	{
 		if ((flags & RASTER_SHADE_HIDDEN) &&
 			(flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE)) &&
 			(flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE))) {
-			
+
 			shadeGrid(grid,FALSE);
 			rasterDrawPrimitives(grid);
 			return;
 		}
 	}
-	
-	
+
+
 	// Extreme motion blur/DOF.
 	//
 	if (flags & RASTER_XTREME)
 	{
-		
+
 		int xmin =	grid->xbound[0] - left;
 		int xmax =	grid->xbound[1] - left;
 		int ymin =	grid->ybound[0] - top;
 		int ymax =	grid->ybound[1] - top;
-		
+
 		xmin	=	max(xmin,0);		// Clamp the bound in the current bucket
 		ymin	=	max(ymin,0);
 		xmax	=	min(xmax,xres);
 		ymax	=	min(ymax,yres);
-		
+
 		int x = 0;
 		int y = 0;
 
 		// For each pixel in this bucket.
 		//
-		for (y = ymin; y <= ymax; y++) 
+		for (y = ymin; y <= ymax; y++)
 		{
-			for (x = xmin; x <= xmax; x++) 
+			for (x = xmin; x <= xmax; x++)
 			{
 				CPixel		*pixel		=	fb[y] + x;
 				int 		i,j;
-		
+
 				const int	*bounds 	=	grid->bounds;
-		
+
 				const float *vertices	=	grid->vertices;
 				const	int udiv		=	grid->udiv;
-		
+
 				const	int vdiv		=	grid->vdiv;
 
 				// For each vertex in the grid.
@@ -1100,7 +1100,7 @@ CStochastic::rasterDrawPrimitives(
 		// Not so extreme motion blur or DOF.
 		//
 		assert(0);
-		
+
 		int 		i,j;
 		const int	*bounds 	=	grid->bounds;
 		const float *vertices	=	grid->vertices;
@@ -1117,34 +1117,34 @@ CStochastic::rasterDrawPrimitives(
 
 		// For each vertex in the grid.
 		//
-		for (j=0;j<vdiv;j++) 
+		for (j=0;j<vdiv;j++)
 		{
-			for (i=0;i<udiv;i++,bounds+=4,vertices+=numVertexSamples) 
+			for (i=0;i<udiv;i++,bounds+=4,vertices+=numVertexSamples)
 			{
-		
+
 				// Trivial rejects
 				if (bounds[1] < left)		continue;
 				if (bounds[3] < top)		continue;
 				if (bounds[0] >= right) 	continue;
 				if (bounds[2] >= bottom)	continue;
-		
+
 				// Extract the quad corners
 				const float *v0 =	vertices;
 				const float *v1 =	vertices + numVertexSamples;
 				const float *v2 =	v1 + udiv*numVertexSamples;
 				const float *v3 =	v2 + numVertexSamples;
-		
-		
+
+
 				int xmin	=	bounds[0] - left;	// Convert the bound into the current bucket
 				int ymin	=	bounds[2] - top;
 				int xmax	=	bounds[1] - left;
 				int ymax	=	bounds[3] - top;
-		
+
 				xmin		=	max(xmin,0);		// Clamp the bound in the current bucket
 				ymin		=	max(ymin,0);
 				xmax		=	min(xmax,xres);
 				ymax		=	min(ymax,yres);
-				
+
 				// SLOW_RASTER means the quad has motion blur or depth of field
 				// In such a case, we need to deform the quad individually for each
 				// sample which makes the rasterization slower
@@ -1173,13 +1173,13 @@ CStochastic::rasterDrawPrimitives(
 						continue;
 					}
 				}
-				
+
 				// for each pixel in bucket.
 				//
 				for (y = ymin; y <= ymax; y++)
 				{
 					CPixel		*pixel;
-				
+
 					for (pixel = fb[y] + xmin, x = xmin;
 						 x <= xmax; x++, pixel++)
 					{
@@ -1209,7 +1209,7 @@ CStochastic::rasterDrawPrimitives(
 							{
 								continue;
 							}
-							
+
 							if (!drawPixelCheck(grid, pixel, z, u, v, v0, v1, v2, v3, displacement))
 							{
 								// bail out
@@ -1219,10 +1219,10 @@ CStochastic::rasterDrawPrimitives(
 					}
 				}
 			}
-			
+
 			vertices	+=	numVertexSamples;
 		}
-		
+
 	}
 }
 
@@ -1264,7 +1264,7 @@ checkQuadOrientation(
 	return a > 0;
 }
 
-// Note: due to the way we insert samples, we may have inserted a new one behind the 
+// Note: due to the way we insert samples, we may have inserted a new one behind the
 // maximum opaque depth - in which case we must flush the new sample and everything
 // beind it.  Otherwise, we need to update accumulated opacity, and cull samples
 // behind the point where we become opaque
@@ -1308,13 +1308,13 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	const int		xres					=	width;
 	const int		yres					=	height;
 	float			*tmp;
-	
-	
+
+
 	// Deep shadow map computation
 	if (CRenderer::flags & OPTIONS_FLAGS_DEEP_SHADOW_RENDERING)	deepShadowCompute();
 	else if (noObjects) {
 		// early-out if we have no data
-		
+
 		// initialize the default samples and also the extra samples using "sampleDefaults"
 		for (tmp=fb2,i=xres*yres;i>0;i--) {
 			*tmp++	=	0;					// r
@@ -1322,16 +1322,16 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			*tmp++	=	0;					// b
 			*tmp++	=	0;					// a
 			*tmp++	=	C_INFINITY;			// z
-			
+
 			// default-fill extra samples
 			if (CRenderer::numExtraSamples > 0) {
 				memcpy(tmp,CRenderer::sampleDefaults,CRenderer::numExtraSamples*sizeof(float));
-			
+
 				tmp += CRenderer::numExtraSamples;
 			}
 		}
 
-		
+
 		return;
 	}
 
@@ -1354,7 +1354,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	float			*fbs					=	(float *) ralloc(totalWidth*totalHeight*pixelSize*sizeof(float),threadMemory);
 	const int		sampleLineDisplacement	=	CRenderer::pixelXsamples*pixelSize;
 	int				sx,sy;
-	
+
 	// 0	=	alpha
 	// 1	=	z;
 	// 2-4	=	color
@@ -1373,17 +1373,17 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			vector		O;
 			float		*Z2			=	&cFb[5];
 			float		*ES			=	&cFb[6];
- 			
+
 			assert(cPixel->first.z == -C_INFINITY);
 
 			// We re-use cPixel->first as a marker as to whether the pixel has any matte samples,
 			// cPixel->last ise really used, but cPixel->first is not (it's always skipped in the composite),
 			// so this is safe to do
-			
+
 			///////////////////////////////////////////////
 			// Opacity thresholding for non composited aovs
 			///////////////////////////////////////////////
-			
+
 			{
 			// Q: Why are we recalculating z
 			// A: because maintaining an accurate z for transparent samples
@@ -1392,13 +1392,13 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 			//    aov, which will account for transparent samples.  So we pass
 			//    thru to grab the right value.  In fully opaque scenes this
 			//    should not add significant additional workload
-			
+
 			#define NonCompositeSampleLoop() 											\
 				const float *sampleExtra	= cSample->extraSamples;					\
 				for(int es = 0; es < numExtraNonCompChannels; es++) {					\
 					const int sampleOffset	= CRenderer::nonCompChannelOrder[es*4];		\
 					const int numSamples	= CRenderer::nonCompChannelOrder[es*4+1];
-			
+
 			#define copyNonCompSamples(src)												\
 				float *ESD				= ES + sampleOffset;							\
 				const float *ESS		= src;											\
@@ -1406,11 +1406,11 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 			#define checkZThreshold()		(opacity[0] > zvisibilityThreshold[0]) || (opacity[1] > zvisibilityThreshold[1]) || (opacity[2] > zvisibilityThreshold[2])
 			#define checkMatteZThreshold()	(1+opacity[0] > zvisibilityThreshold[0]) || (1+opacity[1] > zvisibilityThreshold[1]) || (1+opacity[2] > zvisibilityThreshold[2])
-				
+
 			cSample	=	cPixel->first.next;
-			
+
 			if (cPixel->first.opacity[0] >= 0 || cPixel->first.opacity[1] >= 0 || cPixel->first.opacity[2] >= 0) { 		// Pixel has no Matte
-								
+
 				for (;cSample!=NULL;) {
 					const float *opacity	= cSample->opacity;
 
@@ -1419,7 +1419,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						NonCompositeSampleLoop()
 							copyNonCompSamples(sampleExtra + sampleOffset);
 						}
-						
+
 						Z[0] = cSample->z;
 						// We've found our sample quit out
 						break;
@@ -1430,10 +1430,10 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				for (;cSample!=NULL;) {
 					const float	*color		= cSample->color;
 					const float *opacity	= cSample->opacity;
-	
+
 					int isMatte = (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0);
 						// Matte
-					
+
 					if (checkMatteZThreshold()) {
 						// Copy default non-composited AOVs - default values unless ignoring matte
 						NonCompositeSampleLoop()
@@ -1445,19 +1445,19 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 							}
 						}
 						// FIXME: respect matte mode for main display (also reset it)
-						
+
 						//if (isMatte && matteMode)
 						Z[0]	=	cSample->z;
-						// We've found our sample, quit out	
+						// We've found our sample, quit out
 						break;
 					}
-						
+
 					cSample		=	cSample->next;
 				}
 			}
-			
+
 			// Deal with no samples, and finding a second sample for midpoint
-			
+
 			if (cSample == NULL) {
 				// No samples that satisfy zthreshold, use defaults
 				for(int es = 0; es < numExtraNonCompChannels; es++) {
@@ -1468,14 +1468,14 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				Z[0]	=	C_INFINITY;
 				Z2[0]	=	C_INFINITY;
 			} else if (CRenderer::depthFilter == DEPTH_MID) {
-				
+
 				// Find the second sample for midpoint, if needed
 				// Q: Why not just use zold?
 				// A: It doesn't take account of transparent samples
-				
+
 				for (;cSample!=NULL;cSample=cSample->next) {
 					const float *opacity	= cSample->opacity;
-	
+
 					if (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0) {
 						if (checkMatteZThreshold()) {
 							// FIXME: respect matteMode
@@ -1491,13 +1491,13 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					}
 				}
 				if (cSample == NULL) {
-					// no second sample, use the first (we have one, 
+					// no second sample, use the first (we have one,
 					// otherwise we'd be in the first case)
 					Z2[0]	=	Z[0];
 				}
 				Z2[0] = max(Z2[0],cPixel->zold);
  			}
-			
+
 			#undef NonCompositeSampleLoop
 			#undef copyNonCompSamples
 			#undef checkZThreshold
@@ -1505,38 +1505,38 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 			// clip-correct the depth components
 			if (Z[0] >= CRenderer::clipMax)			Z[0]	=	C_INFINITY;
-			if (Z2[0] >= CRenderer::clipMax)		Z2[0]	=	C_INFINITY;	
+			if (Z2[0] >= CRenderer::clipMax)		Z2[0]	=	C_INFINITY;
 			}
-			
+
 			///////////////////////////////////////////////
 			// Composite loop for composited aovs, rgba
 			// Note: we also remove the samples here
 			///////////////////////////////////////////////
-			
+
 			{
 			#define compositeSampleLoop()										\
 				const float *sampleExtra = cSample->extraSamples;				\
 				for(int es = 0; es < numExtraCompChannels; es++) {				\
 					const int sampleOffset = CRenderer::compChannelOrder[es*4];
-						
+
 			cSample	=	cPixel->first.next;
-			
+
 			if (!(cPixel->first.opacity[0] < 0 || cPixel->first.opacity[1] < 0 || cPixel->first.opacity[2] < 0)) {
 				// Pixel samples have no Mattes
-			
+
 				// Get the base color and opacity
 				movvv(C,cSample->color);
 				movvv(O,cSample->opacity);
 				ropacity[0]	=	1-O[0];
 				ropacity[1]	=	1-O[1];
 				ropacity[2]	=	1-O[2];
-				
+
 				// If this sample has no valid samples, this will fill in the sample defaults
 				// because pixel->last's AOVs get initialized to the defaults
 				compositeSampleLoop()
 					movvv(ES + sampleOffset,sampleExtra + sampleOffset);
 				}
-				
+
 				// Transparency collapse, and delete samples
 				oSample		=	cSample;
 				cSample		=	cSample->next;
@@ -1553,24 +1553,24 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					O[0]		+=	ropacity[0]*opacity[0];
 					O[1]		+=	ropacity[1]*opacity[1];
 					O[2]		+=	ropacity[2]*opacity[2];
-					
+
 					// Composite extra samples
 					compositeSampleLoop()
 						ES[sampleOffset + 0] += ropacity[0]*sampleExtra[sampleOffset + 0];
 						ES[sampleOffset + 1] += ropacity[1]*sampleExtra[sampleOffset + 1];
 						ES[sampleOffset + 2] += ropacity[2]*sampleExtra[sampleOffset + 2];
 					}
-					
+
 					ropacity[0]	*=	1-opacity[0];
 					ropacity[1]	*=	1-opacity[1];
 					ropacity[2]	*=	1-opacity[2];
-	
+
 					oSample		=	cSample;
 					cSample		=	cSample->next;
 				}
 			} else {
 				// We have mattes in the stack
-				
+
 				// Get the base color, opacity and extra samples
 				// This will install defaults if there are no valid samples
 				if (cSample->opacity[0] < 0 || cSample->opacity[1] < 0 || cSample->opacity[2] < 0) {
@@ -1580,7 +1580,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					ropacity[0]	=	1+cSample->opacity[0];
 					ropacity[1]	=	1+cSample->opacity[1];
 					ropacity[2]	=	1+cSample->opacity[2];
-					
+
 					// Composite AOVs with ignore matte flag
 					compositeSampleLoop()
 						const int matteMode		= CRenderer::compChannelOrder[es*4+2];
@@ -1594,13 +1594,13 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					ropacity[0]	=	1-O[0];
 					ropacity[1]	=	1-O[1];
 					ropacity[2]	=	1-O[2];
-										
+
 					// Composite extra samples
 					compositeSampleLoop()
 						movvv(ES + sampleOffset,sampleExtra + sampleOffset);
 					}
 				}
-				
+
 				// Transparency collapse, and delete samples
 				oSample		=	cSample;
 				cSample		=	cSample->next;
@@ -1608,13 +1608,13 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					deleteFragment(oSample);
 					const float	*color		= cSample->color;
 					const float *opacity	= cSample->opacity;
-	
+
 					if (opacity[0] < 0 || opacity[1] < 0 || opacity[2] < 0) {
 						// Composite Matte
 						ropacity[0]	*=	1+opacity[0];
 						ropacity[1]	*=	1+opacity[1];
 						ropacity[2]	*=	1+opacity[2];
-						
+
 						// Composite AOVs with ignore matte flag
 						compositeSampleLoop()
 							const int matteMode	=	CRenderer::compChannelOrder[es*4+2];
@@ -1629,23 +1629,23 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 						O[0]		+=	ropacity[0]*opacity[0];
 						O[1]		+=	ropacity[1]*opacity[1];
 						O[2]		+=	ropacity[2]*opacity[2];
-						
+
 						compositeSampleLoop()
 							ES[sampleOffset + 0] += ropacity[0]*sampleExtra[sampleOffset + 0];
 							ES[sampleOffset + 1] += ropacity[1]*sampleExtra[sampleOffset + 1];
 							ES[sampleOffset + 2] += ropacity[2]*sampleExtra[sampleOffset + 2];
 						}
-						
+
 						ropacity[0]	*=	1-opacity[0];
 						ropacity[1]	*=	1-opacity[1];
 						ropacity[2]	*=	1-opacity[2];
 					}
-					
+
 					oSample		=	cSample;
 					cSample		=	cSample->next;
 				}
 			}
-			
+
 			// Alpha is the average opacity
 			// I know this is wrong but this is more useful
 			cFb[0]			=	((O[0] + O[1] + O[2])*0.3333333333333333f);
@@ -1655,7 +1655,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 	// Note: at this point, all the subpixel samples are valid
 	// We could output subpixel samples here if we wish to support a subpixel hider
-	
+
 	// Clear the memory first
 	for (tmp=fb2,i=xres*yres*CRenderer::numSamples;i>0;i--)	*tmp++	=	0;
 
@@ -1663,22 +1663,22 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 	// Note: technically, this should filter in the specified width/height
 	// but > 1 pixel doesn't really make sense
 	switch(CRenderer::depthFilter) {
-	case DEPTH_MIN:	
-		
+	case DEPTH_MIN:
+
 		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
-			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
+			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];
 			float			*cSample		=	cSampleLine;
 
 			for (i=0;i<xres;i++,cPixel+=CRenderer::numSamples,cSample+=CRenderer::pixelXsamples*pixelSize) {
 				cPixel[4]		=	cSample[1];		// initialize with first sample
 			}
-			
+
 			cSample		=	cSampleLine;
 			for (sy=0;sy<CRenderer::pixelYsamples;sy++) {
 				cPixel = cPixelLine;
-				for (i=0;i<xres;i++) {			
+				for (i=0;i<xres;i++) {
 					for (sx=0;sx<CRenderer::pixelXsamples;sx++,cSample+=pixelSize) {
 						cPixel[4]		=	min(cPixel[4],cSample[1]);
 					}
@@ -1692,21 +1692,21 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 		break;
 	case DEPTH_MAX:
-		
+
 		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
-			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
+			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];
 			float			*cSample		=	cSampleLine;
 
 			for (i=0;i<xres;i++,cPixel+=CRenderer::numSamples,cSample+=CRenderer::pixelXsamples*pixelSize) {
 				cPixel[4]		=	cSample[1];		// initialize with first sample
 			}
-			
+
 			cSample		=	cSampleLine;
 			for (sy=0;sy<CRenderer::pixelYsamples;sy++) {
 				cPixel = cPixelLine;
-				for (i=0;i<xres;i++) {			
+				for (i=0;i<xres;i++) {
 					for (sx=0;sx<CRenderer::pixelXsamples;sx++,cSample+=pixelSize) {
 						cPixel[4]		=	max(cPixel[4],cSample[1]);
 					}
@@ -1720,21 +1720,21 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 		break;
 	case DEPTH_AVG:
-		
+
 		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
-			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
+			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];
 			float			*cSample		=	cSampleLine;
 
 			for (i=0;i<xres;i++,cPixel+=CRenderer::numSamples,cSample+=CRenderer::pixelXsamples*pixelSize) {
 				cPixel[4]		=	0;		// initialize with zero
 			}
-			
+
 			cSample		=	cSampleLine;
 			for (sy=0;sy<CRenderer::pixelYsamples;sy++) {
 				cPixel = cPixelLine;
-				for (i=0;i<xres;i++) {			
+				for (i=0;i<xres;i++) {
 					for (sx=0;sx<CRenderer::pixelXsamples;sx++,cSample+=pixelSize) {
 						cPixel[4]		+=	cSample[1];
 					}
@@ -1745,7 +1745,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				cSampleLine = cSample;
 			}
 		}
-		
+
 		{
 			const float normalizer = 1.0f/((float)CRenderer::pixelXsamples*(float)CRenderer::pixelYsamples);
 			for (int y=0;y<yres;y++) {
@@ -1757,7 +1757,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		}
 
 		break;
-	
+
 	case DEPTH_MID:
 		/// FIXME: for midpoint should be working out front most 2 planes (min of front, min of 2nd)
 		// and do midpoint on the - need extra working space to do this.
@@ -1765,17 +1765,17 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 		for (int y=0;y<yres;y++) {
 			float			*cPixelLine		=	&fb2[y*xres*CRenderer::numSamples];
 			float			*cPixel			=	cPixelLine;
-			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];	
+			float			*cSampleLine	=	&fbs[((y*CRenderer::pixelYsamples+CRenderer::ySampleOffset)*totalWidth+CRenderer::xSampleOffset)*pixelSize];
 			float			*cSample		=	cSampleLine;
 
 			for (i=0;i<xres;i++,cPixel+=CRenderer::numSamples,cSample+=CRenderer::pixelXsamples*pixelSize) {
 				cPixel[4]		=	0;		// initialize with zero
 			}
-			
+
 			cSample		=	cSampleLine;
 			for (sy=0;sy<CRenderer::pixelYsamples;sy++) {
 				cPixel = cPixelLine;
-				for (i=0;i<xres;i++) {			
+				for (i=0;i<xres;i++) {
 					for (sx=0;sx<CRenderer::pixelXsamples;sx++,cSample+=pixelSize) {
 						cPixel[4]		+=	0.5f*(cSample[1] + cSample[5]);		// FIXME: this is wrong, we're doing average on midpoint values
 					}
@@ -1786,7 +1786,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 				cSampleLine = cSample;
 			}
 		}
-		
+
 		{
 			const float normalizer = 1.0f/((float)CRenderer::pixelXsamples*(float)CRenderer::pixelYsamples);
 			for (int y=0;y<yres;y++) {
@@ -1801,7 +1801,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 
 	// FIXME: Filter non-composited samples
 	if (numExtraNonCompChannels > 0) {
-	
+
 	}
 
 	// Filter the samples
@@ -1821,7 +1821,7 @@ void		CStochastic::rasterEnd(float *fb2,int noObjects) {
 					pixelLine[1]				+=	filterResponse*sampleLine[3];
 					pixelLine[2]				+=	filterResponse*sampleLine[4];
 					pixelLine[3]				+=	filterResponse*sampleLine[0];
-					
+
 					// Filter the extra samples here
 					for (es=0;es<CRenderer::numExtraSamples;es++) {
 						pixelLine[5+es]			+=	filterResponse*sampleLine[6+es];
@@ -1896,7 +1896,7 @@ inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 
 		fwrite(data.origin,sizeof(float),4,data.deepShadowFile);
 	} else if (cZ == data.origin[0]) {	// Do we have a step ?
-		const float	dr	=	absf(data.origin[1] - opacity[0]);							
+		const float	dr	=	absf(data.origin[1] - opacity[0]);
 		const float	dg	=	absf(data.origin[2] - opacity[1]);
 		const float	db	=	absf(data.origin[3] - opacity[2]);
 
@@ -1927,7 +1927,7 @@ inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 		cgSlopeMin				=	max(cgSlopeMin,data.gSlopeMin);
 		cbSlopeMin				=	max(cbSlopeMin,data.bSlopeMin);
 
-		if ((crSlopeMin < crSlopeMax) && (cgSlopeMin < cgSlopeMax) && (cbSlopeMin < cbSlopeMax)) {			
+		if ((crSlopeMin < crSlopeMax) && (cgSlopeMin < cgSlopeMax) && (cbSlopeMin < cbSlopeMax)) {
 			// We're in range
 			data.rSlopeMax		=	crSlopeMax;
 			data.gSlopeMax		=	cgSlopeMax;
@@ -1952,7 +1952,7 @@ inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 
 			// Do we have a step ?
 			if (cZ == data.origin[0]) {
-				const float	dr	=	absf(data.origin[1] - opacity[0]);							
+				const float	dr	=	absf(data.origin[1] - opacity[0]);
 				const float	dg	=	absf(data.origin[2] - opacity[1]);
 				const float	db	=	absf(data.origin[3] - opacity[2]);
 
@@ -1988,7 +1988,7 @@ inline	void	outSample(float cZ,const float *opacity,CTSMData &data) {
 // Comments				:
 inline	void	finishSample(float cZ,const float *opacity,CTSMData &data) {
 	if (data.origin[0] < cZ) {
-		data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;	
+		data.origin[1]		+=	(data.rSlopeMin + data.rSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
 		data.origin[2]		+=	(data.gSlopeMin + data.gSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
 		data.origin[3]		+=	(data.bSlopeMin + data.bSlopeMax)*(data.lastZ - data.origin[0])*0.5f;
 		data.origin[0]		=	data.lastZ;
@@ -2118,9 +2118,9 @@ void		CStochastic::deepShadowCompute() {
 	float		*fWeights;
 
 	osLock(CRenderer::deepShadowMutex);
-	
+
 	memBegin(threadMemory);
-	
+
 	prevFilePos		=	ftell(CRenderer::deepShadowFile);
 
 	// Allocate the memory for misc junk
@@ -2202,7 +2202,7 @@ void		CStochastic::deepShadowCompute() {
 	CRenderer::deepShadowIndex[tileIndex + CRenderer::xBuckets*CRenderer::yBuckets]	=	ftell(CRenderer::deepShadowFile) - prevFilePos;
 
 	memEnd(threadMemory);
-	
+
 	osUnlock(CRenderer::deepShadowMutex);
 }
 

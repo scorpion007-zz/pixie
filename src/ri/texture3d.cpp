@@ -42,7 +42,7 @@
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *tndc,int nc,CChannel *ch) : CFileResource(n) { 
+CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *tndc,int nc,CChannel *ch) : CFileResource(n) {
 	dataSize	=	0;
 	channels	=	NULL;
 	numChannels	=	0;
@@ -51,7 +51,7 @@ CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *
 
 	// will be read from file if not provided
 	if (tndc != NULL)	movmm(toNDC,tndc);
-	
+
 	dPscale		=	pow(fabs(determinantm(to)),1.0f / 3.0f);
 
 	if (nc > 0) {
@@ -72,10 +72,10 @@ CTexture3d::CTexture3d(const char *n,const float *f,const float *t,const float *
 /// \brief					Dtor
 // Return Value			:	-
 // Comments				:
-CTexture3d::~CTexture3d() { 
+CTexture3d::~CTexture3d() {
 	if (channels != NULL) delete [] channels;
 }
-	
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CTexture3d
 // Method				:	defineChannels
@@ -86,23 +86,23 @@ CTexture3d::~CTexture3d() {
 void CTexture3d::defineChannels(const char *channelDefinitions) {
 	char				*nextComma,*sampleName,*tmp;
 	CDisplayChannel		*oChannel;
-	
+
 	// This is used by remote channels
 	// The channel definitions will be loaded when
 	// creating the remote channel
 	if (channelDefinitions == NULL) return;
-	
+
 	// determinte the channels
 	numChannels		=	1;
 	dataSize		=	0;
-	
+
 	const char	*sd = channelDefinitions;
 	while ((sd = strchr(sd,',')) != NULL) {
 		sd++;
 		numChannels++;
 	}
 	channels		=	new CChannel[numChannels];
-	
+
 	// parse the channels / sample types
 	char *sampleDefinition = strdup(channelDefinitions); // duplicate to tokenize
 	nextComma = sampleName = sampleDefinition;
@@ -116,7 +116,7 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 			while (isspace(*nextComma)) nextComma++;
 		}
 		while (isspace(*sampleName)) sampleName++;
-		
+
 		// is the sample name a channel we know about?
 		oChannel = CRenderer::retrieveDisplayChannel(sampleName);
 		if (oChannel != NULL) {
@@ -130,13 +130,13 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 				channels[numChannels].type			= TYPE_FLOAT;
 			channels[numChannels].fill				= oChannel->fill;
 			//GSHTODO: duplicate fill
-			
+
 			dataSize								+= oChannel->numSamples;
-			numChannels++;	
+			numChannels++;
 		} else  {
 			error(CODE_BADTOKEN,"Unknown display channel \"%s\"\n",sampleName);
 		}
-		
+
 		sampleName = nextComma;
 	} while((sampleName != NULL) && (*sampleName != '\0'));
 
@@ -152,14 +152,14 @@ void CTexture3d::defineChannels(const char *channelDefinitions) {
 // Comments				:	used by ptcapi, does not require RiBegin()
 void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 	// determinte the channels
-	dataSize		=	0;	
+	dataSize		=	0;
 	channels		=	new CChannel[n];
-	
+
 	// parse the channels / sample types
 	numChannels = 0;
 	for (int i=0;i<n;i++) {
 		// parse to next comma, remove spaces
-		
+
 		CVariable var;
 		if (parseVariable(&var,channelNames[i],channelTypes[i]) == TRUE) {
 
@@ -170,12 +170,12 @@ void CTexture3d::defineChannels(int n,char **channelNames,char **channelTypes) {
 			channels[numChannels].fill				= NULL;
 			channels[numChannels].type				= var.type;
 			//GSHTODO: deal with fill
-			
+
 			dataSize								+= var.numFloats;
-			numChannels++;	
+			numChannels++;
 		} else  {
 			error(CODE_BADTOKEN,"Failed to interpret display channel name \"%s\"\n",channelNames[i]);
-		}		
+		}
 	}
 }
 
@@ -228,11 +228,11 @@ void CTexture3d::readChannels(FILE *in) {
 // Comments				:
 void	CTexture3d::resolve(int n,const char **names,int *entry,int *size) {
 	int	i;
-	
+
 	// Find the channel for every name
 	for (i=0;i<n;i++) {
 		int	j;
-		
+
 		// Find the channel
 		for (j=0;j<numChannels;j++) {
 			if (strcmp(names[i],channels[j].name) == 0) {
@@ -241,7 +241,7 @@ void	CTexture3d::resolve(int n,const char **names,int *entry,int *size) {
 				break;
 			}
 		}
-		
+
 		if (j==numChannels) {
 			error(CODE_BADTOKEN,"Unknown 3d texture channel \"%s\"\n",names[i]);
 			entry[i]		=	0;

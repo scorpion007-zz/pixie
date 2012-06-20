@@ -44,7 +44,7 @@ typedef struct {
 
 #define	SHADEOP_TABLE(__shadeopname)	extern "C" __declspec(dllexport) SHADEOP_SPEC	__shadeopname##_shadeops[]
 
-#define	SHADEOP_INIT(__shadeopname)		extern "C" void __declspec(dllexport) *__shadeopname(int ctx, void *texturectx) 
+#define	SHADEOP_INIT(__shadeopname)		extern "C" void __declspec(dllexport) *__shadeopname(int ctx, void *texturectx)
 
 #define	SHADEOP(__shadeopname)			extern "C" void __declspec(dllexport) __shadeopname(void *initdata,int argc,char *argv[])
 
@@ -54,7 +54,7 @@ typedef struct {
 
 #define	SHADEOP_TABLE(__shadeopname)	extern "C" SHADEOP_SPEC __shadeopname##_shadeops[]; SHADEOP_SPEC __shadeopname##_shadeops[]
 
-#define	SHADEOP_INIT(__shadeopname)		extern "C" void *__shadeopname(int ctx, void *texturectx) 
+#define	SHADEOP_INIT(__shadeopname)		extern "C" void *__shadeopname(int ctx, void *texturectx)
 
 #define	SHADEOP(__shadeopname)			extern "C" void __shadeopname(void *initdata,int argc,char *argv[])
 

@@ -59,7 +59,7 @@ CPrimaryBundle::CPrimaryBundle(int mr,int numSamples,int nExtraChans,int *sampOr
 	for (int i=0;i<maxPrimaryRays;i++,src+=numSamples) {
 		rayBase[i].samples	=	src;
 	}
-	
+
 	numExtraChannels	=	nExtraChans;
 	sampleOrder			=	sampOrder;
 	numExtraSamples		=	numExtraSamp;
@@ -143,7 +143,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 			const int 	channelSamples	= *cOrder++;
 			const float	*s				= varying[outType];
 			float		*d;
-					
+
 			switch(channelSamples) {
 			case 0:
 				break;
@@ -209,7 +209,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 				movvv(t,Oi);
 				mulvv(Ci,cRay->ropacity);
 				mulvv(Oi,cRay->ropacity);
-				
+
 				addvv(cRay->color,Ci);
 				addvv(cRay->opacity,Oi);
 				cRay->ropacity[0]	*=	1-t[0];
@@ -222,9 +222,9 @@ void	CPrimaryBundle::postShade(int nr,CRay **r,float **varying)	{
 			} else {
 				movvv(cRay->samples,cRay->color);
 			}
-			
+
 			cRay->samples[3]	=	(float) ((cRay->opacity[0] + cRay->opacity[1] + cRay->opacity[2])*0.333333333);//1;
-			
+
 		}
 
 		// The extra samples are copied from the closest intersection
@@ -249,7 +249,7 @@ void	CPrimaryBundle::postShade(int nr,CRay **r) {
 			cRay->samples[3]	=	0;
 			cRay->samples[4]	=	C_INFINITY;
 		}
-		
+
 		// zero the extra samples
 		if (numExtraSamples > 0) {
 			for (int j=0;j<nr;j++) {
@@ -296,7 +296,7 @@ CRaytracer::CRaytracer(int thread) : CShadingContext(thread), primaryBundle(CRen
 	const int		yoffset		=	(int) ceil((CRenderer::pixelFilterHeight	- 1)*0.5f);
 	const int		xpixels		=	CRenderer::bucketWidth + 2*xoffset;
 	const int		ypixels		=	CRenderer::bucketHeight + 2*yoffset;
-	
+
 	fbContribution				=	new float[xpixels*ypixels];
 	fbPixels					=	new float[xpixels*ypixels*CRenderer::numSamples];
 }
@@ -361,7 +361,7 @@ void	CRaytracer::renderingLoop() {
 
 			// Flush the data to the out devices
 			CRenderer::commit(left,top,width,height,fbPixels);
-			
+
 			// Send bucket data if we're a netrender
 			if (CRenderer::netClient != INVALID_SOCKET) {
 				CRenderer::sendBucketDataChannels(currentXBucket,currentYBucket);
@@ -416,7 +416,7 @@ void	CRaytracer::sample(int left,int top,int xpixels,int ypixels) {
 		int		numShading	=	0;
 		int		x,y;
 		cRay				=	rays;
-		
+
 		for (j=0;j<ysamples;j+=8) {
 			for (i=0;i<xsamples;i+=8) {
 				const int	my	=	min(ysamples-j,8);

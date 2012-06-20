@@ -76,7 +76,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		int				moving() const { return (pl != NULL ? (pl->data1 !=NULL) : base->variables->moving);	}
 		void			interpolate(int,float **,float ***) const;
-		
+
 
 private:
 		void			prep();

@@ -102,11 +102,11 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 							if (version[3] != sizeof(int*) ) {
 								error(CODE_VERSION,"File \"%s\" is binary an incompatible (generated on a machine with different word size)\n",fileName);
 							} else {
-								
+
 								fread(&i,sizeof(int),1,in);
 								t	=	(char *) alloca((i+1)*sizeof(char));
 								fread(t,sizeof(char),i+1,in);
-	
+
 								info(CODE_PRINTF,"File:    %s\n",fileName);
 								info(CODE_PRINTF,"Version: %d.%d.%d\n",version[0],version[1],version[2]);
 								info(CODE_PRINTF,"Type:    %s\n",t);
@@ -116,7 +116,7 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 
 								identitym(from);
 								identitym(to);
-	
+
 								if (strcmp(t,filePhotonMap) == 0) {
 									view	=	CRenderer::getPhotonMap(fileName);
 								} else if (strcmp(t,fileIrradianceCache) == 0) {
@@ -128,7 +128,7 @@ CShow::CShow(int thread) : CShadingContext(thread) {
 								} else if (strcmp(t,fileBrickMap) == 0) {
 									view	=	CRenderer::getTexture3d(fileName,FALSE,NULL,from,to);
 								}
-	
+
 								// Create / display the window
 								if (view != NULL)	visualize(view);
 							}

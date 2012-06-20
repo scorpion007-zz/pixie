@@ -59,7 +59,7 @@ public:
 	// Return Value			:	-
 	// Comments				:
 	virtual ~CFileFramebuffer() { };
-	
+
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFileFramebuffer
 	// Method				:	write
@@ -68,7 +68,7 @@ public:
 	// Return Value			:	-
 	// Comments				:
 	virtual void write(int x,int y,int w,int h,float *data) { };
-	
+
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CFileFramebuffer
 	// Method				:	success

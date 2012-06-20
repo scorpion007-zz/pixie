@@ -811,7 +811,7 @@ isoct(ch)
 /*									*/
 /************************************************************************/
 
-int 
+int
 item(fun,f)
 	register int		(*fun)();
 	int			f;
@@ -861,7 +861,7 @@ look(str)
 /*									*/
 /************************************************************************/
 
-int 
+int
 match(tbuf,str)
 	register char		*tbuf;
 	register char		*str;
@@ -895,7 +895,7 @@ match(tbuf,str)
 		}
 
 	*t = '\0';			/* End of token here */
- 
+
 	return (*s == '\0');		/* Return TRUE if end of string	*/
 	}
 
@@ -968,7 +968,7 @@ readexpline(buf,bufsize)
 /*									*/
 /************************************************************************/
 
-int 
+int
 test(str)
 	register char		*str;
 	{

@@ -300,11 +300,11 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 			CPixel			*pixel	=	fb[y]+x;
 
 			lodCheck();
-	
+
 			const float		xcent	=	pixel->xcent;
 			const float		ycent	=	pixel->ycent;
-		
-		
+
+
 #ifdef STOCHASTIC_MOVING
 			const	float	jt		=	pixel->jt;
 			vector	v0movTmp;

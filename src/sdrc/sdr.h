@@ -46,7 +46,7 @@
 //
 //
 //				Script compiler header file ...
-//				This file handles most of the stuff 
+//				This file handles most of the stuff
 //
 //
 //				The script language is RenderMan Shading Language
@@ -163,7 +163,7 @@ class	CSymbol {
 public:
 						CSymbol(const char *);							// The parameter is the name of the symbol
 	virtual				~CSymbol();
-	
+
 	char				*symbolName;									// This is the name a variable refered in the original code
 	int					defLineNo;										// The line number where the symbol is defined
 	char				*defFileName;									// The source file where the symbol is defined
@@ -179,7 +179,7 @@ public:
 //							and the scope of the variable. The meanings of the bit positions
 //							are defined at the top of this file (constants that start with SLC_...)
 //							The varName field holds the name of the variable in the final code.
-//							So it has to be unique. 
+//							So it has to be unique.
 //							The numItems field holds the multiplicity of the variable.
 //							This field is originally 1 but if the SLC_ARRAY bit of the variableType
 //							is set, it should contain the number of items in the array.
@@ -261,7 +261,7 @@ public:
 
 	CVariable				*getVariable(const char *,int probe=FALSE);		// Gets the variable record associated with the name. Returns null if the variable doesn't exist
 																		// Gets the function associated with the name and the parameter list. Retuns NULL if not found
-	CFunction				*getFunction(const char *,CList<CExpression *> *,int returnType = SLC_NONE);	
+	CFunction				*getFunction(const char *,CList<CExpression *> *,int returnType = SLC_NONE);
 
 	CExpression				*initExpression;
 	CExpression				*code;
@@ -311,11 +311,11 @@ public:
 						~CFunctionPrototype();
 
 																		// Returns TRUE if the given function matches perfectly to this
-	int					perfectMatch(const char *,CList<CExpression *> *,int dt = SLC_NONE);	
+	int					perfectMatch(const char *,CList<CExpression *> *,int dt = SLC_NONE);
 																		// Returns TRUE if these two functions are compatible
-	int					match(const char *,CList<CExpression *> *,int dt = SLC_NONE);	
+	int					match(const char *,CList<CExpression *> *,int dt = SLC_NONE);
 																		// Returns the function call code
-	
+
 	char				*prototype;										// The prototype of the function (e.g.: "f=f" for sin)
 	int					compatibleShaders;								// A list of compatible shader types
 	int					functionType;									// Type of the function
@@ -366,7 +366,7 @@ public:
 
 	CParameter			*newParameter(const char *,int,int);			// Create a new parameter to the topmost function
 	CVariable			*newVariable(const char *,int,int);				// Create a new variable to the topmost function
-	CFunction			*newFunction(const char *);						// Create a function to the topmost function																		
+	CFunction			*newFunction(const char *);						// Create a function to the topmost function
 	void				newLabel(char *);								// Create a unique label
 	void				addVariable(CVariable *);						// Create a unique name for the variable
 
@@ -433,7 +433,7 @@ CList<CVariable *>				*globalVariables;					// List of all global variables
 int						desiredType;									// The desired type in the current context
 CList<int>				*desiredTypeStack;
 
-																		// The following stuff is used to manage the 
+																		// The following stuff is used to manage the
 																		// parameter lists that are passed to functions
 																		// (somewhat ugly)
 CList<CVariable *>				*variableList;							// Internal stuff

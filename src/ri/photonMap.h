@@ -90,7 +90,7 @@ public:
 /// \brief					A Photon map
 // Comments				:
 class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView, public CRefCounter {
-	
+
 	#ifdef PHOTON_LOOKUP_CACHE
 		class	CPhotonSample {
 		public:
@@ -107,7 +107,7 @@ class	CPhotonMap : public CMap<CPhoton> , public CFileResource, public CView, pu
 			CPhotonNode		*children[8];
 		};
 	#endif
-	
+
 public:
 				CPhotonMap(const char *,FILE *);
 				~CPhotonMap();

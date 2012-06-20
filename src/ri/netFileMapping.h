@@ -48,7 +48,7 @@ public:
 		free(from);
 		free(to);
 	}
-	
+
 	char *from,*to;
 };
 

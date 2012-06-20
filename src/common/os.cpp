@@ -196,7 +196,7 @@ void	*osResolve(void *cModule,const char *name) {
 		result	=	GetProcAddress((HMODULE) cModule,name);
 #else
 		result	=	dlsym((void *) cModule,name);
-		
+
 // OSX 10.2.x fix
 #if defined(__APPLE__) || defined(__APPLE_CC__)	// guard against __APPLE__ being undef from ftlk
 		if(result == NULL){
@@ -218,7 +218,7 @@ void	*osResolve(void *cModule,const char *name) {
 /// \brief					Get an environment variable
 // Return Value			:	The variable value if found
 // Comments				:
-char			*osEnvironment(const char *name) {	
+char			*osEnvironment(const char *name) {
 	return getenv(name);
 }
 
@@ -261,8 +261,8 @@ void	osFixSlashes(char *st) {
 // Comments            :   The directory will end with / or \
 //                     :   Does not create the directory.
 //                     :   Path is only unique within this process.
-void   osTempdir(char *result, size_t resultsize) {    
-   
+void   osTempdir(char *result, size_t resultsize) {
+
 #ifdef _WIN32
 	sprintf(result,"PixieTemp_%d\\",GetCurrentProcessId());
 #elif defined(__APPLE__) || defined(__APPLE_CC__)  // guard against __APPLE__ being undef from ftlk
@@ -275,7 +275,7 @@ void   osTempdir(char *result, size_t resultsize) {
 		snprintf(result,resultsize,"%s/PixieTemp_%d/",tempDirPath,getpid());
 	else
 		snprintf(result,resultsize,"/tmp/PixieTemp_%d/",getpid());
-	
+
 #else
 	// Unix-y
 	const char *tempDirEnv = osEnvironment("TMPDIR");
@@ -286,8 +286,8 @@ void   osTempdir(char *result, size_t resultsize) {
 	else
 		snprintf(result,resultsize,"PixieTemp_%d/",getpid());
 #endif
-	
-	osFixSlashes(result);   
+
+	osFixSlashes(result);
 }
 
 
@@ -337,7 +337,7 @@ void	osCreateDir(const char *n) {
 // Comments				:
 void	osDeleteDir(const char *n)	{
 #ifdef _WIN32
-	_rmdir(n);	
+	_rmdir(n);
 #else
 	rmdir(n);
 #endif
@@ -351,9 +351,9 @@ void	osDeleteDir(const char *n)	{
 // Comments				:
 void	osDeleteFile(const char *n)	{
 #ifdef _WIN32
-	_unlink(n);	
+	_unlink(n);
 #else
-	unlink(n);	
+	unlink(n);
 #endif
 }
 
@@ -584,7 +584,7 @@ int    osAvailableCPUs() {
 	SYSTEM_INFO sys_info;
     GetSystemInfo(&sys_info);
     return sys_info.dwNumberOfProcessors;
-	
+
 #elif defined(CTL_HW)
 	// BSD, Mac OS X
 	int ncpu = 0;
@@ -598,20 +598,20 @@ int    osAvailableCPUs() {
 #endif
 	if(sysctl(mib, 2, &ncpu, &sz, NULL, 0) == -1)
 		return ncpu;
-	   
+
 #elif defined(_SC_NPROCESSORS_ONLN)
 	// Linux, AIX, Solaris
 	return sysconf( _SC_NPROCESSORS_ONLN );
-	
+
 #elif defined(MPC_GETNUMSPUS)
 	// HP-UX
 	return mpctl(MPC_GETNUMSPUS, NULL, NULL);
-   
+
 #elif defined(_SC_NPROC_ONLN)
 	// IRIX
 	return sysconf( _SC_NPROC_ONLN );
-#endif 
-	
+#endif
+
 	return -1;
 }
 

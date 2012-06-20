@@ -48,10 +48,10 @@
 class	CFileFramebufferTIFF: public CFileFramebuffer {
 public:
 	CFileFramebufferTIFF(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter);
-	virtual ~CFileFramebufferTIFF();	
+	virtual ~CFileFramebufferTIFF();
 	virtual void write(int x,int y,int w,int h,float *data);
 	virtual bool success() { return !!image; };
-	
+
 	unsigned char	**scanlines;
 	int				*scanlineUsage;
 	int				width,height;
@@ -59,11 +59,11 @@ public:
 	int				numSamples;
 	int				lastSavedLine;
 	TMutex			fileMutex;
-	
+
 	float			qmin,qmax,qone,qzero,qamp;
 	float			gamma,gain;
 	int				bitspersample,sampleformat;
-	
+
 	TIFF			*image;
 };
 

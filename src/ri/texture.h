@@ -51,7 +51,7 @@ class	CTextureInfoBase : public CFileResource {
 public:
 						CTextureInfoBase(const char *name) : CFileResource(name) { }
 	virtual				~CTextureInfoBase() { }
-	
+
 	virtual void		getResolution(float *dest)			= 0;
 	virtual const char	*getTextureType()					= 0;
 	virtual int 		getNumChannels()					= 0;
@@ -78,7 +78,7 @@ public:
 	virtual float		lookupz(float u,float v,float z,CShadingContext *context)						=	0;
 	virtual	void		lookup(float *dest,float u,float v,CShadingContext *context)					=	0;
 	virtual	void		lookup4(float *dest,const float *u,const float *v,CShadingContext *context)		=	0;
-	
+
 	// textureinfo support
 	void				getResolution(float *r)		{ r[0] = 0; r[1] = 0; }
 	const char			*getTextureType()			{ return "texture"; }
@@ -105,7 +105,7 @@ public:
 						}
 
 	virtual	void		lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context)	=	0;
-	
+
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = 0; r[1] = 0; }
 	const char			*getTextureType()			{ return "environment"; }
@@ -140,7 +140,7 @@ class	CDummyEnvironment : public CEnvironment {
 public:
 						CDummyEnvironment(const char *name) : CEnvironment(name) {}
 						~CDummyEnvironment() {}
-						
+
 	void				lookup(float *dest,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context);
 };
 

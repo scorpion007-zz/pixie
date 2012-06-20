@@ -74,7 +74,7 @@ CDLObject::~CDLObject() {
 	tiniFunction(data);
 	osUnloadModule(handle);
 }
-	
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 
 	// Should we intersect ?
 	if (! (ray->flags & attributes->flags) )	return;
-	
+
 	if (attributes->flags & ATTRIBUTES_FLAGS_LOD) {
 		const float importance = attributes->lodImportance;
 		if (importance >= 0) {
@@ -99,8 +99,8 @@ void					CDLObject::intersect(CShadingContext *context,CRay *ray) {
 			if ((1-ray->jimp) >= -importance)	return;
 		}
 	}
-	
-	
+
+
 	// Transform the ray
 	vector	oFrom,oDir;
 	transform(oFrom,oDir,xform,ray);

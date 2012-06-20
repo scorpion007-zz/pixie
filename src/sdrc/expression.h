@@ -66,7 +66,7 @@ class	CScriptContext;						// The main shader context. Holds everything
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CExpression
 // Description			:	This class holds an expression (multiplication , function call, etc)
-// Comments				:	
+// Comments				:
 class	CExpression {
 public:
 						CExpression(int);
@@ -85,7 +85,7 @@ public:
 // Class				:	CTwoExpressions
 // Description			:
 /// \brief					This expression is used to encapsulate multiple expressions
-// Comments				:	
+// Comments				:
 class	CTwoExpressions : public CExpression {
 public:
 						CTwoExpressions(CExpression *,CExpression *);

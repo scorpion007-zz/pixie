@@ -73,7 +73,7 @@ private:
 // Class				:	CPolygonTriangle
 // Description			:
 /// \brief					This class is used during the tesselation
-//							Every polygon is first triangulated to obtain a 
+//							Every polygon is first triangulated to obtain a
 //							meaningful parameter space. Then individual triangles
 //							(this class) is tesselated into microtriangles
 // Comments				:
@@ -84,7 +84,7 @@ public:
 
 		void				intersect(CShadingContext *,CRay *);
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const	{	assert(FALSE);	}
-	
+
 
 		int					moving() const												{	return mesh->pl->data1 != NULL;		}
 		void				sample(int,int,float **,float ***,unsigned int &) const;

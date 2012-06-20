@@ -95,9 +95,9 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 	for (i=0;i<numRays;i++) {
 		CRay	*ray	=	rays[i];
-		
+
 		t				=	ray->t;
-		
+
 		// Check the ray against the clipping planes
 		for (cPlane=CRenderer::clipPlanes;cPlane!=NULL;cPlane=cPlane->next) {
 			tt	=	-(dotvv(cPlane->normal,ray->from)+cPlane->d) / dotvv(cPlane->normal,ray->dir);
@@ -144,9 +144,9 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 				// Compute the hash key (fast and easy)
 				object.pointer	=	cRay->object;
-				key				=	(int) (	(object.integer >> 0) ^ 
-											(object.integer >> 4) ^ 
-											(object.integer >> 8) ^ 
+				key				=	(int) (	(object.integer >> 0) ^
+											(object.integer >> 4) ^
+											(object.integer >> 8) ^
 											(object.integer >> 16)) & (SHADING_OBJECT_CACHE_SIZE - 1);
 
 				cHash			=	traceObjectHash + key;
@@ -208,7 +208,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			}
 
 			// Question: Why are we storing the rays from the end to the beginning ?
-			// Answer: So that se start shading from the beginning and the bundles 
+			// Answer: So that se start shading from the beginning and the bundles
 			//         can use the beginning of the rays array to store continuing rays
 
 			// Shade the shading groups
@@ -217,7 +217,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 
 				while((numShading = shadingGroups->numRays) > 0) {
 					if (numShading > CRenderer::maxGridSize)	numShading	=	CRenderer::maxGridSize;
-					
+
 					// Restore the object pointers in the rays for the bundle code
 					for (i=0;i<numShading;i++) {
 						shadingGroups->rays[i]->object = shadingGroups->object;
@@ -233,7 +233,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 					shadingGroups->numRays	-=	numShading;
 					shadingGroups->rays		+=	numShading;
 				}
-				
+
 			}
 
 			// Tell the bundle that we're done with the rays
@@ -243,7 +243,7 @@ void	CShadingContext::trace(CRayBundle *bundle) {
 			if ((numRays=bundle->numRays) == 0) {
 				break;
 			}
-			
+
 			// Keep tracing these rays
 			assert(rays == bundle->rays);
 			for (i=numRays;i>0;i--) {
@@ -328,17 +328,17 @@ public:
 //							5. flags
 void	CShadingContext::trace(CRay *ray) {
 
-	
+
 	CTraceObject		heapBase[TRACE_HEAP_SIZE + 1];
 	CTraceObject		*heap		=	heapBase;
 	int					numObjects	=	1;
 	int					maxObjects	=	TRACE_HEAP_SIZE;
-	
+
 	// Compute the inverse of the ray direction first
 	ray->invDir[0]	= 1.0 / (double) ray->dir[0];
 	ray->invDir[1]	= 1.0 / (double) ray->dir[1];
 	ray->invDir[2]	= 1.0 / (double) ray->dir[2];
-	
+
 	// Compute the first entry in the heap
 	heap[1].tmin		=	nearestBox(CRenderer::root->bmin,CRenderer::root->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
 	heap[1].object		=	CRenderer::root;
@@ -374,21 +374,21 @@ void	CShadingContext::trace(CRay *ray) {
 
 		// Is the object hierarchy ready ?
 		if ((object->flags & OBJECT_HIERARCHY_READY) == 0) {
-		
+
 			// Lock the thing
 			// IDEA: This mutex can be per object, but it would increase the dummy object overhead
 			osLock(CRenderer::hierarchyMutex);
 			if ((object->flags & OBJECT_HIERARCHY_READY) == 0) {
-			
+
 				// Do the clustering
 				object->cluster(this);
-				
+
 				// Mark the object as ready
 				object->flags		|=	OBJECT_HIERARCHY_READY;
 			}
 			osUnlock(CRenderer::hierarchyMutex);
 		}
-		
+
 		// Insert the children objects into the queue
 		CObject	*cChild;
 		for (cChild=object->children;cChild!=NULL;cChild=cChild->sibling) {
@@ -403,7 +403,7 @@ void	CShadingContext::trace(CRay *ray) {
 
 			// Insert the child into the heap
 			const float	tmin	=	nearestBox(cChild->bmin,cChild->bmax,ray->from,ray->invDir,ray->tmin,ray->t);
-			
+
 			if (tmin < ray->t) {
 				// Maintain the heap
 				int	child	=	++numObjects;

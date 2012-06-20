@@ -52,14 +52,14 @@ public:
 		void			intersect(CShadingContext *,CRay *);
 		int				moving() const
 		{
-			return (nextData != NULL) | (xform->next != NULL);		
+			return (nextData != NULL) | (xform->next != NULL);
 		}
-		
+
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
 
-		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }				
+		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }
 
 private:
 		CParameter		*parameters;
@@ -87,7 +87,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 private:
 		CParameter		*parameters;
 		unsigned int	parametersF;
@@ -114,7 +114,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = max(3-depth,1); minDivV = 1; return 0; }
 
 private:
@@ -143,7 +143,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }
 
 private:
@@ -172,7 +172,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = max(3-depth,1); minDivV = 1; return 0; }
 
 private:
@@ -200,7 +200,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 0; }
 
 private:
@@ -230,7 +230,7 @@ public:
 		void			sample(int,int,float **,float ***,unsigned int &) const;
 		void			interpolate(int,float **,float ***) const;
 		void			instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 		int				getDicingStats(int depth, int &minDivU,int &minDivV) const { minDivU = minDivV = max(3-depth,1); return 2; }
 
 private:

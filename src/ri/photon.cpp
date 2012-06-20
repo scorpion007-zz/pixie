@@ -122,7 +122,7 @@ void CPhotonHider::preDisplaySetup() {
 /// \brief					Renders the frame
 // Return Value			:	-
 // Comments				:
-void		CPhotonHider::renderingLoop(){  
+void		CPhotonHider::renderingLoop(){
 	CRenderer::CJob	job;
 
 	// This is da loop
@@ -170,7 +170,7 @@ void		CPhotonHider::renderingLoop(){
 						currentShadingState->shadingDim			=	SHADING_0D;
 						currentShadingState->currentObject		=	phony;
 						currentShadingState->lightCategory		=	0;
-						
+
 						// Ensure there's space for the ambient lights
 						memBegin(threadMemory);
 						*alights					=		(CShadedLight*)	ralloc(sizeof(CShadedLight),threadMemory);
@@ -180,21 +180,21 @@ void		CPhotonHider::renderingLoop(){
 						(*alights)->lightTags		=		NULL;
 						(*alights)->instance		=		NULL;
 						(*alights)->next			=		NULL;
-						
-						// Reset the state	
+
+						// Reset the state
 						currentShadingState->lights			=	NULL;			// Lights			:	Cool
 						currentShadingState->currentLight	=	NULL;			// Light iterator	:	Cool
 						currentShadingState->freeLights		=	NULL;			// Free light list	:	Cool
-						
+
 						Clsave						= (*alights)->savedState[1];
-						
+
 						int *tags					=	currentShadingState->tags;
 						for (j=0;j<numVertices;j++) {
 							initv(Clsave,0,0,0);						// Ambient lights	:	Cool
 							tags[j]		=	0;							// Exec tags		:	Cool
 							Clsave		+=	3;
 						}
-						
+
 						// Prepare the lightsource parameters
 						currentShadingState->locals[ACCESSOR_LIGHTSOURCE] = cLight->prepare(threadMemory,currentShadingState->varying,numVertices);
 
@@ -285,27 +285,27 @@ void		CPhotonHider::solarEnd() {
 		const int		numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
 		const int		step			=	1;
 		const int		n				=	(numPoints-4)/step+1;
-		
-		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {	
-			
+
+		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
+
 			float		wavelen			=	urand();
 			int			piece			=	(int) floor(wavelen * n);
 			int			pieceid			=	piece*step;
 			float		u				=	wavelen*n - piece;
-			
+
 			float		tmp[4];
 			float		ub[4];
-			
+
 			ub[3] = 1;
 			ub[2] =	u;
 			ub[1] =	u*u;
 			ub[0] =	u*ub[2];
-			
+
 			tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];
 			tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];
 			tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];
 			tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];
-			
+
 			Ce[0]		=	tmp[0]*spectrumSpline[pieceid+0][0] +
 							tmp[1]*spectrumSpline[pieceid+1][0] +
 							tmp[2]*spectrumSpline[pieceid+2][0] +
@@ -386,7 +386,7 @@ void		CPhotonHider::illuminateBegin(const float *P,const float *N,const float *t
 			// Sample a direction in the unit sphere
 			sampleHemisphere(shaderL,N,theta[0],gen4);
 
-			// Compute the point being shaded	
+			// Compute the point being shaded
 			normalizev(shaderL);
 			addvv(shaderPs,P,shaderL);
 		}
@@ -415,26 +415,26 @@ void		CPhotonHider::illuminateEnd() {
 		const int	numPoints		=	sizeof(spectrumSpline)/(sizeof(float)*3);
 		const int	step			=	1;
 		const int	n				=	(numPoints-4)/step+1;
-		
-		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {				
+
+		for (i=numVertices;i>0;i--,Ps+=3,L+=3,Cl+=3) {
 			float		wavelen			=	urand();
 			int			piece			=	(int) floor(wavelen * n);
 			int			pieceid			=	piece*step;
 			float		u				=	wavelen*n - piece;
-			
+
 			float		tmp[4];
 			float		ub[4];
-			
+
 			ub[3] = 1;
 			ub[2] =	u;
 			ub[1] =	u*u;
 			ub[0] =	u*ub[2];
-			
+
 			tmp[0]	=	ub[0]*ubasis[element(0,0)] + ub[1]*ubasis[element(0,1)] + ub[2]*ubasis[element(0,2)] + ub[3]*ubasis[element(0,3)];
 			tmp[1]	=	ub[0]*ubasis[element(1,0)] + ub[1]*ubasis[element(1,1)] + ub[2]*ubasis[element(1,2)] + ub[3]*ubasis[element(1,3)];
 			tmp[2]	=	ub[0]*ubasis[element(2,0)] + ub[1]*ubasis[element(2,1)] + ub[2]*ubasis[element(2,2)] + ub[3]*ubasis[element(2,3)];
 			tmp[3]	=	ub[0]*ubasis[element(3,0)] + ub[1]*ubasis[element(3,1)] + ub[2]*ubasis[element(3,2)] + ub[3]*ubasis[element(3,3)];
-			
+
 			Ce[0]		=	tmp[0]*spectrumSpline[pieceid+0][0] +
 							tmp[1]*spectrumSpline[pieceid+1][0] +
 							tmp[2]*spectrumSpline[pieceid+2][0] +
@@ -448,7 +448,7 @@ void		CPhotonHider::illuminateEnd() {
 							tmp[2]*spectrumSpline[pieceid+2][2] +
 							tmp[3]*spectrumSpline[pieceid+3][2];
 			mulvv(Cc,Cl,Ce);
-			
+
 			subvv(Ps,L);
 			mulvf(Cc,powerScale*photonPower);
 			tracePhoton(Ps,L,Cc,wavelen);
@@ -532,7 +532,7 @@ processBounce:;
 				if (dotvv(ray.dir,Nl) > 0) {
 					mulvf(Nl,-1);
 				}
-				
+
 				// Save the photon
 				if ((globalMap=attributes->globalMap) != NULL) {
 					if (globalMap->modifying == FALSE) {
@@ -555,7 +555,7 @@ processBounce:;
 							causticMap->reset();
 							balanceList.push(causticMap);
 						}
-	
+
 						causticMap->store(Pl,Nl,ray.dir,Cl);
 
 						return;
@@ -570,7 +570,7 @@ processBounce:;
 				sampleCosineHemisphere(ray.dir,Nl,(float) (C_PI / 2.0),gen4);
 				assert(dotvv(Nl,ray.dir) > 0);
 				normalizev(ray.dir);
-				
+
 				// Bounce the photon
 				mulvv(Cl,surfaceColor);
 
@@ -587,7 +587,7 @@ processBounce:;
 			break;
 
 		case SM_TRANSLUCENT:
-			// Not supported			
+			// Not supported
 			break;
 		case SM_CHROME:
 			{
@@ -608,7 +608,7 @@ processBounce:;
 
 				// Modulate by surface color
 				mulvv(Cl,surfaceColor);
-				
+
 				// Bounce the photon
 				movvv(ray.from,Pl);
 				ray.tmin				=	attributes->bias;
@@ -718,11 +718,11 @@ processBounce:;
 				// Check if we hit the maximum number of bounces
 				if (numSpecularBounces >= attributes->maxSpecularDepth) return;
 				numSpecularBounces++;
-				
+
 				// Calculate the effective ior
 				float iorR = attributes->photonIor[0];
 				float iorB = attributes->photonIor[1];
-				
+
 				float ior = (wavelength*iorR + (1.0f-wavelength)*iorB);
 
 				// Sample the reflection direction

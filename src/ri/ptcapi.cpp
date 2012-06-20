@@ -51,16 +51,16 @@ struct PtcPointCloudInternal {
 // Return Value			:
 // Comments				:
 /// \note					Handle
-PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,float *world2eye, float *world2ndc, float *format) {		
+PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes, char **varnames,float *world2eye, float *world2ndc, float *format) {
 	PtcPointCloudInternal *ptcInternal = new PtcPointCloudInternal;
-	
+
 	matrix eye2world;
 	invertm(eye2world,world2eye);
-	
+
 	ptcInternal->ptc			=	new CPointCloud(filename,eye2world,world2eye,world2ndc,nvars,varnames,vartypes,TRUE);
 	ptcInternal->numPoints		=	0;
 	ptcInternal->curPoint		=	0;
-	
+
 	return (PtcPointCloud) ptcInternal;
 }
 
@@ -72,9 +72,9 @@ PtcPointCloud PtcCreatePointCloudFile(char *filename, int nvars, char **vartypes
 // Comments				:
 void PtcWriteDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float radius, float *data) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
-	
+
 	ptcInternal->ptc->store(data,point,normal,radius);
-	
+
 	ptcInternal->numPoints++;
 	ptcInternal->curPoint++;
 }
@@ -90,7 +90,7 @@ void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
 
 	// Will write out the point cloud
 	delete	ptcInternal->ptc;
-		
+
 	delete	ptcInternal;
 }
 
@@ -108,16 +108,16 @@ void PtcFinishPointCloudFile(PtcPointCloud pointcloud) {
 PtcPointCloud PtcOpenPointCloudFile(char *fileName, int *nvars, const char **vartypes, const char **varnames) {
 	PtcPointCloudInternal	*ptcInternal = new PtcPointCloudInternal;
 	FILE					*in;
-	
+
 	if ((in	=	ropen(fileName,"rb",filePointCloud,TRUE)) != NULL) {
 		matrix from,to;
 		identitym(from);
 		identitym(to);
-		
+
 		ptcInternal->ptc			=	new CPointCloud(fileName,from,to,in);
-		
+
 		ptcInternal->ptc->queryChannels(nvars,vartypes,varnames);
-		
+
 		ptcInternal->numPoints		=	ptcInternal->ptc->getNumPoints()-1;
 		ptcInternal->curPoint		=	1;	// First point is dummy
 	} else {
@@ -146,7 +146,7 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *re
 		ptcInternal->ptc->bound(bmin,bmax);
 	} else if(strcmp(request,"datasize") == 0) {
 		int *ds = ((int*) result);
-		ds[0] = ptcInternal->ptc->getDataSize();		
+		ds[0] = ptcInternal->ptc->getDataSize();
 	} else if(strcmp(request,"world2eye") == 0) {
 		float *from = ((float*) result);
 		ptcInternal->ptc->getFromMatrix(from);
@@ -156,7 +156,7 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *re
 	} else if(strcmp(request,"format") == 0) {
 		float *fmt = ((float*) result);
 		fmt[0] = fmt[1] = fmt[2] = 1;
-		
+
 		//warning(CODE_UNIMPLEMENT,"format request is not supported\"%s\"\n",request);
 		// Don't use warning or error as Ri may not be initialized
 		fprintf(stderr,"format request is not supported\n");
@@ -177,9 +177,9 @@ int PtcGetPointCloudInfo(PtcPointCloud pointcloud, const char *request, void *re
 // Comments				:
 int PtcReadDataPoint(PtcPointCloud pointcloud, float *point, float *normal, float *radius, float *data) {
 	PtcPointCloudInternal *ptcInternal = (PtcPointCloudInternal *) pointcloud;
-	
+
 	if (ptcInternal->curPoint >= ptcInternal->numPoints) return FALSE;
-	
+
 	ptcInternal->ptc->getPoint(ptcInternal->curPoint++,data,point,normal,radius);
 	return TRUE;
 }
@@ -195,7 +195,7 @@ void PtcClosePointCloudFile(PtcPointCloud pointcloud) {
 
 	// Will write out the point cloud
 	delete	ptcInternal->ptc;
-		
+
 	delete	ptcInternal;
 }
 

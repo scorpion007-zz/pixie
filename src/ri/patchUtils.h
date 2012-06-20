@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	patcheUtils.cpp
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					Utilities for bicubic patches
 //

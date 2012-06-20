@@ -90,67 +90,67 @@ transformPoints(
 	__in int numVertices)
 {
 	if (xform->next && !(up & (PARAMETER_BEGIN_SAMPLE | PARAMETER_END_SAMPLE)))
-	{		
+	{
 		transform(
 			&varying[VARIABLE_P][start*3],
 			numVertices,
 			xform->from,
 			xform->next->from,
-			&varying[VARIABLE_TIME][start]);	
-																									
-		if (up & PARAMETER_DPDU) 
-		{																	
+			&varying[VARIABLE_TIME][start]);
+
+		if (up & PARAMETER_DPDU)
+		{
 			vtransform(
 				&varying[VARIABLE_DPDU][start*3],
 				numVertices,
 				xform->from,
 				xform->next->from,
-				&varying[VARIABLE_TIME][start]);	
-		}																							
-																									
-		if (up & PARAMETER_DPDV) 
-		{																	
+				&varying[VARIABLE_TIME][start]);
+		}
+
+		if (up & PARAMETER_DPDV)
+		{
 			vtransform(
 				&varying[VARIABLE_DPDV][start*3],
 				numVertices,
 				xform->from,
 				xform->next->from,
-				&varying[VARIABLE_TIME][start]);	
-		}																							
-																									
-		if (up & PARAMETER_NG) 
-		{																		
+				&varying[VARIABLE_TIME][start]);
+		}
+
+		if (up & PARAMETER_NG)
+		{
 			ntransform(
 				&varying[VARIABLE_NG][start*3],
 				numVertices,
 				xform->to,
 				xform->next->to,
-				&varying[VARIABLE_TIME][start]);	
-		}																							
+				&varying[VARIABLE_TIME][start]);
+		}
 	}
 	else
-	{																						
-		float	*from	=	xform->from;															
-		float	*to		=	xform->to;																
-																									
-		if ((up & PARAMETER_END_SAMPLE) && (xform->next != NULL))	{								
-			from	=	xform->next->from;															
-			to		=	xform->next->to;															
-		}																							
-																									
-		transform(&varying[VARIABLE_P][start*3],numVertices,from);									
-																									
-		if (up & PARAMETER_DPDU) {																	
-			vtransform(&varying[VARIABLE_DPDU][start*3],numVertices,from);							
-		}																							
-																									
-		if (up & PARAMETER_DPDV) {																	
-			vtransform(&varying[VARIABLE_DPDV][start*3],numVertices,from);							
-		}																							
-																									
-		if (up & PARAMETER_NG) {																	
-			ntransform(&varying[VARIABLE_NG][start*3],numVertices,to);								
-		}																							
+	{
+		float	*from	=	xform->from;
+		float	*to		=	xform->to;
+
+		if ((up & PARAMETER_END_SAMPLE) && (xform->next != NULL))	{
+			from	=	xform->next->from;
+			to		=	xform->next->to;
+		}
+
+		transform(&varying[VARIABLE_P][start*3],numVertices,from);
+
+		if (up & PARAMETER_DPDU) {
+			vtransform(&varying[VARIABLE_DPDU][start*3],numVertices,from);
+		}
+
+		if (up & PARAMETER_DPDV) {
+			vtransform(&varying[VARIABLE_DPDV][start*3],numVertices,from);
+		}
+
+		if (up & PARAMETER_NG) {
+			ntransform(&varying[VARIABLE_NG][start*3],numVertices,to);
+		}
 	}
 }
 
@@ -258,7 +258,7 @@ void	CSphere::intersect(CShadingContext *context,CRay *rv) {
 		vmax	=	this->vmax;
 		umax	=	this->umax;
 	}
-	
+
 
 	const double a	=	dotvv(oDir,oDir);
 	const double b	=	2*dotvv(oDir,oFrom);
@@ -387,7 +387,7 @@ CSphere::sample(
 			dest[COMP_Y]			=	tmp*sinu[currentVertex];
 			dest					+=	3;
 		}
-		
+
 		// Set dPdu
 		if (up & PARAMETER_DPDU) {
 			const float	*src	=	varying[VARIABLE_P] + start*3;
@@ -484,22 +484,22 @@ CSphere::sample(
 			mulvf(N,P,f);
 		}
 	}
-	
+
 	// Set dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			// Get the u and v
 			assert(u ==	(varying[VARIABLE_U] + start));
 			assert(v ==	(varying[VARIABLE_V] + start));
-			
+
 			// Compute the xforms
 			for (int currentVertex=0;currentVertex<numVertices;++currentVertex,dest+=3)	{
 				const float	uAngleStart	=	(float) (umax*(double)u[currentVertex]);
@@ -515,18 +515,18 @@ CSphere::sample(
 				Pstart[COMP_X]			=	rStart*cosf(vAngleStart)*cosf(uAngleStart);
 				Pstart[COMP_Y]			=	rStart*cosf(vAngleStart)*sinf(uAngleStart);
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				Pend[COMP_Z]			=	rEnd*sinf(vAngleEnd);
 				Pend[COMP_X]			=	rEnd*cosf(vAngleEnd)*cosf(uAngleEnd);
 				Pend[COMP_Y]			=	rEnd*cosf(vAngleEnd)*sinf(uAngleEnd);
 				mulmp(Pend,fromEnd,Pend);
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
 			}
-		} 
+		}
 		else
 		{
 			// Get the xform matrices
@@ -535,7 +535,7 @@ CSphere::sample(
 			// I.e. just the translation part. Looks pretty column-major to me.
 			//
 			const float	*fromStart	=	xform->from + element(0,3);
-			
+
 			const float	*fromEnd	=	fromStart;
 
 			// If we have an end sample, use it.
@@ -544,7 +544,7 @@ CSphere::sample(
 			{
 				fromEnd = xform->next->from + element(0,3);
 			}
-				
+
 			vector D;
 
 			// Compute the direction vector. (endPos - startPos).
@@ -554,7 +554,7 @@ CSphere::sample(
 			// Divide it by the shutter duration.
 			//
 			mulvf(D, CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			//
 			for (int i = 0; i < numVertices; ++i, dest += 3)
@@ -901,22 +901,22 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 			initv(Ng,0,0,f);
 		}
 	}
-	
+
 	// Set dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			// Obtain the u/v
 			assert(u ==	(varying[VARIABLE_U] + start));
 			assert(v ==	(varying[VARIABLE_V] + start));
-			
+
 			// Compute the xforms
 			for (int i=0;i<numVertices;++i,dest+=3)	{
 				const float	uAngleStart	=	umax;
@@ -926,19 +926,19 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 				const float	zEnd		=	nextData[1];
 				const float	rEnd		=	nextData[0];
 				vector		Pstart,Pend;
-			
+
 				// Compute the position at the beginning
 				Pstart[COMP_X]			=	(float) (rStart*(1.0-(double)v[i])*cosf(u[i]*uAngleStart));
 				Pstart[COMP_Y]			=	(float) (rStart*(1.0-(double)v[i])*sinf(u[i]*uAngleStart));
 				Pstart[COMP_Z]			=	zStart;
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				Pend[COMP_X]			=	(float) (rEnd*(1.0-(double)v[i])*cosf(u[i]*uAngleEnd));
 				Pend[COMP_Y]			=	(float) (rEnd*(1.0-(double)v[i])*sinf(u[i]*uAngleEnd));
 				Pend[COMP_Z]			=	zEnd;
 				mulmp(Pend,fromEnd,Pend);
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
@@ -950,12 +950,12 @@ void			CDisk::sample(int start,int numVertices,float **varying,float ***locals,u
 			vector		D;
 			subvv(D,fromEnd,fromStart);
 			mulvf(D,CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
 	}
-	
+
 	// Transform the points.
 	//
 	transformPoints(xform, up, varying, start, numVertices);
@@ -1235,7 +1235,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 		float		*umax	=	height + numVertices;
 		const float	*time	=	varying[VARIABLE_TIME] + start;
 		float		*dest	=	varying[VARIABLE_P] + start*3;
-		
+
 		// Compute the position
 		for (int i=0;i<numVertices;++i,dest+=3) {
 			r[i]			=	(float) (this->r		* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
@@ -1339,18 +1339,18 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			mulvf(N,-1);
 		}
 	}
-	
+
 	// Set dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			// Compute the xforms
 			for (int i=0;i<numVertices;++i,dest+=3)	{
 				const float rStart			=	r;
@@ -1360,19 +1360,19 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 				const float heightEnd		=	nextData[1];
 				const float umaxEnd			=	nextData[2];
 				vector		Pstart,Pend;
-				
+
 				// Compute the position at the start
 				Pstart[COMP_X]	=	(rStart*(1.0f-v[i])*cosf(u[i]*umaxStart));
 				Pstart[COMP_Y]	=	(rStart*(1.0f-v[i])*sinf(u[i]*umaxStart));
 				Pstart[COMP_Z]	=	v[i]*heightStart;
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				Pend[COMP_X]	=	(rEnd*(1.0f-v[i])*cosf(u[i]*umaxEnd));
 				Pend[COMP_Y]	=	(rEnd*(1.0f-v[i])*sinf(u[i]*umaxEnd));
 				Pend[COMP_Z]	=	v[i]*heightEnd;
 				mulmp(Pend,fromEnd,Pend);
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
@@ -1384,7 +1384,7 @@ void			CCone::sample(int start,int numVertices,float **varying,float ***locals,u
 			vector		D;
 			subvv(D,fromEnd,fromStart);
 			mulvf(D,CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
@@ -1674,7 +1674,7 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 		float		*zmin	=	zmax + numVertices;
 		const float	*time	=	varying[VARIABLE_TIME] + start;
 		float		*dest	=	varying[VARIABLE_P] + start*3;
-		
+
 		// For each point to compute
 		for (int i=0;i<numVertices;++i) {
 			r[i]			=	(float) (this->r	* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
@@ -1684,7 +1684,7 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 			cosu[i]			=	cosf(u[i]*umax[i]);
 			sinu[i]			=	sinf(u[i]*umax[i]);
 			sqrtz[i]		=	sqrtf(((zmax[i]-zmin[i])*v[i]+zmin[i])/zmax[i]);
-			
+
 			dest[COMP_Z]	=	(zmax[i] - zmin[i])*v[i] + zmin[i];
 			dest[COMP_X]	=	r[i]*sqrtz[i]*cosu[i];
 			dest[COMP_Y]	=	r[i]*sqrtz[i]*sinu[i];
@@ -1788,21 +1788,21 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 			mulvf(N,-1);
 		}
 	}
-	
+
 	// Set dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			assert(u == (varying[VARIABLE_U] + start));
 			assert(v == (varying[VARIABLE_V] + start));
-			
+
 			// Compute the xforms
 			for (int i=0;i<numVertices;++i,dest+=3)	{
 				const float rStart		=	r;
@@ -1812,7 +1812,7 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 				const float rEnd		=	nextData[0];
 				const float zminEnd		=	nextData[1];
 				const float zmaxEnd		=	nextData[2];
-				const float umaxEnd		=	nextData[3];			
+				const float umaxEnd		=	nextData[3];
 				vector		Pstart,Pend;
 
 				// Compute the position at the start
@@ -1820,13 +1820,13 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 				Pstart[COMP_X]	=	rStart*sqrtf(((zmaxStart-zminStart)*v[i]+zminStart)/zmaxStart)*cosf(u[i]*umaxStart);
 				Pstart[COMP_Y]	=	rStart*sqrtf(((zmaxStart-zminStart)*v[i]+zminStart)/zmaxStart)*sinf(u[i]*umaxStart);
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				Pend[COMP_Z]	=	(zmaxEnd - zminEnd)*v[i] + zminEnd;
 				Pend[COMP_X]	=	rEnd*sqrtf(((zmaxEnd-zminEnd)*v[i]+zminEnd)/zmaxEnd)*cosf(u[i]*umaxEnd);
 				Pend[COMP_Y]	=	rEnd*sqrtf(((zmaxEnd-zminEnd)*v[i]+zminEnd)/zmaxEnd)*sinf(u[i]*umaxEnd);
 				mulmp(Pend,fromEnd,Pend);
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
@@ -1838,7 +1838,7 @@ void			CParaboloid::sample(int start,int numVertices,float **varying,float ***lo
 			vector		D;
 			subvv(D,fromEnd,fromStart);
 			mulvf(D,CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
@@ -2045,7 +2045,7 @@ void	CCylinder::intersect(CShadingContext *context,CRay *rv) {
 		P[0]	=	from[0] + dir[0]*t;
 		P[1]	=	from[1] + dir[1]*t;
 		P[2]	=	from[2] + dir[2]*t;
-	
+
 		if (zmin < zmax) {
 			if (P[COMP_Z] < zmin)	continue;
 			if (P[COMP_Z] > zmax)	continue;
@@ -2109,8 +2109,8 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 		float		*zmin	=	zmax + numVertices;
 		const float	*time	=	varying[VARIABLE_TIME] + start;
 		float		*dest	=	varying[VARIABLE_P] + start*3;
-		
-		// For every vertex to compute 
+
+		// For every vertex to compute
 		for (int i=0;i<numVertices;++i) {
 			r[i]		=	(float) (this->r 	* (1.0 - (double)time[i])	+ nextData[0] * (double)time[i]);
 			zmin[i]		=	(float) (this->zmin * (1.0 - (double)time[i])	+ nextData[1] * (double)time[i]);
@@ -2225,17 +2225,17 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			// Basic sanity check
 			assert(u == (varying[VARIABLE_U] + start));
 			assert(v == (varying[VARIABLE_V] + start));
-			
+
 			// Compute the xforms
 			for (int i=0;i<numVertices;++i,dest+=3)	{
 				const float rStart		=	r;
@@ -2253,13 +2253,13 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 				Pstart[COMP_Y]	=	(sinf(u[i]*umaxStart))*rStart;
 				Pstart[COMP_Z]	=	(zmaxStart - zminStart)*v[i] + zminStart;
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				Pend[COMP_X]	=	(cosf(u[i]*umaxEnd))*rEnd;
 				Pend[COMP_Y]	=	(sinf(u[i]*umaxEnd))*rEnd;
 				Pend[COMP_Z]	=	(zmaxEnd - zminEnd)*v[i] + zminEnd;
 				mulmp(Pend,fromEnd,Pend);
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
@@ -2271,12 +2271,12 @@ void			CCylinder::sample(int start,int numVertices,float **varying,float ***loca
 			vector		D;
 			subvv(D,fromEnd,fromStart);
 			mulvf(D,CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
 	}
-	
+
 	// Transform the points.
 	//
 	transformPoints(xform, up, varying, start, numVertices);
@@ -2533,7 +2533,7 @@ void	CHyperboloid::intersect(CShadingContext *context,CRay *rv) {
 
 			if (v > 1)	continue;
 		}
-		
+
 		x			=	(float) (p1[COMP_X]*(1.0-v) + p2[COMP_X]*(double)v);
 		y			=	(float) (p1[COMP_Y]*(1.0-v) + p2[COMP_Y]*(double)v);
 
@@ -2734,21 +2734,21 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 			mulvf(N,-1);
 		}
 	}
-	
+
 	// Set dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			assert(u == (varying[VARIABLE_U] + start));
 			assert(v == (varying[VARIABLE_V] + start));
-			
+
 			// Compute the xforms
 			for (int i=0;i<numVertices;++i,dest+=3)	{
 				const float	*p1End	=	nextData;
@@ -2772,7 +2772,7 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 					Pstart[COMP_Z]	=	z;
 				}
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				{
 					const float x	=	p1End[COMP_X] + dxEnd*v[i];
@@ -2783,7 +2783,7 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 					Pend[COMP_Z]	=	z;
 				}
 				mulmp(Pend,fromEnd,Pend);
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
@@ -2795,7 +2795,7 @@ void			CHyperboloid::sample(int start,int numVertices,float **varying,float ***l
 			vector		D;
 			subvv(D,fromEnd,fromStart);
 			mulvf(D,CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}
@@ -3034,7 +3034,7 @@ void	CToroid::intersect(CShadingContext *context,CRay *rv) {
 			int		j,k;
 			double	u,v,r;
 			vector	Nt;
-		
+
 			// Extract the minimum intersection (the intersections are not sorted)
 			t	=	C_INFINITY;
 			for (j=0;j<ns;j++) {
@@ -3245,17 +3245,17 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 	if (up & PARAMETER_DPDTIME) {
 		// This is where we'll store the result
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Are we moving?
 		if (nextData != NULL) {
 			// Get the xform matrices to move to the camera system
 			const float	*fromStart	=	xform->from;
 			const float	*fromEnd	=	(xform->next != NULL ? xform->next->from : xform->from);
-			
+
 			// Sanity check
 			assert(u == (varying[VARIABLE_U] + start));
 			assert(v == (varying[VARIABLE_V] + start));
-			
+
 			// Compute the xforms
 			for (int i=0;i<numVertices;++i,dest+=3)	{
 				vector		Pstart,Pend;
@@ -3270,7 +3270,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 				Pstart[COMP_X]	=	(rmax+r)*cosu;
 				Pstart[COMP_Y]	=	(rmax+r)*sinu;
 				mulmp(Pstart,fromStart,Pstart);
-				
+
 				// Compute the position at the end
 				{
 					const float rminEnd		=	nextData[0];
@@ -3288,7 +3288,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 					Pstart[COMP_Y]	=	(rmaxEnd+r)*sinu;
 					mulmp(Pend,fromEnd,Pend);
 				}
-				
+
 				// Compute the dPdtime
 				subvv(dest,Pend,Pstart);
 				mulvf(dest,CRenderer::invShutterTime);
@@ -3300,7 +3300,7 @@ void			CToroid::sample(int start,int numVertices,float **varying,float ***locals
 			vector		D;
 			subvv(D,fromEnd,fromStart);
 			mulvf(D,CRenderer::invShutterTime);
-			
+
 			// dPdtime is zero
 			for (int i=0;i<numVertices;++i,dest+=3)	movvv(dest,D);
 		}

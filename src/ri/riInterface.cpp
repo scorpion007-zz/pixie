@@ -378,7 +378,7 @@ void		*CRiInterface::RiArchiveBeginV(const char *name,int n,const char *tokens[]
 
 void		CRiInterface::RiArchiveEnd(void) {
 }
-	
+
 void		CRiInterface::RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]) {
 }
 

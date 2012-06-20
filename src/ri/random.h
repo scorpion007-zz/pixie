@@ -127,7 +127,7 @@ public:
 						// 1/(common denominator of the elements in v_direction)
 						last_denominator_inv = (float) (1.0 /(2.0 * ell));
 
-						// final setup 
+						// final setup
 						sequence_count = seq;
 						for(i_dim=0; i_dim<dimension; i_dim++) last_numerator_vec[i_dim] = 0;
 					}

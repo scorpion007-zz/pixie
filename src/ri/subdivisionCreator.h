@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	subdivisionCreator.h
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					The code that does the subdivision and generates the bicubic patches
 //

@@ -107,18 +107,18 @@ static	inline	float	ff(const float *rP,const float *rN,const float *oP,const flo
 // Return Value			:
 // Comments				:
 CPointHierarchy::CPointHierarchy(const char *n,const float *from,const float *to,FILE *in) : CMap<CPointCloudPoint>(), CTexture3d(n,from,to) {
-	
+
 	// Try to read the point cloud
 
 	// Read the header
 	readChannels(in);
-	
+
 	// Read the points
 	CMap<CPointCloudPoint>::read(in);
 
 	// Reserve the actual space
 	data.reserve(numItems*dataSize);
-	
+
 	// Read the data
 	fread(data.array,sizeof(float),numItems*dataSize,in);
 	data.numItems	=	numItems*dataSize;
@@ -161,7 +161,7 @@ void		CPointHierarchy::computeHierarchy() {
 	// Get the item pointers into a temporary array
 	int	i;
 	int	*tmp	=	new int[CMap<CPointCloudPoint>::numItems];
-	
+
 	for (i=1;i<=CMap<CPointCloudPoint>::numItems;i++)	tmp[i-1]	=	i;
 
 	// Compute the map hierarchy
@@ -212,7 +212,7 @@ int			CPointHierarchy::average(int numItems,int *indices) {
 		subvv(D,node.P,item->P);
 		if (areaIndex == -1)		area	=	max(((float) C_PI*item->dP*item->dP*dotvv(node.N,item->N)),0);
 		else						area	=	max((src[areaIndex]*dotvv(node.N,item->N)),0);
-		
+
 		node.dP		+=	area;
 
 		if (radiosityIndex != -1) {
@@ -261,7 +261,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 	} else {
 		// Allocate temp memory
 		int	*membership,*subItems;
-		
+
 		// Use alloca if the allocation size is low enough
 		if (numItems >= ALLOCA_MAX_ITEMS)	membership	=	new int[numItems*2];
 		else								membership	=	(int *) alloca(numItems*2*sizeof(int));
@@ -272,13 +272,13 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 
 		initv(bmin,C_INFINITY);
 		initv(bmax,-C_INFINITY);
-		
+
 		// The membership is dummy ... Also compute the bounding box of the point set
 		for (int i=0;i<numItems;i++) {
 			membership[i]	=	-1;
 			addBox(bmin,bmax,CMap<CPointCloudPoint>::items[indices[i]].P);
 		}
-		
+
 		vector	C0,C1;		// The cluster centers
 		vector	N0,N1;		// The cluster normals
 
@@ -310,20 +310,20 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 			initv(nN1,0);
 			num0	=	0;
 			num1	=	0;
-			
+
 			// iterate over items
 			for (int i=0;i<numItems;i++) {
 				vector						D;
 				const	CPointCloudPoint	*cItem	=	CMap<CPointCloudPoint>::items + indices[i];
-				
+
 				// Compute the distance to the first cluster
 				subvv(D,cItem->P,C0);
 				const float d0	=	dotvv(D,D) / max(dotvv(N0,cItem->N),C_EPSILON);
-				
+
 				// Compute the distance to the second cluster
 				subvv(D,cItem->P,C1);
 				const float d1	=	dotvv(D,D) / max(dotvv(N1,cItem->N),C_EPSILON);
-				
+
 				// Change the membership if necessary
 				if (d0 < d1) {
 					if (membership[i] != 0) {
@@ -345,7 +345,7 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 					num1++;
 				}
 			}
-			
+
 			// Check for degenerate cases
 			if ((num0 == 0) || (num1 == 0)) {
 				initv(C0,	_urand()*(bmax[0]-bmin[0]) + bmin[0],
@@ -368,9 +368,9 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 				// Normalize the normal vectors
 				normalizevf(N0,nN0);
 				normalizevf(N1,nN1);
-			}	
+			}
 		}
-		
+
 		// Do we have a bad clustering?
 		while (num0 == 0 || num1 == 0) {
 
@@ -385,25 +385,25 @@ int			CPointHierarchy::cluster(int numItems,int *indices) {
 
 			// FIXME: A smarter thing to do would be to sort the items in one dimension and split it in half
 		}
-		
+
 		assert((num0 + num1) == numItems);
 
 		// Average the items and create an internal node
 		const int	nodeIndex	=	average(numItems,indices);
-		
+
 		// OK, split the items into two
 		int	i,j;
-		
+
 		// Collect the items in the first child
 		for (i=0,j=0;i<numItems;i++)	if (membership[i] == 0)	subItems[j++]	=	indices[i];
 		assert(j == num0);
 		const int	child0	=	cluster(num0,subItems);
-		
+
 		// Collect the items in the second child
 		for (i=0,j=0;i<numItems;i++)	if (membership[i] == 1)	subItems[j++]	=	indices[i];
 		assert(j == num1);
 		const int	child1	=	cluster(num1,subItems);
-		
+
 		// NOTE: There's an important subtlety here...
 		// We can not access cNode before the child nodes are created because the creation of children
 		// may change the nodes.array field
@@ -452,7 +452,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 
 			// Are we behind the item?
 			if (dotvv(P,item->N) <= dotvv(item->P,item->N))	continue;
-			
+
 			// Compute the form factor
 			float		form;
 			const float	*src	=	data.array + item->entryNumber;
@@ -470,10 +470,10 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 
 		} else {
 			const CMapNode			*node	=	nodes.array + currentNode;
-			
+
 			// Are we behind the node?
 			//if ((node->dN > 0.999999) && (dotvv(P,node->N) <= dotvv(node->P,node->N))) {
-			
+
 			// FIXME: A more general behind test would be nice
 
 			// Decide whether we want to split this node
@@ -497,7 +497,7 @@ void		CPointHierarchy::lookup(float *Cl,const float *Pl,const float *dPdul,const
 			} else {
 				// Sanity check
 				assert((stack-stackBase) < (POINTHIERARCHY_STACK_SIZE-2));
-		
+
 				// Split
 				*stack++	=	node->child0;
 				*stack++	=	node->child1;

@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 			} else {
 				fprintf(stdout,"\"");
 			}
-			
+
 			switch(cParameter->container) {
 			case CONTAINER_CONSTANT:
 				fprintf(stdout,"constant ");
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
 			UDefaultVal *currentDefault = &cParameter->defaultValue;
 			if (cParameter->numItems > 1)
 				currentDefault = currentDefault->array;
-			
+
 			for(int i=0;i<cParameter->numItems;i++){
 				switch(cParameter->type) {
 				case TYPE_FLOAT:

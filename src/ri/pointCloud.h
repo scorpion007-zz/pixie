@@ -75,7 +75,7 @@ public:
 	void					draw();
 	int						keyDown(int);
 	void					bound(float *bmin,float *bmax);
-	
+
 							// ptcApi interface
 	int						getNumPoints() { return numItems; }
 	void					getPoint(int i,float *C,float *P,float *N,float *dP);
@@ -92,7 +92,7 @@ private:
 							public:
 								int				ignoreNormal;
 							};
-		
+
 							///////////////////////////////////////////////////////////////////////
 							// Class				:	CMap
 							// Method				:	lookup
@@ -134,7 +134,7 @@ private:
 								// If the item is valid, insert it
 								if (d < l->distances[0]) {
 									if (d < (photon->dP*photon->dP*scale*scale)) {
-									
+
 										// Note that we do the opposite to photonmaps
 										// only entries coherent with N contribute
 										// but l.N is reversed...
@@ -144,17 +144,17 @@ private:
 									}
 								}
 							}
-						
+
 	CArray<float>			data;				// This is where we actually keep the data
 	int						flush;				// Should this be written to disk?
 	TMutex					mutex;				// To synchronize updates
 	float					maxdP;
-	
+
 	static	int				drawDiscs;			// Which type to draw
 	static	int				drawChannel;		// Which channel to draw
-	
+
 	friend			void	makeBrickMap(int n,const char **,const char *,TSearchpath *,int,const char **,const void **);
-	
+
 	friend class CRemotePtCloudChannel;
 };
 

@@ -293,7 +293,7 @@ inline	CVariable	*getContainer(FILE *out,int type,CExpression *src) {
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CExpression::CExpression(int t)	{	
+CExpression::CExpression(int t)	{
 	type	=	t;
 
 }
@@ -305,7 +305,7 @@ CExpression::CExpression(int t)	{
 /// \brief					Dtor
 // Return Value			:	-
 // Comments				:
-CExpression::~CExpression()	{	
+CExpression::~CExpression()	{
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ CExpression::~CExpression()	{
 // Description			:	Generate code that stores the result in "dest"
 // Return Value			:	-
 // Comments				:
-void		CExpression::getCode(FILE *out,CVariable *dest)	{	
+void		CExpression::getCode(FILE *out,CVariable *dest)	{
 }
 
 
@@ -324,7 +324,7 @@ void		CExpression::getCode(FILE *out,CVariable *dest)	{
 // Description			:	If this is a variable, return the variable
 // Return Value			:	-
 // Comments				:
-CVariable	*CExpression::getVariable()	{	
+CVariable	*CExpression::getVariable()	{
 	return	NULL;
 }
 
@@ -414,7 +414,7 @@ CNullExpression::CNullExpression() : CExpression(SLC_NONE) {
 CTwoExpressions::CTwoExpressions(CExpression *f,CExpression *s) : CExpression(SLC_NONE) {
 	first	=	f;
 	second	=	s;
-	
+
 	// work out if the expression pair is varying
 	if ((f->type & SLC_UNIFORM) && (s->type & SLC_UNIFORM)) {
 		type |= SLC_UNIFORM;
@@ -725,7 +725,7 @@ int			CMatrixExpression::value(char *dest) {
 CArrayExpression::CArrayExpression(CVariable *v,CExpression *i) : CExpression((v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK)) | (v->type & i->type & SLC_UNIFORM)) {
 	array	=	v;
 	item	=	getConversion(SLC_FLOAT | (type & SLC_UNIFORM),i);
-	
+
 	if (v->type & SLC_ARRAY) {
 	} else {
 		sdr->fatal("%s needs to be array\n",v->symbolName);
@@ -762,7 +762,7 @@ void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 
 	assert(	((dest->type & SLC_UNIFORM) ^ (type & SLC_UNIFORM))	== 0);
 
-	lock(op1,item);	
+	lock(op1,item);
 	assert(item->type & SLC_FLOAT);
 
 	if ((array->type & SLC_UNIFORM) ^ (type & SLC_UNIFORM)) {
@@ -785,7 +785,7 @@ void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 
 
 	fprintf(out,"%s\t%s %s %s\n",opcode,dest->codeName(),array->codeName(),op1);
-	
+
 	release(op1);
 }
 
@@ -814,7 +814,7 @@ void		CArrayExpression::getCode(FILE *out,CVariable *dest) {
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK | SLC_UNIFORM))	{	
+CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (SLC_TYPE_MASK | SLC_SUB_TYPE_MASK | SLC_UNIFORM))	{
 	variable	=	v;
 }
 
@@ -827,7 +827,7 @@ CTerminalExpression::CTerminalExpression(CVariable *v) : CExpression(v->type & (
 /// \brief					Dtor
 // Return Value			:	-
 // Comments				:
-CTerminalExpression::~CTerminalExpression()	{	
+CTerminalExpression::~CTerminalExpression()	{
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -882,7 +882,7 @@ void		CTerminalExpression::getCode(FILE *out,CVariable *dest) {
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpression(t | SLC_UNIFORM) {	
+CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpression(t | SLC_UNIFORM) {
 	constant		=	c;
 	dummy			=	new CVariable(c,t | SLC_UNIFORM,1);
 	dummy->cName	=	strdup(constant);
@@ -895,8 +895,8 @@ CConstantTerminalExpression::CConstantTerminalExpression(int t,char *c)	: CExpre
 /// \brief					Dtor
 // Return Value			:	-
 // Comments				:
-CConstantTerminalExpression::~CConstantTerminalExpression()	{	
-	free(constant);	
+CConstantTerminalExpression::~CConstantTerminalExpression()	{
+	free(constant);
 	delete dummy;
 }
 
@@ -975,7 +975,7 @@ int			CConstantTerminalExpression::value(char *dest) {
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CBinaryExpression::CBinaryExpression(int t,const char *o,CExpression *f,CExpression *s) : CExpression(t | (f->type & s->type & SLC_UNIFORM))	{ 
+CBinaryExpression::CBinaryExpression(int t,const char *o,CExpression *f,CExpression *s) : CExpression(t | (f->type & s->type & SLC_UNIFORM))	{
 	first	=	f;
 	second	=	s;
 	opcode	=	o;
@@ -1052,9 +1052,9 @@ void	CBinaryExpression::getCode(FILE *out,CVariable *dest) {
 /// \brief					Ctor
 // Return Value			:	-
 // Comments				:
-CUnaryExpression::CUnaryExpression(int t,const char *o,CExpression *f) : CExpression(t | (f->type & SLC_UNIFORM) ) { 
-	first	= f; 
-	opcode	= o; 
+CUnaryExpression::CUnaryExpression(int t,const char *o,CExpression *f) : CExpression(t | (f->type & SLC_UNIFORM) ) {
+	first	= f;
+	opcode	= o;
 }
 
 
@@ -1224,11 +1224,11 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : C
 	if (f->returnValue != NULL)	type	=	f->returnValue->type;
 	function	=	f;
 	error		=	FALSE;
-	
+
 	// take the container from subexpressions
 	if (function->code)
 		type		|=	function->code->type & SLC_UNIFORM;
-	
+
 	// handle the parameters
 	if (p == NULL) {
 		// No arguments
@@ -1252,7 +1252,7 @@ CFuncallExpression::CFuncallExpression(CFunction *f,CList<CExpression *> *p) : C
 				newArguments->push(getConversion(parameter->type & SLC_TYPE_MASK,argument));
 				if (!(argument->type & SLC_UNIFORM)) {
 					type	&=	~SLC_UNIFORM;
-				}	
+				}
 			}
 		}
 
@@ -1362,10 +1362,10 @@ void		CFuncallExpression::getCode(FILE *out,CVariable *dest) {
 		c	=	NULL;
 	}
 
-	// Go over the init code 
+	// Go over the init code
 	if (function->initExpression != NULL) function->initExpression->getCode(out,NULL);
 
-	// Go over the code 
+	// Go over the code
 	if (function->code != NULL) function->code->getCode(out,NULL);
 
 	// Release the locked registers
@@ -1495,7 +1495,7 @@ CBuiltinExpression::CBuiltinExpression(CFunctionPrototype *f,CList<CExpression *
 			}
 
 			replacementPrototype	=	"c=SFffffffff!";
-		} 
+		}
 
 		if (arguments != NULL) {
 			p	=	arguments;
@@ -1892,7 +1892,7 @@ void		CConditionalExpression::getCode(FILE *out,CVariable *dest) {
 	fprintf(out,"%s\t%s\n",opcodeElse,endLabel);
 
 	getContainer(out,dest,falseExpression);
-	
+
 	fprintf(out,"%s:\n",endLabel);
 	fprintf(out,"%s\n",opcodeEndif);
 }
@@ -2005,7 +2005,7 @@ CArrayAssignmentExpression::CArrayAssignmentExpression(CVariable *f,CExpression 
 			sdr->error("Can not assign varying to uniform %s\n",f->symbolName);
 		}
 	}
-	
+
 	first	=	f;
 	index	=	getConversion(SLC_FLOAT | (type & SLC_UNIFORM),i);
 	second	=	getConversion((first->type & SLC_TYPE_MASK) | (type & SLC_UNIFORM),s);
@@ -2036,7 +2036,7 @@ void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 
 	lock(opi,index);	// Get float index
 	lock(op,second);	// Get the second code
-	
+
 	if (first->type & SLC_FLOAT) {
 		opcode	=	opcodeFToArray;
 		opcodeN	=	opcodeMoveFloatFloat;
@@ -2098,13 +2098,13 @@ void		CArrayAssignmentExpression::getCode(FILE *out,CVariable *dest) {
 CArrayUpdateExpression::CArrayUpdateExpression(CVariable *f,CExpression *i,CExpression *s,const char *opcodeFloat,const char *opcodeVector,const char *opcodeMatrix) : CExpression(f->type) {
 	first = f;
 	arrayAssigner = NULL;
-	
+
 	// Ensure index is float
 	index = getConversion(SLC_FLOAT | (type & SLC_UNIFORM),i);
 
 	// pre-reseve the register (needs 1 register for index for both load and store)
 	indexVar = sdr->lockRegister(SLC_FLOAT | (type & SLC_UNIFORM));
-	
+
 	// Create Accessor
 	if(CExpression *arrayAccessor = new CArrayExpression(first,new CTerminalExpression(indexVar))){
 		// Create update expression
@@ -2764,7 +2764,7 @@ void		CForLoop::getCode(FILE *out,CVariable *dest) {
 
 	if (body != NULL)	body->getCode(out,NULL);
 
-	
+
 	fprintf(out,"%s:\n",contLabel);
 
 	if (update != NULL) {
@@ -2823,19 +2823,19 @@ CIlluminationLoop::CIlluminationLoop(CList<CExpression *> *p,CExpression *b) : C
 
 	// Get the parameters
 	switch(numCore) {
-	case 1:		
+	case 1:
 		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-0]);
 		break;
-	case 2:		
+	case 2:
 		this->category	=	getConversion(SLC_STRING,p->array[p->numItems-1-0]);
 		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-1]);
 		break;
-	case 3:		
+	case 3:
 		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-0]);
 		this->N			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-1]);
 		this->angle		=	getConversion(SLC_FLOAT,p->array[p->numItems-1-2]);
 		break;
-	case 4:		
+	case 4:
 		this->category	=	getConversion(SLC_STRING,p->array[p->numItems-1-0]);
 		this->P			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-1]);
 		this->N			=	getConversion(SLC_VECTOR,p->array[p->numItems-1-2]);
@@ -2906,7 +2906,7 @@ void		CIlluminationLoop::getCode(FILE *out,CVariable *dest) {
 		fprintf(out," %s ",op4);
 	}
 	fprintf(out,"\n");
-	
+
 	fprintf(out,"%s:\n",beginLabel);
 
 	if (body != NULL)	body->getCode(out,NULL);
@@ -3096,7 +3096,7 @@ CExpression	*getOperation(CExpression *first,CExpression *second,const char *opc
 		sdr->error("Direct operations on arrays is not possible\n");
 		return	new CNullExpression;
 	}
-	
+
 	// Do the types match
 	if ((first->type & SLC_TYPE_MASK) == (second->type & SLC_TYPE_MASK)) {
 		// Yesss
@@ -3107,20 +3107,20 @@ CExpression	*getOperation(CExpression *first,CExpression *second,const char *opc
 			} else {
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_FLOAT),opcodeFloat,first,second);
 			}
-		} else if (first->type & SLC_VECTOR) {	
+		} else if (first->type & SLC_VECTOR) {
 			if (opcodeVector == NULL) {
 				sdr->error("This operation is not defined on vectors\n");
 			} else {
 				int subtype = (first->type | second->type) & SLC_SUB_TYPE_MASK;
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : (SLC_VECTOR|subtype)),opcodeVector,first,second);
 			}
-		} else if (first->type & SLC_MATRIX) {	
+		} else if (first->type & SLC_MATRIX) {
 			if (opcodeMatrix == NULL) {
 				sdr->error("This operation is not defined on matrices\n");
 			} else {
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_MATRIX),opcodeMatrix,first,second);
 			}
-		} else if (first->type & SLC_STRING) {	
+		} else if (first->type & SLC_STRING) {
 			if (opcodeString == NULL) {
 				sdr->error("This operation is not defined on strings\n");
 			} else {
@@ -3131,26 +3131,26 @@ CExpression	*getOperation(CExpression *first,CExpression *second,const char *opc
 		}
 	} else {
 		// Nop, try converting to the most general type
-		if ((first->type | second->type) & SLC_STRING) {			
+		if ((first->type | second->type) & SLC_STRING) {
 			if (opcodeString == NULL) {
 				sdr->error("This operation is not defined on strings\n");
 			} else {
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_STRING),opcodeString,getConversion(SLC_STRING,first),getConversion(SLC_STRING,second));
 			}
-		} else if ((first->type | second->type) & SLC_MATRIX) {		
+		} else if ((first->type | second->type) & SLC_MATRIX) {
 			if (opcodeMatrix == NULL) {
 				sdr->error("This operation is not defined on matrices\n");
 			} else {
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : SLC_MATRIX),opcodeMatrix,getConversion(SLC_MATRIX,first),getConversion(SLC_MATRIX,second));
 			}
-		} else if ((first->type | second->type) & SLC_VECTOR)	{	
+		} else if ((first->type | second->type) & SLC_VECTOR)	{
 			if (opcodeVector == NULL) {
 				sdr->error("This operation is not defined on vectors\n");
 			} else {
 				int subtype = (first->type | second->type) & SLC_SUB_TYPE_MASK;
 				return	new CBinaryExpression((typeOverwrite ? typeOverwrite : (SLC_VECTOR|subtype)),opcodeVector,getConversion(SLC_VECTOR,first),getConversion(SLC_VECTOR,second));
 			}
-		} else if ((first->type | second->type) & SLC_FLOAT) {		
+		} else if ((first->type | second->type) & SLC_FLOAT) {
 			if (opcodeFloat == NULL) {
 				sdr->error("This operation is not defined on floats\n");
 			} else {
@@ -3179,7 +3179,7 @@ CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char 
 		sdr->error("Direct operations on arrays is not possible\n");
 		return	new CNullExpression();
 	}
-		
+
 	if (first->type & SLC_FLOAT)		return	new CUnaryExpression((typeOverwrite ? typeOverwrite : SLC_FLOAT),opcodeFloat,first);
 	else if (first->type & SLC_VECTOR)	return	new CUnaryExpression((typeOverwrite ? typeOverwrite : (SLC_VECTOR | (first->type & SLC_SUB_TYPE_MASK))),opcodeVector,first);
 	else if (first->type & SLC_MATRIX)	return	new CUnaryExpression((typeOverwrite ? typeOverwrite : SLC_MATRIX),opcodeMatrix,first);
@@ -3198,7 +3198,7 @@ CExpression *getOperation(CExpression *first,const char *opcodeFloat,const char 
 // Return Value			:	The converted expression
 // Comments				:
 CExpression	*getConversion(int type,CExpression *first) {
-	
+
 	const char* firsttype = "none";
 	if (first->type & SLC_STRING)
 		firsttype = "string";
@@ -3218,7 +3218,7 @@ CExpression	*getConversion(int type,CExpression *first) {
 		desttype = "vector";
 	else if (type & SLC_MATRIX)
 		desttype = "matrix";
-	
+
 	const char* unabletocast = "Unable to cast %s to %s\n";
 	if (type & SLC_STRING) {
 		if (first->type & SLC_STRING)	return first;
@@ -3286,9 +3286,9 @@ void	getConversion(FILE *out,CVariable *dest,CExpression *first) {
 		desttype = "vector";
 	else if (dest->type & SLC_MATRIX)
 		desttype = "matrix";
-	
+
 	const char* unabletocast = "Unable to cast %s to %s\n";
-	
+
 	cVar	=	first->getVariable();
 
 	if (cVar == NULL) {
@@ -3404,8 +3404,8 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CExpression *expressio
 			sdr->error("Can not assign to whole array %s\n",cVar->symbolName);
 			continue;
 		}
-		
-		if (cVar->type & SLC_UNIFORM) 
+
+		if (cVar->type & SLC_UNIFORM)
 			if (!(expression->type & SLC_UNIFORM)) {
 				sdr->error("Can not assign to uniform variable %s\n",cVar->symbolName);
 				continue;
@@ -3459,10 +3459,10 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 	while((cVar=variables->pop()) != NULL) {
 		hasNamedSpace = FALSE;
 		hasComplexRef = FALSE;
-		
+
 		if (cVar->type & SLC_PARAMETER){
 			CParameter	*cPar	=	(CParameter *) cVar;
-			
+
 			// Do we have the right number of arguments
 			if(expressions->numItems == cPar->numItems) {
 
@@ -3476,7 +3476,7 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 						break;
 					}
 				}
-				
+
 				tmp2 = (char*)malloc(expressions->numItems * 128);
 				sprintf(tmp2,"[ ");
 				for(i=expressions->numItems-1;i>=0;i--){
@@ -3504,7 +3504,7 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 				sdr->error("Parameter initializer for \"%s\" has wrong number of items\n",cVar->symbolName);
 			}
 		}
-	
+
 		CExpression	*cExpression	=	new CArrayMove(cVar,expressions);
 
 		if (pExpression == NULL)	pExpression	=	cExpression;
@@ -3515,12 +3515,12 @@ CExpression		*getAssignment(CList<CVariable *> *variables,CList<CExpression *> *
 		delete expressions;
 		return new CNullExpression;
 	}
-	
+
 	return	pExpression;
-	
+
 #else
 	while((cVar=variables->pop()) != NULL) {
-		
+
 		CExpression	*cExpression	=	new CArrayMove(cVar,expressions);
 
 		if (pExpression == NULL)	pExpression	=	cExpression;

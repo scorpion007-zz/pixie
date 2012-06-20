@@ -98,7 +98,7 @@ CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource
 
 		mulmm(to,fromWorld,CRenderer::toWorld);
 		mulmm(from,CRenderer::fromWorld,toWorld);
-		
+
 		#ifdef PHOTON_LOOKUP_CACHE
 			// Initialize the lookup octree
 			root			=	new CPhotonNode;
@@ -109,7 +109,7 @@ CPhotonMap::CPhotonMap(const char *n,FILE *in) : CMap<CPhoton>() , CFileResource
 			for (int i=0;i<8;i++) root->children[i]	=	NULL;
 		#endif
 	} else {
-	
+
 		// Make sure we have a root
 		balance();
 	}
@@ -130,21 +130,21 @@ CPhotonMap::~CPhotonMap() {
 			CPhotonNode		*cNode;
 			CPhotonSample	*cSample;
 			int			i;
-	
+
 			stack		=	stackBase;
 			*stack++	=	root;
 			while(stack > stackBase) {
 				cNode	=	*(--stack);
-	
+
 				while((cSample=cNode->samples) != NULL) {
 					cNode->samples	=	cSample->next;
 					delete cSample;
 				}
-	
+
 				for (i=0;i<8;i++) {
 					if (cNode->children[i] != NULL) *stack++	=	cNode->children[i];
 				}
-	
+
 				delete cNode;
 			}
 		}
@@ -176,30 +176,30 @@ void	CPhotonMap::write(const CXform *world) {
 	// Note: write is multithread safe, though it will
 	// only ever be called in a single-threaded state
 	// we do this so it manages the modifying state properly
-	
+
 	if (modifying == TRUE) {
 		// Flush the photonmap
 		FILE		*out		=	ropen(name,"wb",filePhotonMap);
-	
+
 		if (out != NULL) {
-	
+
 			// Balance the map
 			balance();
-	
+
 			// Write the map
 			CMap<CPhoton>::write(out);
-	
+
 			// Write the matrices
 			fwrite(CRenderer::fromWorld,sizeof(matrix),1,out);
 			fwrite(CRenderer::toWorld,sizeof(matrix),1,out);
 			maxPower	=	sqrtf(maxPower);
 			fwrite(&maxPower,sizeof(float),1,out);
-	
+
 			fclose(out);
 		} else {
 			error(CODE_BADFILE,"Failed to open \"%s\" for writing\n",name);
 		}
-		
+
 		// We are no longer modifying this map
 		modifying = FALSE;
 	}
@@ -216,7 +216,7 @@ void	CPhotonMap::write(const CXform *world) {
 // Description			:
 /// \brief					Locate the nearest maxFoundPhoton photons
 // Return Value			:
-// Comments				:	
+// Comments				:
 int		CPhotonMap::probe(float *C,const float *P,const float *N) {
 	CPhotonNode			*cNode;
 	CPhotonNode			**stackBase	=	(CPhotonNode **)	alloca(maxDepth*sizeof(CPhotonNode *)*8);
@@ -224,9 +224,9 @@ int		CPhotonMap::probe(float *C,const float *P,const float *N) {
 	CPhotonSample		*cSample;
 	float				totalWeight	=	0;
 	int					i;
-	
+
 	// Note: if word-stores are atomic, we don't need to lock when doing this
-	
+
 	if (root == NULL) return FALSE;
 
 	stack			=	stackBase;
@@ -239,7 +239,7 @@ int		CPhotonMap::probe(float *C,const float *P,const float *N) {
 		for (cSample=cNode->samples;cSample!=NULL;cSample=cSample->next) {
 			vector	D;
 			float	d;
-			
+
 			subvv(D,cSample->P,P);
 
 			d	=	dotvv(D,D);
@@ -252,7 +252,7 @@ int		CPhotonMap::probe(float *C,const float *P,const float *N) {
 					// if N=0, this should not operate anything out.  verify
 					d = C_INFINITY;
 				}
-			
+
 				if (d < cSample->dP) {
 					float	weight	=	1 - d / cSample->dP;
 
@@ -297,7 +297,7 @@ int		CPhotonMap::probe(float *C,const float *P,const float *N) {
 // Description			:
 /// \brief					Insert a sample
 // Return Value			:
-// Comments				:	
+// Comments				:
 void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 	CPhotonSample	*cSample	=	new CPhotonSample;
 	CPhotonNode		*cNode		=	root;
@@ -306,7 +306,7 @@ void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 
 	// lock the mutex so we're thread safe
 	osLock(mutex);
-	
+
 	movvv(cSample->C,C);
 	movvv(cSample->P,P);
 	movvv(cSample->N,N);
@@ -344,7 +344,7 @@ void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 	cSample->next	=	cNode->samples;
 	cNode->samples	=	cSample;
 	maxDepth		=	max(maxDepth,depth);
-	
+
 	// unlock the mutex
 	osUnlock(mutex);
 }
@@ -362,8 +362,8 @@ void	CPhotonMap::insert(const float *C,const float *P,const float *N,float dP) {
 //							Il	must be normalized
 void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) {
 	int				numFound;
-	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *)); 
-	float			*distances	=	(float	*)			alloca((maxFound+1)*sizeof(float)); 
+	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *));
+	float			*distances	=	(float	*)			alloca((maxFound+1)*sizeof(float));
 	CLookup			l;
 
 	searchRadius		=	(sqrtf(maxFound*maxPower / 0.05f) / (float) C_PI)*0.5f;
@@ -382,30 +382,30 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 	if (!probe(Cl,l.P,l.N)) {
 	#endif
 		CMap<CPhoton>::lookupWithN(&l,1);
-	
+
 		initv(Cl,0);
-	
+
 		if ((numFound = l.numFound) < 2)	return;
-	
+
 		// Accumulate the irradiance
 		for (int i=1;i<=numFound;i++) {
 			const	CPhoton	*p	=	indices[i];
 			vector	I;
-	
+
 			assert(distances[i] <= distances[0]);
-	
+
 			itemToDir(I,p->theta,p->phi);
-	
+
 			if (dotvv(I,l.N) < 0) {
 				addvv(Cl,p->C);
 			}
 		}
-	
+
 		// Normalize the result
 		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
-	
+
 	#ifdef PHOTON_LOOKUP_CACHE
-		// Insert it into the probe 
+		// Insert it into the probe
 		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
 	}
 	#endif
@@ -422,8 +422,8 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,const float *Nl,int maxFound) 
 //							Il	must be normalized
 void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 	int				numFound	=	0;
-	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *)); 
-	float			*distances	=	(float	*)			alloca((maxFound+1)*sizeof(float)); 
+	const CPhoton	**indices	=	(const CPhoton **)	alloca((maxFound+1)*sizeof(CPhoton *));
+	float			*distances	=	(float	*)			alloca((maxFound+1)*sizeof(float));
 	CLookup			l;
 
 	searchRadius		=	(sqrtf(maxFound*maxPower / 0.05f) / (float) C_PI)*0.5f;
@@ -442,26 +442,26 @@ void	CPhotonMap::lookup(float *Cl,const float *Pl,int maxFound) {
 	if (!probe(Cl,l.P,l.N)) {
 	#endif
 		CMap<CPhoton>::lookup(&l,1);
-	
+
 		initv(Cl,0,0,0);
-	
+
 		if (l.numFound < 2)	return;
-	
+
 		numFound	=	l.numFound;
-	
+
 		for (int i=1;i<=numFound;i++) {
 			const	CPhoton	*p	=	indices[i];
-	
+
 			assert(distances[i] <= distances[0]);
-	
+
 			addvv(Cl,p->C);
 		}
-		
+
 		// Normalize the result
 		mulvf(Cl,(float) (1.0 / (C_PI*distances[0])));
-	
+
 	#ifdef PHOTON_LOOKUP_CACHE
-		// Insert it into the probe 
+		// Insert it into the probe
 		insert(Cl,l.P,l.N,sqrtf(distances[0])*(float) 0.2);
 	}
 	#endif
@@ -547,7 +547,7 @@ void	CPhotonMap::draw() {
 		}
 
 		float maxChannel	=	max(max(cT->C[0],cT->C[1]),cT->C[2]);
-		
+
 		movvv(cP,cT->P);
 		mulvf(cC,cT->C,1 / maxChannel);
 	}

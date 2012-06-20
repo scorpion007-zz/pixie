@@ -48,7 +48,7 @@ DEFFUNC(DebugVector		,"debug"		,"o=v", FUN1EXPR_PRE, DEBUGVEXPR, FUN1EXPR_UPDATE
 // faceforward "v=vv"
 #define	FACEFORWARDEXPR_PRE		const float	*Ng	=	varying[VARIABLE_NG];			\
 								FUN3EXPR_PRE
-								
+
 #define	FACEFORWARDEXPR			if (dotvv(op1,Ng) > 0) {							\
 									if (dotvv(op2,Ng) > 0)							\
 										mulvf(res,op1,-1);							\
@@ -92,10 +92,10 @@ DEFFUNC(FaceForward3		,"faceforward"		,"v=vvv",FUN4EXPR_PRE,FACEFORWARD2EXPR,FUN
 
 
 
-		
 
 
-									
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // du "f=f"
 #ifndef INIT_SHADING
@@ -149,7 +149,7 @@ DEFFUNC(Dvf		,"Dv"			,"f=f"	,DVFEXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,PARAMETER
 								dvVector(res,op);
 #else
 #undef	DVVEXPR_PRE
-#define	DVVEXPR_PRE	
+#define	DVVEXPR_PRE
 #endif
 
 
@@ -267,7 +267,7 @@ DEFFUNC(Derivv			,"Deriv"		,"v=vf"	,	DERIVVEXPR_PRE,DERIVVEXPR,DERIVVEXPR_UPDATE
 								vector	tmp;																\
 								duVector(dPdu,op);															\
 								dvVector(dPdv,op);
-								
+
 
 #define	AREAEXPR				mulvf(dPdu,du[0]);															\
 								mulvf(dPdv,dv[0]);															\
@@ -324,7 +324,7 @@ DEFFUNC(Area		,"area"		,"f=p",		AREAEXPR_PRE,AREAEXPR,AREAEXPR_UPDATE,NULL_EXPR,
 									du				=	rayDiff(op);										\
 									dicingMeasure	=	TRUE;												\
 								}
-								
+
 
 #define	AREAEXPR				if (dicingMeasure) {														\
 									assert(*du >= 0);														\
@@ -500,7 +500,7 @@ DEFFUNC(PNoise3D4			,"pnoise"		,"v=pfpf",	FUN5EXPR_PRE,PNOISE3D4EXPR,FUN5EXPR_UP
 							operand(2,op2,const float *);											\
 							ECoordinateSystem	cSystem;											\
 							findCoordinateSystem(*op1,from,to,cSystem);
-							
+
 #define	CTRANSFORMEXPR		convertColorTo(res,op2,cSystem);
 
 DEFFUNC(CTransform		,"ctransform"			,"c=Sc"	,CTRANSFORMEXPR_PRE,CTRANSFORMEXPR,FUN3EXPR_UPDATE(3,0,3),NULL_EXPR,0)
@@ -812,7 +812,7 @@ DEFFUNC(Ambient			,"ambient"				,"c="		,AMBIENTEXPR_PRE,AMBIENTEXPR,AMBIENTEXPR_
 								R[COMP_G] += coefficient * Cl[COMP_G];							\
 								R[COMP_B] += coefficient * Cl[COMP_B];							\
 							}
-								
+
 #define	DIFFUSEEXPR_UPDATE	R		+=	3;														\
 							N		+=	3;														\
 							Cl		+=	3;														\
@@ -886,7 +886,7 @@ DEFLIGHTFUNC(Diffuse				,"diffuse"				,"c=n"		,DIFFUSEEXPR_PRE, DIFFUSEEXPR, DIF
 							Cl			+=	3;													\
 							L			+=	3;													\
 							nd			+=	ndStep;
-							
+
 
 #define DIFFUSE2EXPR_POST		exitFastLightingConditional();									\
 								*currentLight=(*currentLight)->next;							\
@@ -1609,7 +1609,7 @@ DEFFUNC(TextureColor			,"texture"					,"c=SFff!"		,TEXTUREFEXPR_PRE,TEXTURECEXPR
 									osUnlock(CRenderer::shaderMutex);											\
 								}																				\
 								scratch->textureParams.filter	=	lookup->filter;
-								
+
 
 #define	TEXTUREFFULLEXPR		plReady();																		\
 								cs[0]		=	*op3;															\
@@ -1835,7 +1835,7 @@ DEFFUNC(TextureColorFull			,"texture"				,"c=SFffffffff!"		,TEXTUREFFULLEXPR_PRE
 									}																				\
 								}																					\
 								plEnd();
-								
+
 #else
 #define	ENVIRONMENTEXPR_PRE
 #define	ENVIRONMENTEXPR
@@ -2152,7 +2152,7 @@ DEFSHORTFUNC(Bake3d			,"bake3d"					,"f=SSpn!"		,BAKE3DEXPR_PRE,BAKE3DEXPR,BAKE3
 																												\
 								for (int channel=0;channel<lookup->numChannels;++channel) {						\
 									operand(lookup->channelIndex[channel],channelValues[channel],float *);		\
-								} 
+								}
 
 #define	TEXTURE3DEXPR			plReady();																		\
 								float radius;																	\

@@ -116,7 +116,7 @@ for (j=0;j<vdiv;j++) {
 						checkPixel(<);
 
 						recordPixel();
-						
+
 					}
 				}
 			}
@@ -127,7 +127,7 @@ for (j=0;j<vdiv;j++) {
 				int		x,y;
 				for (		ycent=top+	ymin+0.5001011f,y=ymin;y<=ymax;y++,ycent++) {
 					for (	xcent=left+	xmin+0.5001011f,x=xmin;x<=xmax;x++,xcent++) {
-						
+
 						checkPixel(>);
 
 						recordPixel();
@@ -136,7 +136,7 @@ for (j=0;j<vdiv;j++) {
 			}
 		}
 
-		
+
 	}
 
 	vertices	+=	numVertexSamples;

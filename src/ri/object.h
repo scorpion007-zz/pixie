@@ -76,13 +76,13 @@ public:
 							//
 							// All objects must override the following functions
 							//
-							//	
+							//
 	virtual	void			intersect(CShadingContext *,CRay *)								=	0;
 	virtual	void			dice(CShadingContext *);
 	virtual	void			instantiate(CAttributes *,CXform *,CRendererContext *) const	=	0;
 
 														// Cluster the children
-			void			cluster(CShadingContext *);	
+			void			cluster(CShadingContext *);
 
 														// Set the children objects
 			void			setChildren(CShadingContext *,CObject *);
@@ -131,7 +131,7 @@ public:
 							// CObject interface
 	virtual	void			intersect(CShadingContext *,CRay *);						// Intersect a ray with the surface
 	virtual	void			dice(CShadingContext *);									// Split or render this object
-	
+
 							// CSurface interface
 	virtual	int				moving() const;												// TRUE if we're moving
 	virtual	void			sample(int,int,float **,float ***,unsigned int &) const;	// Sample the surface of the object

@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	remoteChannel.h
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					This base class for remote deep data channels
 //
@@ -60,18 +60,18 @@ typedef enum {
 // Class				:	CRemoteChannel
 // Description			:
 /// \brief					base class for remote channels
-// Comments				:	
+// Comments				:
 class CRemoteChannel {
 public:
 					CRemoteChannel(const char *n,int f,int d) : name(strdup(n)), flags(f), channelType(d), remoteId(-1) { }
 		virtual 	~CRemoteChannel() { free(name); };
-		
+
 		virtual		int		sendSetupData(SOCKET s)					{ return TRUE; }
 		virtual		int		setup(SOCKET s)							{ return TRUE; }
 		virtual		int		sendRemoteBucket(SOCKET s,int,int)		{ return TRUE; }
 		virtual		int		recvRemoteBucket(SOCKET s,int,int)		{ return TRUE; }
 		virtual		int		sendRemoteFrame(SOCKET s)				{ return TRUE; }
-		virtual		int		recvRemoteFrame(SOCKET s)				{ return TRUE; }		
+		virtual		int		recvRemoteFrame(SOCKET s)				{ return TRUE; }
 
 public:
 	char	*name;
@@ -84,12 +84,12 @@ public:
 // Class				:	CRemoteTSMChannel
 // Description			:
 /// \brief					remote channel for tsm
-// Comments				:	
+// Comments				:
 class	CRemoteTSMChannel : public CRemoteChannel {
 public:
 	CRemoteTSMChannel(const char*,FILE*,int*,int,int);
 	~CRemoteTSMChannel() { }
-	
+
 	int sendRemoteBucket(SOCKET s,int x,int y);
 	int recvRemoteBucket(SOCKET s,int x,int y);
 
@@ -104,12 +104,12 @@ private:
 // Class				:	CRemoteICacheChannel
 // Description			:
 /// \brief					remote channel for irradiance caches
-// Comments				:	
+// Comments				:
 class	CRemoteICacheChannel : public CRemoteChannel {
 public:
 	CRemoteICacheChannel(CIrradianceCache *);
 	~CRemoteICacheChannel() { }
-	
+
 	int	sendSetupData(SOCKET s);
 	int	setup(SOCKET s);
 	int sendRemoteFrame(SOCKET s);
@@ -123,12 +123,12 @@ private:
 // Class				:	CRemotePtCloudChannel
 // Description			:
 /// \brief					remote channel for point clouds
-// Comments				:	
+// Comments				:
 class	CRemotePtCloudChannel : public CRemoteChannel {
 public:
 	CRemotePtCloudChannel(CPointCloud *);
 	~CRemotePtCloudChannel() { }
-	
+
 	int	sendSetupData(SOCKET s);
 	int	setup(SOCKET s);
 	int sendRemoteFrame(SOCKET s);

@@ -161,7 +161,7 @@ DEFSHORTFUNC(Transmission		,"transmission"			,"c=pp!"		,TRANSMISSIONEXPR_PRE,TRA
 #define	TRACEEXPR
 #define	TRACEEXPR_UPDATE
 #define	TRACEEXPR_POST
-#define	TRACE2EXPR_POST	
+#define	TRACE2EXPR_POST
 
 #endif
 
@@ -417,7 +417,7 @@ DEFSHORTFUNC(Photonmap2			,"photonmap"	,"c=Sp!"	,PHOTONMAP2EXPR_PRE,PHOTONMAP2EX
 								lastGather->rays					=	(CRay **) ralloc(numVertices*sizeof(CGatherRay *),threadMemory);		\
 								lastGather->raysStorage				=	lastGather->rays;							\
 								lastGather->raysBase	=	rays	=	(CGatherRay *) ralloc(numVertices*sizeof(CGatherRay),threadMemory);
-								
+
 
 
 #define GATHERHEADEREXPR		plReady();																			\

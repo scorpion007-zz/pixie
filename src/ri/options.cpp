@@ -274,7 +274,7 @@ COptions::COptions() {
 	screenRight				=	4.0f/3.0f;
 	screenTop				=	1;
 	screenBottom			=	-1;
-	
+
 	clipMin					=	C_EPSILON;
 	clipMax					=	C_INFINITY;
 
@@ -283,10 +283,10 @@ COptions::COptions() {
 	jitter					=	0.99f;
 
 	hider					=	strdup("stochastic");
-	
+
 #ifdef __APPLE__
 	// Support for finding resources in Mac OS X bundles and standard Mac OS X file system locations
-	
+
 	// Find the application bundle's plug-in and Resources directory
 	char path[OS_MAX_PATH_LENGTH];
 	char pathtmp[OS_MAX_PATH_LENGTH];
@@ -308,7 +308,7 @@ COptions::COptions() {
 		}
 		CFRelease(bundle);
 	}
-	
+
 	// Find the application support directory (~/Library/Application Support/Pixie/PlugIns), and set the
 	// PIXIEUSERDIR environment variable to that directory
 	FSRef appsupport;
@@ -318,7 +318,7 @@ COptions::COptions() {
 		mkdir(pathtmp, 0755);
 		setenv("PIXIEUSERDIR", (const char*)pathtmp, 1);
 	}
-	
+
 	// Find the application support directory (/Library/Application Support/Pixie/PlugIns), and set the
 	// PIXIELOCALDIR environment variable to that directory
     if (FSFindFolder(kLocalDomain, kApplicationSupportFolderType, kCreateFolder, &appsupport) == noErr) {
@@ -327,10 +327,10 @@ COptions::COptions() {
 		mkdir(pathtmp, 0755);
 		setenv("PIXIELOCALDIR", (const char*)pathtmp, 1);
 	}
-	
+
 	// Default home, unless overridden with environment
 	setenv("PIXIEHOME","/Library/Pixie",0);
-	
+
 	archivePath             =   optionsGetSearchPath(".:%RIBS%:%PIXIEHOME%/ribs" ,NULL);
 	proceduralPath          =   optionsGetSearchPath(".:%PROCEDURALS%:%PIXIEUSERDIR%/procedurals:%PIXIELOCALDIR%/procedurals:%PIXIEAPPPLUGINS%:%PIXIEHOME%/procedurals",NULL);
 	texturePath             =   optionsGetSearchPath(".:%TEXTURES%:%PIXIEUSERDIR%/textures:%PIXIELOCALDIR%/textures:%PIXIEAPPRESOURCES%/textures:%PIXIEHOME%/textures",NULL);
@@ -351,7 +351,7 @@ COptions::COptions() {
 	pixelYsamples			=	2;
 
 	gamma					=	1;
-	gain					=	1;	
+	gain					=	1;
 
 	pixelFilterWidth		=	2;
 	pixelFilterHeight		=	2;
@@ -370,7 +370,7 @@ COptions::COptions() {
 
 	initv(opacityThreshold,0.996f);
 	initv(zvisibilityThreshold,0.996f);
-	
+
 	// We default to sampling motion, but this can be turned off.
 	// Additionally, if there's no motionblur in the scene, it will be turned off
 	flags					=	OPTIONS_FLAGS_SAMPLEMOTION;
@@ -418,7 +418,7 @@ COptions::COptions() {
 	netYBuckets				=	DEFAULT_NET_YBUCKETS;
 
 	threadStride			=	DEFAULT_THREAD_STRIDE;
-	
+
 	geoCacheMemory			=	DEFAULT_GEO_CACHE_SIZE;
 
 	maxEyeSplits			=	10;
@@ -491,7 +491,7 @@ COptions::COptions(const COptions *o) {
 		clipPlanes		=	NULL;
 	}
 
-	
+
 	if (o->fromRGB	!= NULL) {
 		fromRGB		=	new float[3*nColorComps];
 		memcpy(fromRGB,o->fromRGB,3*nColorComps*sizeof(float));
@@ -524,7 +524,7 @@ COptions::COptions(const COptions *o) {
 COptions::~COptions(){
 	atomicDecrement(&stats.numOptions);
 
-	if (fromRGB != NULL) 
+	if (fromRGB != NULL)
 		delete [] fromRGB;
 
 	if (toRGB != NULL)
@@ -608,19 +608,19 @@ TSearchpath		*COptions::pickSearchpath(const char *name) {
 
 	} else if (strstr(name,"tiff") != NULL) {
 		return texturePath;
-	
+
 	} else if (strstr(name,"tex") != NULL) {
 		return texturePath;
-	
+
 	} else if (strstr(name,"tx") != NULL) {
 		return texturePath;
-	
+
 	} else if (strstr(name,"ptc") != NULL) {
 		return texturePath;
-	
+
 	} else if (strstr(name,"bm") != NULL) {
 		return texturePath;
-		
+
 	} else if (strstr(name,"sdr") != NULL) {
 		return shaderPath;
 
@@ -783,14 +783,14 @@ int			COptions::find(const char *name,const char *category,EVariableType &type,c
 		else if (strcmp(name,RI_INHERITATTRIBUTES) == 0)	{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) != 0;				return TRUE;}
 		else if (strcmp(name,"frame") == 0)					{	type	=	TYPE_INTEGER;	value	=	&frame;					return TRUE;}
 	}
-	
+
 	if ((category == NULL) || (strcmp(category,RI_HIDER) == 0)) {
 		if (strcmp(name,RI_JITTER) == 0)					{	type	=	TYPE_FLOAT;		value	=	&jitter;				return TRUE;}
 		else if (strcmp(name,RI_EMIT) == 0)					{	type	=	TYPE_INTEGER;	value	=	&numEmitPhotons;		return TRUE;}
 		else if (strcmp(name,RI_SAMPLESPECTRUM) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_SAMPLESPECTRUM) != 0;				return TRUE;}
 		else if (strcmp(name,RI_SAMPLEMOTION) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_SAMPLEMOTION) != 0;				return TRUE;}
 	}
-	
+
 	if ((category == NULL) || (strcmp(category,RI_TRACE) == 0)) {
 		if (strcmp(name,RI_MAXDEPTH) == 0)					{	type	=	TYPE_INTEGER;	value	=	&maxRayDepth;			return TRUE;}
 	}
@@ -801,11 +801,11 @@ int			COptions::find(const char *name,const char *category,EVariableType &type,c
 		else if (strcmp(name,RI_PROGRESS) == 0)				{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & OPTIONS_FLAGS_PROGRESS) != 0;				return TRUE;}
 
 	}
-	
+
 	if ((category == NULL) || (strcmp(category,RI_SHUTTER) == 0)) {
 		if (strcmp(name,RI_OFFSET) == 0)					{	type	=	TYPE_FLOAT;		value	=	&shutterOffset;			return TRUE;}
 	}
 
-	
+
 	return FALSE;
 }

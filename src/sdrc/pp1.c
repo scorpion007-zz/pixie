@@ -221,7 +221,7 @@ main(argc,argv)
 					*s2++ = '\0';	/* Terminate string */
 				else
 					s2 = one_string;	/* Default */
-				
+
 				if(lookup(s,NULL) != NULL)
 					warning("Symbol already defined",s);
 				else
@@ -653,7 +653,7 @@ init()
 
 	for(i=0;i<NUMBUCKETS;i++)
 		Macros[i]=0;
-	
+
 	Ifstack[0].i_state = Ifstate =
 		IFTRUE;			/* Currently TRUE #ifxxx assumed */
 

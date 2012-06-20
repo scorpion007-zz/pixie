@@ -525,7 +525,7 @@ struct	ppdir	pragtab[] =
 		{"value",	NO,		pragvalue,	EMPTY	},
 		{NULL}	/* The end */
 	};
-	
+
 #else	/* !MAIN */
 extern	struct	ppdir	pptab[];
 extern	struct	ppdir	pragtab[];

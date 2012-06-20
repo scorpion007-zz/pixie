@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	patchgrid.cpp
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					Patchgrid implementation
 //
@@ -41,7 +41,7 @@
 // Note:
 //	The patgrid is instantiated with a grid of (nu+2)*(nv+2) vertices which
 //	are used to calculate the derivatives symmetrically
-//	at the borders these neighbor vertices are unavailable, so these are simply 
+//	at the borders these neighbor vertices are unavailable, so these are simply
 //	duplicated points from the nearest available edge.  The edge flags tell us
 //	which edges these are so we can 'do the right thing' when calculating the
 //	derivatives
@@ -102,7 +102,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 		for (i=numVertices*vertexSize;i>0;i--) *dest++ = *ve++;
 	}
 
-	
+
 
 	// Compute the bounding box
 	{
@@ -130,27 +130,27 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 	// Compute dPdu
 	{
 		int	x,y;
-		
+
 		const float lMul = (bLft ? 1.0f : 0.5f);
 		const float rMul = (bRgt ? 1.0f : 0.5f);
-		
+
 		// Compute dPdu using central differencing
 		for (y=0;y<nv;y++) {
 			float	*cdPdu	=	Pu + y*nu*3;
 			float	*cP		=	vertex + (y+1)*(nu+2)*vertexSize + vertexSize;
-			
+
 			subvv(cdPdu,cP+vertexSize,cP-vertexSize);
 			mulvf(cdPdu,lMul);
 			cdPdu	+=	3;
 			cP		+=	vertexSize;
-				
+
 			for (x=1;x<(nu-1);x++) {
 				subvv(cdPdu,cP+vertexSize,cP-vertexSize);
 				mulvf(cdPdu,0.5);
 				cdPdu	+=	3;
 				cP		+=	vertexSize;
 			}
-			
+
 			subvv(cdPdu,cP+vertexSize,cP-vertexSize);
 			mulvf(cdPdu,rMul);
 		}
@@ -159,7 +159,7 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 	// Compute dPdv
 	{
 		int	x,y;
-		
+
 		const float tMul = (bTop ? 1.0f : 0.5f);
 		const float bMul = (bBot ? 1.0f : 0.5f);
 
@@ -172,14 +172,14 @@ CPatchGrid::CPatchGrid(CAttributes *a,CXform *x,CVertexData *var,CParameter *p,i
 			mulvf(cdPdv,tMul);
 			cdPdv	+=	nu*3;
 			cP		+=	(nu+2)*vertexSize;
-			
+
 			for (y=1;y<(nv-1);y++) {
 				subvv(cdPdv,cP+vertexSize*(nu+2),cP-vertexSize*(nu+2));
 				mulvf(cdPdv,0.5);
 				cdPdv	+=	nu*3;
 				cP		+=	(nu+2)*vertexSize;
 			}
-			
+
 			subvv(cdPdv,cP+vertexSize*(nu+2),cP-vertexSize*(nu+2));
 			mulvf(cdPdv,bMul);
 		}
@@ -224,7 +224,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 	if (variables->moving == FALSE) {
 		vertexData		=	vertex;									// No need for interpolation
 		vertexDataStep	=	0;
-	} else {									
+	} else {
 		if (up & PARAMETER_BEGIN_SAMPLE) {
 			vertexData		=	vertex;								// No need for interpolation
 			vertexDataStep	=	0;
@@ -323,13 +323,13 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			assert(u == varying[VARIABLE_U] + start);
 			assert(v == varying[VARIABLE_V] + start);
 			const int disp	=	vertexSize*(nu+2)*(nv+2);
-			
+
 			// Interpolate the thing
 			for (int i=0;i<numVertices;++i,dest+=3) {
 				const	float	cu		=	u[i] * (nu - 1.0f);
@@ -348,7 +348,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 					dest[j]	=	(((d0[disp+j])*(1.0f-xoff) + (d1[disp+j])*xoff)*(1.0f-yoff)  + ((d2[disp+j])*(1.0f-xoff) + (d3[disp+j])*xoff)*yoff) -
 								(((d0[j])*(1.0f-xoff) + (d1[j])*xoff)*(1.0f-yoff)  + ((d2[j])*(1.0f-xoff) + (d3[j])*xoff)*yoff);
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest,CRenderer::invShutterTime);
 			}
@@ -357,7 +357,7 @@ void		CPatchGrid::sample(int start,int numVertices,float **varying,float ***loca
 			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
 		}
 	}
-	
+
 	// Turn off the parameters we've fixed
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }

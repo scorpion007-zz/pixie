@@ -54,7 +54,7 @@ void			CRenderer::initNetwork(const char *ribFile,const char *riNetString) {
 
 	// Network init
 	netSetup(ribFile,riNetString);
-	
+
 	if (netClient != INVALID_SOCKET) {
 		netFileMappings = new CTrie<CNetFileMapping*>;
 	}
@@ -119,7 +119,7 @@ void		rcSend(SOCKET s,const void *dataToSend,int n,int toNetwork) {
 		j		-=	i;
 
 		i		= send(s,data,j,0);
-		
+
 		if (i <= 0) {
 			fatal(CODE_SYSTEM,"Connection broken\n");
 			break;
@@ -154,7 +154,7 @@ void		rcRecv(SOCKET s,void *dataToReceive,int n,int toNetwork) {
 		j		-=	i;
 
 		i		=	recv(s,data,j,0);
-	
+
 		if (i <= 0) {
 			fatal(CODE_SYSTEM,"Connection broken\n");
 			break;
@@ -338,7 +338,7 @@ void				CRenderer::sendFile(int index,char *fileToSend,int start,int size) {
 		// Get the size of the file to send
 		if (size == 0) {
 			int	totalSize;
-			
+
 			fseek(in,0,SEEK_END);
 			totalSize	=	ftell(in);
 
@@ -584,7 +584,7 @@ void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 				if (netName(&serv,tmp) == FALSE) {
 					if (connect(control,(sockaddr *) &serv,servLen) == 0) {
 						send(control," quit",6,0);	// send a quit message
-						
+
 						// Create a new control socket
 						closesocket(control);
 						control = socket(AF_INET, SOCK_STREAM, 0);
@@ -598,7 +598,7 @@ void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 					// Ensure there's no delay on network transactions
 					int val = 1;
 					setsockopt(control,IPPROTO_TCP,TCP_NODELAY,(const char *) &val,sizeof(int));
-					
+
 					// The following sequence will be processed by RNDR
 					send(control,ribFile,(int) strlen(ribFile)+1,0);	// Send the name of the rib file
 					recv(control,(char *) netBuffer,sizeof(T32),0);		// Expect an ACK
@@ -651,7 +651,7 @@ void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 			if (netName(&serv,tmp) == FALSE) {
 				if (connect(control,(sockaddr *) &serv,servLen) == 0) {
 					send(control," quit",6,0);	// send a quit message
-					
+
 					control	=	INVALID_SOCKET;
 				}
 			}
@@ -660,7 +660,7 @@ void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 				// Ensure there's no delay on network transactions
 				int val = 1;
 				setsockopt(control,IPPROTO_TCP,TCP_NODELAY,(const char *) &val,sizeof(int));
-			
+
 				// The following sequence will be processed by RNDR
 				send(control,ribFile,(int) strlen(ribFile)+1,0);	// Send the name of the rib file
 				recv(control,(char *) netBuffer,sizeof(T32),0);		// Expect an ACK
@@ -694,19 +694,19 @@ void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 		}
 	} else if (strncmp(tmp,"locclient=",10) == 0) {
 		tmp += 10;
-		
+
 		// Note that we do not check the client version (it's the same binary)
-		
+
 		// Just read the client port number
 		sscanf(tmp,"%d",&netClient);
 	} else if (strncmp(tmp,"locservers=",11) == 0) {
 		char		*marker;
 		char		*tmpStarts	=	tmp;
-		
+
 		tmp += 11;
-		
+
 		// Note that we do not check the server versions
-		
+
 		// Count up the servers
 		while((marker = strchr(tmp,',')) != NULL) {
 			netNumServers++;
@@ -714,16 +714,16 @@ void		CRenderer::netSetup(const char *ribFile,const char *riNetString) {
 		}
 		netNumServers++;
 		tmp		=	tmpStarts+11;
-		
+
 		// Allocate our arrays
 		netServers			=	new SOCKET[netNumServers];
 		netNumServers		=	0;
-		
+
 		// Now actually parse them
 		while((marker = strchr(tmp,',')) != NULL) {
 			sscanf(tmp,"%d",&netServers[netNumServers]);
 			netNumServers++;
-			
+
 			tmp	=	marker+1;
 		}
 		sscanf(tmp,"%d",&netServers[netNumServers]);

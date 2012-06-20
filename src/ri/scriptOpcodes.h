@@ -161,7 +161,7 @@ DEFOPCODE(Endif	,"endif"	,0,	ENDIFEXPR_PRE,NULL_EXPR,NULL_EXPR,ENDIFEXPR_POST,0)
 							lastConditional->forContinue	=	continueIndex;					\
 							lastConditional->forEnd			=	endIndex;						\
 							lastConditional->forExecCount	=	0;
-							
+
 DEFOPCODE(Forbegin3	,"forbegin"	,3,	FORBEGIN3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ DEFOPCODE(Forbegin3	,"forbegin"	,3,	FORBEGIN3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_E
 #define	FOR3EXPR_POST		if (numActive == 0) {												\
 								jmp(lastConditional->forEnd);									\
 							}
-								
+
 
 
 DEFOPCODE(For3	,"for"	,1,	FOR3EXPR_PRE,NULL_EXPR,NULL_EXPR,FOR3EXPR_POST,0)
@@ -225,7 +225,7 @@ DEFOPCODE(Forend3	,"forend"	,0,	FOREND3EXPR_PRE,NULL_EXPR,NULL_EXPR,NULL_EXPR,0)
 								}																\
 							}
 
-#define	BREAK1EXPR_POST		
+#define	BREAK1EXPR_POST
 
 // FIXME: this optmization 'breaks' varying breaks! because they need to exit the conditional
 // in which they are defined.  No easy fix
@@ -630,7 +630,7 @@ DEFOPCODE(Mfromf	,"mfromf"	,2,	OPERANDS2EXPR_PRE(float *,const float *),MFROMFEX
 							operand(0,res,float *);							\
 							operand(1,x,const float *);						\
 							operand(2,y,const float *);						\
-							operand(3,z,const float *);	
+							operand(3,z,const float *);
 
 #define	VFROMF3EXPR			res[0]	=	*x;									\
 							res[1]	=	*y;									\

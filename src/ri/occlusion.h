@@ -50,7 +50,7 @@ public:
 					class COcclusionNode {
 					public:
 							COcclusionNode	*parent;		// The parent pointer
-							COcclusionNode	*children[4];	// The 
+							COcclusionNode	*children[4];	// The
 							float			zmax;			// The depth range
 							int				width;
 					};
@@ -61,7 +61,7 @@ public:
 	virtual			~COcclusionCuller();
 protected:
 	void			initCuller(int,float *);
-	int				probeRect(int *xbound,int *ybound, int bl, int bt, int br, int bb, float zmin);	
+	int				probeRect(int *xbound,int *ybound, int bl, int bt, int br, int bb, float zmin);
 
 	void			resetHierarchy(COcclusionNode *cNode=NULL);
 	void			initToZero();
@@ -91,10 +91,10 @@ protected:
 									cNode->zmax	=	z;
 									return;
 								}
-								
+
 							}
 						}
-						 
+
 					}
 
 	COcclusionNode	*getNode(int x,int y) {

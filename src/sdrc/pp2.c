@@ -1269,7 +1269,7 @@ hash(sym)
 	register char		*str;
 
 	for(str = sym, s = 0; *str != '\0'; s += *str++)
-		;			/* Compute sum of chars */    
+		;			/* Compute sum of chars */
 
 	return (s);
 	}

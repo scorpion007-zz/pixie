@@ -149,7 +149,7 @@ CRendererContext::~CRendererContext() {
 	// Destroy the misc stuff
 	if (keyTimes != NULL)			delete [] keyTimes;
 	if (motionParameters != NULL)	delete [] motionParameters;
-		
+
 
 	// Ditch the instance objects created
 	CInstance	*cInstance;
@@ -173,7 +173,7 @@ CRendererContext::~CRendererContext() {
 	assert(instanceStack !=	NULL);
 	assert(instanceStack->numItems	==	0);
 	delete instanceStack;
-	
+
 	// Ditch the current graphics state
 	assert(currentOptions				!=	NULL);
 	assert(currentXform					!=	NULL);
@@ -182,9 +182,9 @@ CRendererContext::~CRendererContext() {
 	currentXform->detach();
 	currentAttributes->detach();
 
-	assert(savedXforms					!=	NULL);	
-	assert(savedAttributes				!=	NULL);	
-	assert(savedOptions					!=	NULL);	
+	assert(savedXforms					!=	NULL);
+	assert(savedAttributes				!=	NULL);
+	assert(savedOptions					!=	NULL);
 	assert(savedResources				!=	NULL);
 	assert(savedXforms->numItems		==	0);
 	assert(savedAttributes->numItems	==	0);
@@ -224,7 +224,7 @@ GetWithCOW(
 	{
 		TRefC* newObj = new TRefC(*sharedObject);
 		(*sharedObject)->detach();
-		
+
 		(*sharedObject) = newObj;
 		newObj->attach();
 	}
@@ -306,11 +306,11 @@ CShaderInstance		*CRendererContext::getShader(const char *name,int type,int np,c
 		}
 
 		instance	= new CProgrammableShaderInstance(cShader,currentAttributes,currentXform);
-		
+
 		if (type == SL_LIGHTSOURCE) {
 			// fill in lighting category
 			instance->createCategories();
-			
+
 			// Add the new light into the active lights list for the frame
 			CRenderer::allLights->push(instance);
 		}
@@ -375,11 +375,11 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 	initv(P	+	5*3,bmin[0],bmax[1],bmax[2]);	mulmp(P + 5*3,x->from,P + 5*3);
 	initv(P	+	6*3,bmax[0],bmax[1],bmax[2]);	mulmp(P + 6*3,x->from,P + 6*3);
 	initv(P	+	7*3,bmax[0],bmin[1],bmax[2]);	mulmp(P + 7*3,x->from,P + 7*3);
-	
+
 	// Do the projection
 	//camera2screen(8,P);
 	camera2pixels(8,P);
-	
+
 	a		=	0;
 
 #define	sumArea(__i1,__i2,__i3)																				\
@@ -395,7 +395,7 @@ static	float	screenArea(CXform *x,const float *bmin,const float *bmax) {
 	sumArea(4,3,0);
 	sumArea(7,6,2);
 	sumArea(7,2,3);
-	sumArea(5,4,0);	
+	sumArea(5,4,0);
 	sumArea(5,0,1);
 	sumArea(6,5,1);
 	sumArea(6,1,2);
@@ -452,10 +452,10 @@ void		CRendererContext::processDelayedObject(CShadingContext *context,CDelayedOb
 // Return Value			:
 // Comments				:
 void		CRendererContext::processDelayedInstance(CShadingContext *context,CDelayedInstance *cDelayed) {
-	
+
 	// Set the delayed object
 	delayed	=	cDelayed;
-	
+
 	CAttributes		*cAttributes	=	cDelayed->attributes;
 	//CAttributes		*cAttributes	=	NULL;
 	if (currentOptions->flags & OPTIONS_FLAGS_INHERIT_ATTRIBUTES) {
@@ -580,7 +580,7 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,const char 
 		motionParameters + parameterSize * numMotions,
 		parameters,
 		parameterSize * sizeof(float));
-	
+
 	numMotions++;
 
 	if (numExpectedMotions == numMotions) {
@@ -596,7 +596,7 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,const char 
 			// Slope.
 			//
 			d		=	(p1[i] - p0[i]) / (keyTimes[numMotions-1] - keyTimes[0]);
-			
+
 			s		=	p0[i] + (currentOptions->shutterOpen - keyTimes[0])*d;
 			e		=	p1[i] + (currentOptions->shutterClose - keyTimes[numMotions-1])*d;
 			p0[i]	=	s;
@@ -665,7 +665,7 @@ int		CRendererContext::addMotion(float *parameters,int parameterSize,const char 
 void	CRendererContext::RiDeclare(const char *name,const char *declaration) {
 	CRenderer::declareVariable(name,declaration);
 }
-   
+
 // FrameBegin - End stuff
 void	CRendererContext::RiFrameBegin(int number) {
 	COptions	*options;
@@ -694,7 +694,7 @@ void	CRendererContext::RiWorldBegin(void) {
 	xformBegin();
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
-	//		The frame initialization		
+	//		The frame initialization
 	assert(currentOptions	!=	NULL);
 
 	// Init the stats
@@ -734,7 +734,7 @@ void	CRendererContext::RiWorldEnd(void) {
 
 	// Cleanup the frame
 	CRenderer::endFrame();
-	
+
 	// Restore the graphics state
 	xformEnd();
 	attributeEnd();
@@ -806,9 +806,9 @@ void	CRendererContext::RiProjectionV(const char *name,int n,const char *tokens[]
 		int	i;
 		options->projection = OPTIONS_PROJECTION_PERSPECTIVE;
 		for (i=0;i<n;i++) {
-			if (strcmp(tokens[i],RI_FOV) == 0) 
+			if (strcmp(tokens[i],RI_FOV) == 0)
 				options->fov	=	((float **) params)[i][0];
-			else 
+			else
 				error(CODE_BADTOKEN,"Invalid perspective projection parameter: %s\n",tokens[i]);
 		}
 	} else if (strcmp(name,RI_ORTHOGRAPHIC) == 0) {
@@ -950,7 +950,7 @@ void	CRendererContext::RiExposure(float gain,float gamma) {
 
 	options			=	getOptions(TRUE);
 	options->gamma	=	gamma;
-	options->gain	=	gain; 
+	options->gain	=	gain;
 }
 
 void	CRendererContext::RiImagerV (const char *name,int n,const char *tokens[],const void *params[]) {
@@ -989,7 +989,7 @@ void	CRendererContext::RiQuantize(const char *type,int one,int qmin,int qmax,flo
 }
 
 
-void	
+void
 CRendererContext::RiDisplayV(
 	const char *name,
 	const char *type,
@@ -1074,10 +1074,10 @@ CRendererContext::RiDisplayV(
 				}
 
 			if (cVar != NULL) {
-				
+
 				cDisplay->parameters[j].name		=	strdup(cVar->name);
 				cDisplay->parameters[j].numItems	=	cVar->numItems;
-				
+
 				switch(cVar->type) {
 				case TYPE_FLOAT:
 					cDisplay->parameters[j].type	=	FLOAT_PARAMETER;
@@ -1157,9 +1157,9 @@ void	CRendererContext::RiCustomDisplayV(const char *name, RtToken mode, RtDispla
 
 void	CRendererContext::RiDisplayChannelV(const char *channel,int n,const char *tokens[],const void *params[]) {
 	int i,j;
-	
+
 	CDisplayChannel *nChannel = CRenderer::declareDisplayChannel(channel);
-	
+
 	if (nChannel != NULL) {
 		for (j=0,i=0;i<n;i++) {
 			CVariable	*cVar;
@@ -1235,10 +1235,10 @@ void	CRendererContext::RiColorSamples(int N,float *nRGB,float *RGBn) {
 
 	options					=	getOptions(TRUE);
 	options->nColorComps	=	N;
-	
-	if (options->fromRGB != NULL) 
+
+	if (options->fromRGB != NULL)
 		delete [] options->fromRGB;
-	if (options->toRGB != NULL) 
+	if (options->toRGB != NULL)
 		delete [] options->toRGB;
 
 	options->fromRGB	=	new float[N*3];
@@ -1411,14 +1411,14 @@ void	CRendererContext::RiOptionV(const char *name,int n,const char *tokens[],con
 		}
 	} else if (strcmp(name,RI_USER) == 0) {
 		CVariable var;
-		
+
 		for(i=0;i<n;i++) {
 			if (parseVariable(&var,NULL,tokens[i])) {
 				// got an inline declaration
 				options->userOptions.insert(&var,params[i]);
 			} else {
 				CVariable *cVar = CRenderer::retrieveVariable(tokens[i]);
-				
+
 				if (cVar != NULL) {
 					options->userOptions.insert(cVar,params[i]);
 				} else {
@@ -1548,7 +1548,7 @@ void	CRendererContext::RiTextureCoordinates(float s1,float t1,float s2,float t2,
 			attributes->next->t[2] = p0[6];
 			attributes->next->t[3] = p0[7];
 		}
-		
+
 		break;
 	case 2:
 		attributes->s[0] = p0[0];
@@ -1562,7 +1562,7 @@ void	CRendererContext::RiTextureCoordinates(float s1,float t1,float s2,float t2,
 		attributes->flags |= ATTRIBUTES_FLAGS_CUSTOM_ST;
 
 		if (attributes->next == NULL)	attributes->next	=	new CAttributes(attributes);
-		
+
 		attributes->next->s[0] = p1[0];
 		attributes->next->s[1] = p1[1];
 		attributes->next->s[2] = p1[2];
@@ -1719,7 +1719,7 @@ void	CRendererContext::RiMatte(int onoff) {
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes	=	getAttributes(TRUE);
-	if (onoff) 
+	if (onoff)
 		attributes->flags	|=	ATTRIBUTES_FLAGS_MATTE;
 	else {
 		attributes->flags	&=	~ATTRIBUTES_FLAGS_MATTE;
@@ -1749,51 +1749,51 @@ void	CRendererContext::RiDetail(float *bound) {
 	CAttributes	*attributes;
 	CXform		*xform;
 	vector		bmin,bmax;
-	
+
 	if (CRenderer::netNumServers > 0)	return;
 
 	xform				=	getXform(FALSE);
 	attributes			=	getAttributes(TRUE);
-	
+
 	bmin[COMP_X]		=	bound[0];
 	bmax[COMP_X]		=	bound[1];
 	bmin[COMP_Y]		=	bound[2];
 	bmax[COMP_Y]		=	bound[3];
 	bmin[COMP_Z]		=	bound[4];
 	bmax[COMP_Z]		=	bound[5];
-	
-	// project the bound to screen space and calculate size	
-	
+
+	// project the bound to screen space and calculate size
+
 	attributes->lodSize = screenArea(xform,bmin,bmax);
 }
 
 void	CRendererContext::RiDetailRange(float minvis,float lowtran,float uptran,float maxvis) {
 	CAttributes	*attributes;
-	
+
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes				=	getAttributes(TRUE);
-	
+
 	attributes->lodRange[0] =	minvis;
 	attributes->lodRange[1] =	lowtran;
 	attributes->lodRange[2] =	uptran;
 	attributes->lodRange[3] =	maxvis;
-	
+
 	if ((attributes->lodSize < minvis)	|| (attributes->lodSize > maxvis)) {
 		// out of rance, discard all geometry
 		attributes->flags		|=	ATTRIBUTES_FLAGS_DISCARD_GEOMETRY;
 	} else {
 		// Ensure we're no longer discarding geometry
-		
+
 		attributes->flags		&=	~(ATTRIBUTES_FLAGS_DISCARD_GEOMETRY | ATTRIBUTES_FLAGS_LOD);
-		
+
 		if (attributes->lodSize <= lowtran) {
 			// fade in
 			attributes->lodImportance = (attributes->lodSize-minvis)/(lowtran-minvis);
-			
+
 			attributes->flags		|=	ATTRIBUTES_FLAGS_LOD;
 		}
-		
+
 		if (attributes->lodSize > uptran) {
 			// fade out
 			attributes->lodImportance = -(1.0f-(attributes->lodSize-uptran)/(maxvis-uptran));
@@ -2093,7 +2093,7 @@ void	CRendererContext::RiTransform(float transform[][4]) {
 	}
 }
 
-void	
+void
 CRendererContext::RiConcatTransform(float transform[][4])
 {
 	CXform	*xform = NULL;
@@ -2240,7 +2240,7 @@ void	CRendererContext::RiPerspective(float fov) {
 		from[element(3,3)]	=	(float) 0;
 
 		identitym(to);
-		
+
 		mulmm(tmp,xform->from,from);
 		movmm(xform->from,from);
 
@@ -2578,7 +2578,7 @@ RtPoint *	CRendererContext::RiTransformPoints(const char *fromspace,const char *
 
 	for (int i=0;i<npoints;i++)
 		mulmp(points[i], tmp, points[i]);
-	
+
 	return points;
 }
 
@@ -2654,7 +2654,7 @@ void	CRendererContext::RiAttributeV(const char *name,int n,const char *tokens[],
 				attributeCheck(RI_MAXSUBDIVISION,			dummy,				1, 100000,int)
 					warning(CODE_BADTOKEN,"Deprecated attribute \"%s\" will be ignored\n",tokens[i]);
 				attributeCheck(RI_MINSPLITS,				attributes->minSplits,					0, 100000,int)
-				attributeCheck(RI_BOUNDEXPAND,				attributes->rasterExpand,				-C_INFINITY, C_INFINITY,float)				
+				attributeCheck(RI_BOUNDEXPAND,				attributes->rasterExpand,				-C_INFINITY, C_INFINITY,float)
 				attributeCheckFlag(RI_BINARY,				attributes->flags,						ATTRIBUTES_FLAGS_BINARY_DICE)
 				attributeCheckInvertFlag(RI_RASTERORIENT,	attributes->flags,						ATTRIBUTES_FLAGS_NONRASTERORIENT_DICE)
 				attributeEndCheck
@@ -2761,14 +2761,14 @@ void	CRendererContext::RiAttributeV(const char *name,int n,const char *tokens[],
 			}
 		} else if (strcmp(name,RI_USER) == 0) {
 			CVariable var;
-			
+
 			for(i=0;i<n;i++) {
 				if (parseVariable(&var,NULL,tokens[i])) {
 					// got an inline declaration
 					attributes->userAttributes.insert(&var,params[i]);
 				} else {
 					CVariable *cVar = CRenderer::retrieveVariable(tokens[i]);
-					
+
 					if (cVar != NULL) {
 						attributes->userAttributes.insert(cVar,params[i]);
 					} else {
@@ -2792,14 +2792,14 @@ void	CRendererContext::RiPolygonV(int nvertices,int n,const char *tokens[],const
 	CAttributes		*attributes;
 	float			*p0,*p1;
 	CPl				*pl;
-	
+
 	if (CRenderer::netNumServers > 0)	return;
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	pl				=	parseParameterList(1,nvertices,0,nvertices,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
@@ -2812,7 +2812,7 @@ void	CRendererContext::RiPolygonV(int nvertices,int n,const char *tokens[],const
 	case 1:
 		// Restore the parameters
 		if (pl->data0 != p0)
-			memcpy(pl->data0,p0,sizeof(float)*pl->dataSize);			
+			memcpy(pl->data0,p0,sizeof(float)*pl->dataSize);
 		break;
 	case 2:
 		// Restore the parameters
@@ -2845,14 +2845,14 @@ void	CRendererContext::RiGeneralPolygonV(int nloops,int *nverts,int n,const char
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	nvertices=0;
 	for (i=0;i<nloops;i++) {
 		nvertices	+=	nverts[i];
 	}
-	
+
 	pl				=	parseParameterList(1,nvertices,0,nvertices,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
@@ -2894,7 +2894,7 @@ void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	nvertices	=	0;
@@ -2931,7 +2931,7 @@ void	CRendererContext::RiPointsPolygonsV(int npolys,int *nverts,int *verts,int n
 		break;
 	default:
 		break;
-	}	
+	}
 
 	// Get the core and allocate the polygon
 	memBegin(CRenderer::globalMemory);
@@ -2964,7 +2964,7 @@ void	CRendererContext::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nver
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	sloops		=	npolys;
@@ -2983,7 +2983,7 @@ void	CRendererContext::RiPointsGeneralPolygonsV(int npolys,int *nloops,int *nver
 	for (i=0;i<sverts;i++) {
 		numVertices	=	max(numVertices,verts[i]);
 	}
-	
+
 	pl				=	parseParameterList(npolys,numVertices+1,0,sverts,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
 
@@ -3155,7 +3155,7 @@ void	CRendererContext::RiPatchV(const char * type,int n,const char *tokens[],con
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	if (strcmp(type,RI_BILINEAR) == 0)			{
@@ -3164,7 +3164,7 @@ void	CRendererContext::RiPatchV(const char * type,int n,const char *tokens[],con
 		vver	=	2;
 	} else if (strcmp(type,RI_BICUBIC) == 0)	{
 		degree	=	3;
-		uver	=	4;	
+		uver	=	4;
 		vver	=	4;
 	} else {
 		error(CODE_BADTOKEN,"Unknown patch type: %s\n",type);
@@ -3174,7 +3174,7 @@ void	CRendererContext::RiPatchV(const char * type,int n,const char *tokens[],con
 	memBegin(CRenderer::globalMemory);
 
 	correct3begin(uver,vver);
-	
+
 	pl				=	parseParameterList(1,uver*vver,4,0,n,tokens,params,RI_P,0,attributes);
 
 	if (pl != NULL) {
@@ -3200,7 +3200,7 @@ void	CRendererContext::RiPatchV(const char * type,int n,const char *tokens[],con
 			break;
 		default:
 			break;
-		}	
+		}
 	}
 
 	memEnd(CRenderer::globalMemory);
@@ -3220,7 +3220,7 @@ void	CRendererContext::RiPatchMeshV(const char *type,int nu,const char * uwrap,i
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	if (strcmp(uwrap,RI_PERIODIC) == 0) {
@@ -3327,7 +3327,7 @@ void	CRendererContext::RiPatchMeshV(const char *type,int nu,const char * uwrap,i
 			addObject(new CPatchMesh(attributes,xform,pl,degree,nu,nv,uw,vw));
 
 			break;
-		}	
+		}
 	}
 
 	memEnd(CRenderer::globalMemory);
@@ -3344,7 +3344,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 
 	xform			=	getXform(FALSE);
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	memBegin(CRenderer::globalMemory);
@@ -3353,7 +3353,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 
 	upatches		=	nu - uorder + 1;
 	vpatches		=	nv - vorder + 1;
-	
+
 	pl				=	parseParameterList(upatches*vpatches,nu*nv,(upatches+1)*(vpatches+1),0,n,tokens,params,RI_PW,0,attributes);
 
 	if (pl != NULL) {
@@ -3379,7 +3379,7 @@ void	CRendererContext::RiNuPatchV(int nu,int uorder,float *uknot,float umin,floa
 			break;
 		default:
 			break;
-		}	
+		}
 	}
 
 	memEnd(CRenderer::globalMemory);
@@ -3403,9 +3403,9 @@ void	CRendererContext::RiCurvesV(const char *d,int ncurves,int nverts[],const ch
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 
 	if (strcmp(d,RI_LINEAR) == 0) {
@@ -3454,12 +3454,12 @@ void	CRendererContext::RiCurvesV(const char *d,int ncurves,int nverts[],const ch
 	}
 
 	memBegin(CRenderer::globalMemory);
-	
+
 	correct3cbegin(numVertices);
-	
+
 	pl				=	parseParameterList(ncurves,numVertices,numVaryings,0,n,tokens,params,RI_P,0,attributes);
 	if (pl == NULL)	return;
-	
+
 
 	// We have the core
 	switch(addMotion(pl->data0,pl->dataSize,"CRendererContext::RiCurves",p0,p1)) {
@@ -3483,7 +3483,7 @@ void	CRendererContext::RiCurvesV(const char *d,int ncurves,int nverts[],const ch
 		break;
 	default:
 		break;
-	}	
+	}
 
 	memEnd(CRenderer::globalMemory);
 
@@ -3508,9 +3508,9 @@ void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetam
 
 	attributes		=	getAttributes(FALSE);
 	xform			=	getXform(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
 	memBegin(CRenderer::globalMemory);
@@ -3589,7 +3589,7 @@ void	CRendererContext::RiSphereV(float radius,float zmin,float zmax,float thetam
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL)	delete pl;
 
@@ -3609,9 +3609,9 @@ void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,c
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
@@ -3668,7 +3668,7 @@ void	CRendererContext::RiConeV (float height,float radius,float thetamax,int n,c
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL)	delete pl;
 
@@ -3688,9 +3688,9 @@ void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float the
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
@@ -3752,7 +3752,7 @@ void	CRendererContext::RiCylinderV (float radius,float zmin,float zmax,float the
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL)	delete pl;
 
@@ -3773,9 +3773,9 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
@@ -3841,7 +3841,7 @@ void	CRendererContext::RiHyperboloidV (float *point1,float *point2,float thetama
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL) delete pl;
 
@@ -3861,9 +3861,9 @@ void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float th
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
@@ -3927,7 +3927,7 @@ void	CRendererContext::RiParaboloidV(float radius,float zmin,float zmax,float th
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL)	delete pl;
 
@@ -3947,9 +3947,9 @@ void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,c
 	if (CRenderer::netNumServers > 0)			return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
@@ -4009,7 +4009,7 @@ void	CRendererContext::RiDiskV (float height,float radius,float thetamax,int n,c
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL)	delete pl;
 
@@ -4029,9 +4029,9 @@ void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,floa
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,0,4,0,n,tokens,params,NULL,PL_VERTEX_TO_VARYING,attributes);
 
@@ -4060,8 +4060,8 @@ void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,floa
 		break;
 	case 1:
 		// Do we have a torus ?
-		if (	(p0[0] != p0[1]) && 
-				(p0[2] != p0[3]) && 
+		if (	(p0[0] != p0[1]) &&
+				(p0[2] != p0[3]) &&
 				(p0[4] != 0)) {
 
 			if (pl != NULL)	memcpy(pl->data0,&p0[5],sizeof(float)*pl->dataSize);
@@ -4092,7 +4092,7 @@ void	CRendererContext::RiTorusV (float majorrad,float minorrad,float phimin,floa
 		break;
 	default:
 		break;
-	}	
+	}
 
 	if (pl != NULL)	delete pl;
 
@@ -4110,7 +4110,7 @@ void	CRendererContext::RiProcedural(void *data,float *bound,void (*subdivfunc) (
 
 	xform		=	getXform(FALSE);
 	attributes	=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
 
 	if ((xform != NULL) && (attributes != NULL)) {
@@ -4130,7 +4130,7 @@ void	CRendererContext::RiProcedural(void *data,float *bound,void (*subdivfunc) (
 
 void	CRendererContext::RiGeometryV(const char *type,int n,const char *tokens[],const void *params[]) {
 	if (CRenderer::netNumServers > 0)	return;
-		
+
 	if (strcmp(type,"implicit") == 0) {
 		int				i;
 		const char		*name				=	NULL;
@@ -4138,7 +4138,7 @@ void	CRendererContext::RiGeometryV(const char *type,int n,const char *tokens[],c
 		float			stepSize			=	(float) 0.1;
 		float			scaleFactor			=	(float) 0.5;
 		CAttributes		*attributes			=	getAttributes(FALSE);
-		
+
 		checkGeometryOrDiscard();
 
 		for (i=0;i<n;i++) {
@@ -4180,9 +4180,9 @@ void	CRendererContext::RiGeometryV(const char *type,int n,const char *tokens[],c
 		const char		*name				=	NULL;
 		int				frame				=	currentOptions->frame;
 		CAttributes		*attributes			=	getAttributes(FALSE);
-		
+
 		checkGeometryOrDiscard();
-		
+
 		for (i=0;i<n;i++) {
 			if (strcmp(tokens[i],"file") == 0) {
 				name				=	(const char *) params[i];
@@ -4255,9 +4255,9 @@ void	CRendererContext::RiPointsV(int npts,int n,const char *tokens[],const void 
 	if (CRenderer::netNumServers > 0)	return;
 
 	attributes		=	getAttributes(FALSE);
-	
+
 	checkGeometryOrDiscard();
-	
+
 	xform			=	getXform(FALSE);
 	pl				=	parseParameterList(1,npts,0,0,n,tokens,params,RI_P,PL_VARYING_TO_VERTEX,attributes);
 	if (pl == NULL)	return;
@@ -4284,7 +4284,7 @@ void	CRendererContext::RiPointsV(int npts,int n,const char *tokens[],const void 
 		break;
 	default:
 		break;
-	}	
+	}
 
 	memEnd(CRenderer::globalMemory);
 }
@@ -4309,7 +4309,7 @@ void	CRendererContext::RiSubdivisionMeshV(const char * scheme,int nfaces,int nve
 		error(CODE_INCAPABLE,"Unknown subdivision scheme: %s\n",scheme);
 		return;
 	}
-			
+
 	// Count the number of faces / vertices
 	for (i=0,j=0;i<nfaces;j+=nvertices[i],i++);
 
@@ -4371,7 +4371,7 @@ void	*CRendererContext::RiObjectBegin (void) {
 
 	// Reset the xform so that all the objects defined relative to the beginning of the block
 	xformBegin();
-	
+
 	xForm	=	getXform(TRUE);
 	xForm->identity();
 	if (xForm->next != NULL)	xForm->next->identity();
@@ -4408,7 +4408,7 @@ void	CRendererContext::RiMotionBeginV(int N,float times[]) {
 	COptions *options =	getOptions(FALSE);
 
 	int	i;
-	
+
 	numExpectedMotions	=	N;
 	numMotions			=	0;
 	keyTimes			=	new float[numExpectedMotions];
@@ -4520,9 +4520,9 @@ void	*CRendererContext::RiArchiveBeginV(const char *name,int n,const char *token
 void	CRendererContext::RiArchiveEnd(void) {
 	savedRenderMan	=	NULL;
 }
-	
+
 void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]) {
-	
+
 	// Check the parameters
 	if (n == 0) {
 		error(CODE_BADTOKEN,"Was expecting arguments with resource");
@@ -4534,29 +4534,29 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,con
 		error(CODE_BADTOKEN,"Don't know how to handle this type\nPlease tell us know what this type means at the Pixie forums\n");
 		return;
 	}
-	
+
 	int			i;
 	CVariable	tmp;
-	CVariable	*cVariable;	
+	CVariable	*cVariable;
 	int			save					=	FALSE;
 	int			transform				=	TRUE;
 	int			shading					=	TRUE;
 	int			geometrymodification	=	TRUE;
 	int			geometrydefinition		=	TRUE;
 	int			hiding					=	TRUE;
-	
+
 	// Parse the parameter list
 	for (i=0;i<n;i++) {
 
 		// Get the variable
 		cVariable	=	CRenderer::retrieveVariable(tokens[i]);
-		
+
 		// Parse if necessary
 		if (cVariable == NULL) {
 			parseVariable(&tmp,NULL,tokens[i]);
 			cVariable = &tmp;
 		}
-		
+
 		// Do we have something?
 		if (cVariable != NULL) {
 			if (strcmp(cVariable->name,"operation") == 0) {
@@ -4576,7 +4576,7 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,con
 				hiding					=	FALSE;
 
 				const char *subset = ((const char **)parms[i])[0];
-				
+
 				if (strcmp(subset,"shading") == 0)						shading					=	TRUE;
 				else if (strcmp(subset,"geometrymodification") == 0)	geometrymodification	=	TRUE;
 				else if (strcmp(subset,"geometrydefinition") == 0)		geometrydefinition		=	TRUE;
@@ -4602,32 +4602,32 @@ void	CRendererContext::RiResourceV(const char *handle,const char *type,int n,con
 			return;
 		}
 	}
-	
+
 	// Are we saving ?
 	if (save) {
 		CResource	*nResource	=	new CResource(handle,currentAttributes,currentXform);
-		
+
 		nResource->next	=	currentResource;
 		currentResource	=	nResource;
 	} else {
 		CResource	*cResource	=	NULL;
 		int			i;
-		
+
 		// Remporarily push the current resource list into the stack to make our life easier
 		savedResources->push(currentResource);
-		
+
 		// Search the saved resources for the handle we're looking for
 		for (i=savedResources->numItems;i>0;i--) {
 			for (cResource=savedResources->array[i-1];cResource!=NULL;cResource=cResource->next) {
-			
+
 				// Did we find a match ?
 				if (strcmp(cResource->name,handle) == 0)	break;
 			}
-			
+
 			if (cResource != NULL)	break;
 		}
 		savedResources->pop();
-		
+
 		if (cResource == NULL) error(CODE_NOTATTRIBS,"Named resource \"%s\" not found\n",handle);
 		else {
 
@@ -4655,14 +4655,14 @@ void	CRendererContext::RiResourceBegin(void) {
 }
 
 void	CRendererContext::RiResourceEnd(void) {
-	
+
 	// Delete the resources
 	CResource	*cResource;
 	while((cResource = currentResource) != NULL) {
 		currentResource	=	currentResource->next;
 		delete cResource;
 	}
-	
+
 	// Restore the resources
 	currentResource	=	savedResources->pop();
 }
@@ -4683,7 +4683,7 @@ void	CRendererContext::RiIfBeginV(const char *expr,int n,const char *tokens[],co
 }
 
 void	CRendererContext::RiElseIfV(const char *expr,int n,const char *tokens[],const void *parms[]) {
-	
+
 	if (riExecTag == 0) {
 		ignoreCommand	=	TRUE;
 		riExecTag++;
@@ -4741,7 +4741,7 @@ void	CRendererContext::RiError(int code,int severity,const char *mes) {
 	tmp = (char*)malloc(len);
 	tmp[0] = '\0';
 
-	if (severity != RIE_INFO && ribFile)    
+	if (severity != RIE_INFO && ribFile)
 		sprintf(tmp,"%s (%d): ",ribFile,ribCommandLineno);
 
 	if (attributes && attributes->name) {

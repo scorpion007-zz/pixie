@@ -70,7 +70,7 @@ CAttributes::CAttributes() {
 	t[0]					=	0.0;
 	t[1]					=	0.0;
 	t[2]					=	1.0;
-	t[3]					=	1.0;	
+	t[3]					=	1.0;
 
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
@@ -119,7 +119,7 @@ CAttributes::CAttributes() {
 	relativeEmit				=	1;
 
 	shadingModel				=	SM_MATTE;
-	
+
 	globalMapName				=	NULL;
 	causticMapName				=	NULL;
 	globalMap					=	NULL;
@@ -135,14 +135,14 @@ CAttributes::CAttributes() {
 	maxSpecularDepth			=	2;
 
 	shootStep					=	1000;		// Shoot 1000 rays at a time
-	
+
 	lodRange[0]					=	-C_INFINITY;
 	lodRange[1]					=	-C_INFINITY;
 	lodRange[2]					=	C_INFINITY;
 	lodRange[3]					=	C_INFINITY;
 	lodSize						=	0;
 	lodImportance				=	1;
-	
+
 	checkParameters();
 }
 
@@ -150,7 +150,7 @@ CAttributes::CAttributes() {
 // Class				:	CAttributes
 // Method				:	CAttributes
 // Description			:
-/// \brief					This functions creates an exact replica of 
+/// \brief					This functions creates an exact replica of
 //							another attribute set
 // Return Value			:	-
 // Comments				:
@@ -163,7 +163,7 @@ CAttributes::CAttributes(const CAttributes *a) {
 
 	// Note: The assignment here also invokes the assignment operator of userAttributes
 	//      so there's no need for a separate copy for that
-	
+
 	refCount					=	0;
 
 	if (surface != NULL)			surface->attach();
@@ -247,14 +247,14 @@ void	CAttributes::addLight(CShaderInstance *cLight) {
 		if (nLight->light == cLight)	return;
 		pLight = nLight;
 	}
-	
+
 	// Make sure lighting order matches RIB order
 	if (pLight == NULL) {
 		nLight			=	lightSources	=	new CActiveLight;
 	} else {
 		nLight			=	pLight->next	=	new CActiveLight;
 	}
-	
+
 	nLight->light		=	(CProgrammableShaderInstance*) cLight;
 	nLight->next		=	NULL;
 	checkParameters();
@@ -354,7 +354,7 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 		if (atmosphere != NULL)		atmosphere->detach();
 		if (interior != NULL)		interior->detach();
 		if (exterior != NULL)		exterior->detach();
-		
+
 		surface			=	other->surface;			if (surface != NULL)		surface->attach();
 		displacement	=	other->displacement;	if (displacement != NULL)	displacement->attach();
 		atmosphere		=	other->atmosphere;		if (atmosphere != NULL)		atmosphere->attach();
@@ -378,7 +378,7 @@ void		CAttributes::restore(const CAttributes *other,int shading,int geometrymodi
 			nLight->next			=	lightSources;
 			lightSources			=	nLight;
 		}
-		
+
 		checkParameters();
 
 		shadingRate	=	other->shadingRate;
@@ -445,7 +445,7 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 			if (value != NULL)	return TRUE;
 		}
 	}
-	
+
 	if ((category == NULL) || (strcmp(category,RI_DICE) == 0)) {
 		if (strcmp(name,RI_NUMPROBES) == 0)				{	type	=	TYPE_INTEGER;	value	=	&numUProbes;			return TRUE;}
 		else if (strcmp(name,RI_MINSPLITS) == 0)		{	type	=	TYPE_INTEGER;	value	=	&minSplits;				return TRUE;}
@@ -488,7 +488,7 @@ int		CAttributes::find(const char *name,const char *category,EVariableType &type
 		else if (strcmp(name,RI_PHOTON) == 0)			{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_PHOTON_VISIBLE) != 0;			return TRUE;}
 		else if (strcmp(name,RI_TRANSMISSION) == 0)		{	type	=	TYPE_INTEGER;	value	=	NULL;	intValue = (flags & ATTRIBUTES_FLAGS_TRANSMISSION_VISIBLE) != 0;	return TRUE;}
 	}
-	
+
 	if ((category == NULL) || (strcmp(category,RI_IDENTIFIER) == 0)) {
 		if (strcmp(name,RI_NAME) == 0)					{	type	=	TYPE_STRING;	value	=	this->name;				return TRUE;}
 	}

@@ -400,7 +400,7 @@ DEFFUNC(Ptlined		,"ptlined"			,"f=ppp"	,PTLINEDEXP_PRE,PTLINEDEXP,FUN4EXPR_UPDAT
 DEFFUNC(Rotatep		,"rotate"			,"p=pfpp"	,ROTATEEXP_PRE,ROTATEEXP,FUN5EXPR_UPDATE(3,3,1,3,3),NULL_EXPR,0)
 
 #define	REFLECTEXP	reflect(res,op1,op2);
-					
+
 
 DEFFUNC(Reflect		,"reflect"			,"v=vv"	,FUN3EXPR_PRE,REFLECTEXP,FUN3EXPR_UPDATE(3,3,3),NULL_EXPR,0)
 
@@ -783,7 +783,7 @@ DEFFUNC(Format					,"format"						,"s=s.*"		,FORMATEXPR_PRE,FORMATEXPR,FORMAT_UP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // spline	"f=Sfffff*"
 // spline	"f=fffff*"
-#define SPLINEPARAMETERS()		
+#define SPLINEPARAMETERS()
 
 #ifndef INIT_SHADING
 
@@ -1056,7 +1056,7 @@ DEFFUNC(Splineap			,"spline"		,"p=fP"		,SPLINEAPEXPR_PRE,SPLINEAPEXPR,SPLINEAPEX
 																							\
 							void			*handle	=	code->dso->handle;					\
 							dsoExecFunction exec	=	code->dso->exec;
-						
+
 
 #define	DSOEXEC				exec(handle,numArguments-1,(void **) op);
 

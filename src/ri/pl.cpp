@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	pl.cpp
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					Parameter list class implementation
 //
@@ -111,7 +111,7 @@ public:
 							else											destf	=	NULL;
 						}
 
-						
+
 						if (destf != NULL) {
 
 							if ((variable->container == CONTAINER_UNIFORM) || (variable->container == CONTAINER_CONSTANT)) {
@@ -189,10 +189,10 @@ public:
 
 	CParameter		*clone(CAttributes *a) {
 						CUniformParameter	*cUniform;
-						
+
 						if (variable->storage == STORAGE_GLOBAL)	cUniform	=	new CUniformParameter(variable);
 						else										cUniform	=	new CUniformParameter(a->findParameter(variable->name));
-						
+
 						if (variable->type == TYPE_STRING) {
 							cUniform->data					=	new char*[variable->numFloats];
 							memcpy(cUniform->data,data,variable->numFloats*sizeof(char*));
@@ -288,7 +288,7 @@ public:
 
 	CParameter		*clone(CAttributes *a) {
 						CVaryingParameter	*cVarying;
-						
+
 						if (variable->storage == STORAGE_GLOBAL)	cVarying	=	new CVaryingParameter(variable);
 						else										cVarying	=	new CVaryingParameter(a->findParameter(variable->name));
 
@@ -341,7 +341,7 @@ public:
 								for (j=0;j<numFloats;j++) {
 									*dest++	=	(float) (v0[j]*(1.0-cu) + v1[j]*cu*cv + v2[j]*cu*(1.0-cv));
 								}
-							}	
+							}
 						}
 
 						if (next != NULL)	next->dispatch(numVertices,varying,locals);
@@ -444,7 +444,7 @@ public:
 						if (variable->storage == STORAGE_GLOBAL)		dest	=	varying[variable->entry];
 						else if (locals[variable->accessor] != NULL)	dest	=	locals[variable->accessor][variable->entry];
 						else											dest	=	NULL;
-						
+
 						if (dest != NULL) {
 							int			i,j;
 							const int	numFloats	=	variable->numFloats;
@@ -468,7 +468,7 @@ public:
 
 	CParameter		*clone(CAttributes *a) {
 						CVarying2Parameter	*cVarying;
-						
+
 						if (variable->storage == STORAGE_GLOBAL)	cVarying	=	new CVarying2Parameter(variable);
 						else										cVarying	=	new CVarying2Parameter(a->findParameter(variable->name));
 
@@ -791,7 +791,7 @@ CPl				*CPl::clone(CAttributes *a) {
 	}
 
 	// Allocate a fresh copy of the parameters
-	nParameters				=	new CPlParameter[numParameters];	
+	nParameters				=	new CPlParameter[numParameters];
 	memcpy(nParameters,parameters,numParameters*sizeof(CPlParameter));
 
 	// Re-link the variables to the latest attributes
@@ -888,7 +888,7 @@ void	CPl::collect(int &size,float *&data,EVariableClass container,CMemPage *page
 	if (data1 != NULL) {
 
 		for (i=0;i<numParameters;i++) {
-			
+
 			if (parameters[i].container == container) {
 				const float	*sData		=	data1 + parameters[i].index;
 				const int	numFloats	=	parameters[i].variable->numFloats;
@@ -919,7 +919,7 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		
+
 		// Is this a uniform parameter ?
 		if (cParameter->container == CONTAINER_UNIFORM) {
 			CVariable			*cVariable	=	cParameter->variable;
@@ -938,7 +938,7 @@ CParameter		*CPl::uniform(int u,CParameter *p) {
 				np->data				=	new float[numFloats];
 				memcpy(np->data,cData+u*numFloats,numFloats*sizeof(float));
 			}
-			
+
 
 			np->next				=	p;
 			p						=	np;
@@ -1042,7 +1042,7 @@ CParameter		*CPl::varying(float *v0,float *v1,float *v2,float *v3,CParameter *p)
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		
+
 		if (cParameter->container == CONTAINER_VARYING) {
 			CVariable			*cVariable	=	cParameter->variable;
 			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
@@ -1079,7 +1079,7 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,int v3,CParameter *p) {
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		
+
 		if (cParameter->container == CONTAINER_FACEVARYING) {
 			CVariable			*cVariable	=	cParameter->variable;
 			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
@@ -1111,7 +1111,7 @@ CParameter		*CPl::facevarying(float *v0,float *v1,float *v2,float *v3,CParameter
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		
+
 		if (cParameter->container == CONTAINER_FACEVARYING) {
 			CVariable			*cVariable	=	cParameter->variable;
 			CVaryingParameter	*np			=	new CVaryingParameter(cVariable);
@@ -1148,7 +1148,7 @@ CParameter		*CPl::facevarying(int v0,int v1,int v2,CParameter *p) {
 	CPlParameter	*cParameter	=	parameters;
 
 	for (i=numParameters;i>0;i--,cParameter++) {
-		
+
 		if (cParameter->container == CONTAINER_FACEVARYING) {
 			CVariable			*cVariable	=	cParameter->variable;
 			CVarying3Parameter	*np			=	new CVarying3Parameter(cVariable);
@@ -1219,7 +1219,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 			// This may be an inline decl., try to parse it into a temp var
 			if (parseVariable(&tmp,NULL,params[i])) {
-			
+
 				// Save the declared container and fetch the variable
 				container		=	tmp.container;
 				declaredParam	=	TRUE;
@@ -1228,12 +1228,12 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				if (cVar == NULL) {
 					// No match, query the shaders
 					sVar		=	&tmp;
-					 
+
 					cVar		=	attributes->findParameter(tmp.name);
-					
+
 					if (cVar != NULL) {
 						// check declaration against the shader parameter
-						if (cVar->numFloats != sVar->numFloats || cVar->type != sVar->type ) {							
+						if (cVar->numFloats != sVar->numFloats || cVar->type != sVar->type ) {
 							// We used the inline declaration to check the number of items, but it turns out it mismatches the shader, do not bind
 							// Don't warn either
 							//warning(CODE_BADTOKEN,"Parameter \"%s\" mismatches declaration\n",params[i]);
@@ -1244,10 +1244,10 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 					// It was a declaration, Query the shaders
 					sVar		=	&tmp;
 					cVar		=	attributes->findParameter(tmp.name);
-					
+
 					if (cVar != NULL) {
 						// check declaration against the shader parameter
-						if (cVar->numFloats != sVar->numFloats || cVar->type != sVar->type ) {							
+						if (cVar->numFloats != sVar->numFloats || cVar->type != sVar->type ) {
 							// We used the inline declaration to check the number of items, but it turns out it mismatches the shader, do not bind
 							// Don't warn either
 							//warning(CODE_BADTOKEN,"Parameter \"%s\" mismatches declaration\n",params[i]);
@@ -1258,7 +1258,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 			} else {
 				// Query the shaders
 				cVar		=	attributes->findParameter(params[i]);
-				
+
 				if (cVar != NULL) {
 					container	=	cVar->container;
 				}
@@ -1267,44 +1267,44 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 			// This is a predeclared type, but not a global, query the shaders
 			sVar		=	cVar;
 			cVar		=	attributes->findParameter(params[i]);
-			
+
 			if (cVar != NULL) {
-				
+
 				// check declaration against the shader parameter
 				if (cVar->numFloats		!= sVar->numFloats ||
 					cVar->type			!= sVar->type ||
 					(cVar->container == CONTAINER_UNIFORM || cVar->container == CONTAINER_CONSTANT) &&
 					(sVar->container != CONTAINER_UNIFORM) && (sVar->container != CONTAINER_CONSTANT)) {
-				
+
 					// We used the global declaration to check the number of items, but it mismatches the shader, do not bind
 					// Don't warn either
 					//warning(CODE_BADTOKEN,"Parameter \"%s\" mismatches declaration\n",params[i]);
 					continue;
 				}
-				
+
 				container	=	cVar->container;
 			}
 		} else {
 			container	=	cVar->container;
 		}
-		
+
 		//GSHTODO: bind to multiple shaders
-		
+
 		// Did we find the variable ?
 		if (cVar == NULL) {
 			// We did not, so it must be skipped
 			continue;
 		}
-		
+
 		// Check the container type to prevent varying to uniform assignment
 		if ((cVar->container == CONTAINER_UNIFORM || cVar->container == CONTAINER_CONSTANT) &&
 			(container != CONTAINER_UNIFORM) && (container != CONTAINER_CONSTANT)) {
-			
+
 			// Warn because the variables bound but containers don't match
 			warning(CODE_BADTOKEN,"Parameter \"%s\" container mismatches definition\n",params[i]);
 			continue;
 		}
-		
+
 		// Do necessary conversions
 		if (flags & PL_VARYING_TO_VERTEX) {
 			if (container == CONTAINER_VARYING)
@@ -1369,10 +1369,10 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 
 			const char	*sDecl = RI_S;
 			const char	*tDecl = RI_T;
-			
-			if( declaredParam ) { 
+
+			if( declaredParam ) {
 				const char	*decl;
-				
+
 				switch(container) {
 					case CONTAINER_UNIFORM:
 						decl	=	"uniform float";
@@ -1402,7 +1402,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 				sDecl	=	sDeclTemp;
 				tDecl	=	tDeclTemp;
 			}
-			
+
 			ntokens[j]		=	sDecl;
 			nvals[j]		=	sval;
 			j++;
@@ -1427,11 +1427,11 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 		parameters[numDefinedParams].variable	=	cVar;
 		parameters[numDefinedParams].container	=	container;
 		parameters[numDefinedParams].numItems	=	numItems;
-		
+
 		// We're gonna fill in the index value later
-		
+
 		paramvals[numDefinedParams]				=	vals[i];
-		
+
 		numDefinedParams++;
 
 		// Count the size of the data field we need
@@ -1491,7 +1491,7 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 			memcpy(cData,(float *) paramvals[i],sizeof(float)*num*cVar->numFloats);
 			cData	+=	num*cVar->numFloats;
 		}
-		
+
 		// Ensure alignment
 		cData	=	(float *) align64(cData);
 	}
@@ -1500,9 +1500,9 @@ CPl		*parseParameterList(int numUniform,int numVertex,int numVarying,int numFace
 	assert((cData - data) == dataSize);
 
 	// Create the memory for the final pl
-	finalParameters			=	new CPlParameter[numDefinedParams];	
+	finalParameters			=	new CPlParameter[numDefinedParams];
 	memcpy(finalParameters,parameters,numDefinedParams*sizeof(CPlParameter));
-	
+
 	// Return the parameter list
 	return	new CPl(dataSize,numDefinedParams,finalParameters,data);
 

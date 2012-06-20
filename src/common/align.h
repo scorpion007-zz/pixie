@@ -46,11 +46,11 @@
 
 #else				// >>Windoze
 
-#ifndef uint32_t 
+#ifndef uint32_t
 #define uint32_t unsigned int
 #endif
 
-#ifndef uint64_t 
+#ifndef uint64_t
 #define uint64_t unsigned long long
 #endif
 

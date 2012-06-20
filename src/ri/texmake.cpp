@@ -95,7 +95,7 @@ static	void	appendLayer(TIFF *out,int dstart,int numSamples,int bitsperpixel,int
 	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_PIXARLOG);
 	//TIFFSetField(out, TIFFTAG_COMPRESSION,			COMPRESSION_DEFLATE);
 
-	
+
 	TIFFSetField(out, TIFFTAG_SAMPLESPERPIXEL,		(unsigned long) numSamples);
 	TIFFSetField(out, TIFFTAG_TILEWIDTH,			(unsigned long) tileSize);
 	TIFFSetField(out, TIFFTAG_TILELENGTH,			(unsigned long) tileSize);
@@ -202,7 +202,7 @@ template <class T> static	void	appendPyramid(TIFF *out,int &dstart,int numSample
 				*dest++	*=	1/(float) 4;
 			}
 		}
-			
+
 		for (s=0;s<nextWidth*nextHeight*numSamples;s++) {
 			currentLevel[s]	=	(T) fnextLevel[s];
 		}
@@ -372,7 +372,7 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 
 	float minVal = -C_INFINITY;
 	float maxVal = C_INFINITY;
-	
+
 	if (bitspersample == 8) {
 		minVal = 0;
 		maxVal = 255;
@@ -380,7 +380,7 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 		minVal = 0;
 		maxVal = 65535;
 	}
-	
+
 	// Normalize the image
 	float	*pixel	=	filteredData;
 	T		*dest	=	data;
@@ -393,7 +393,7 @@ template <class T> void	filterImage(int width,int height,int numSamples,int bits
 			float t = (pixel[k] / norm[0]);		// avoid precision / quanitze issues
 			t = min(max(minVal,t),maxVal);
 			dest[k]	=	(T) (t);
-			
+
 			//dest[k]	=	(T) (pixel[k] / norm[0]);
 		}
 
@@ -446,7 +446,7 @@ template <class T> void	filterScaleImage(int width,int height,int targetWidth,in
 			int		i,j;
 			float	*pixel	=	&filteredData[(y*newWidth+x)*numSamples];
 			float	*norm	=	&normalizer[y*newWidth+x];
-			
+
 			float	xo		=	x*widthRatio;
 			float	yo		=	y*heightRatio;
 			int		xoi		=	(int) floor(xo);
@@ -481,7 +481,7 @@ template <class T> void	filterScaleImage(int width,int height,int targetWidth,in
 
 	float minVal = -C_INFINITY;
 	float maxVal = C_INFINITY;
-	
+
 	if (bitspersample == 8) {
 		minVal = 0;
 		maxVal = 255;
@@ -489,7 +489,7 @@ template <class T> void	filterScaleImage(int width,int height,int targetWidth,in
 		minVal = 0;
 		maxVal = 65535;
 	}
-	
+
 	// Normalize the image
 	float	*pixel	=	filteredData;
 	T		*dest	=	dataOut;
@@ -534,7 +534,7 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 	// default to rounding up
 	for (newWidth=1;newWidth < width[0];newWidth = newWidth << 1);
 	for (newHeight=1;newHeight < height[0];newHeight = newHeight << 1);
-	
+
 	// check if we're supposed to preserve ratios
 	int resizeModeLen = (int) strlen(resizemode);
 	if (resizeModeLen > 2) {
@@ -543,7 +543,7 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 			resizeModeLen--;
 		}
 	}
-	
+
 	// make adjustments according to resize mode
 	if (strncmp(resizemode,resizeDownMode,resizeModeLen) == 0) {
 		if (newWidth != width[0]) 		newWidth	=	newWidth >> 1;
@@ -562,7 +562,7 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 			}
 		}
 	}
-	
+
 	// adjust the target width / height
 	targetWidth		= newWidth;
 	targetHeight 	= newHeight;
@@ -588,12 +588,12 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 	if (strcmp(resizemode,resizeNoneMode) != 0) {
 		if (!((width[0] == newWidth) && (height[0] == newHeight))) {
 			T *newData;
-		
+
 			newData	=	(T *) ralloc(newWidth*newHeight*numSamples*sizeof(T),CRenderer::globalMemory);
 			memset(newData,0,newWidth*newHeight*numSamples*sizeof(T));
-	
+
 			filterScaleImage<T>(width[0],height[0],targetWidth,targetHeight,newWidth,newHeight,numSamples,bitspersample,filterWidth,filterHeight,filter,data[0],newData);
-			
+
 			data[0]			=	newData;
 			width[0]		=	newWidth;
 			height[0]		=	newHeight;
@@ -606,35 +606,35 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 		// rescale otherwise
 		if (!((width[0] == newWidth) && (height[0] == newHeight))) {
 			T *newData;
-	
+
 			newData	=	(T *) ralloc(newWidth*newHeight*numSamples*sizeof(T),CRenderer::globalMemory);
 			memset(newData,0,newWidth*newHeight*numSamples*sizeof(T));
-	
+
 			copyData<T>(data[0],width[0],height[0],0,0,width[0],height[0],newData,newWidth,newHeight,0,0,numSamples);
-			
+
 			if (strcmp(smode,RI_PERIODIC) == 0) {
 				copyData<T>(data[0],width[0],height[0],0,0,newWidth-width[0],height[0],newData,newWidth,newHeight,width[0],0,numSamples);
 			} else if (strcmp(smode,RI_CLAMP) == 0) {
 				int	i;
-	
+
 				for (i=0;i<newWidth-width[0];i++)
 					copyData<T>(data[0],width[0],height[0],width[0]-1,0,1,height[0],newData,newWidth,newHeight,width[0]+i,0,numSamples);
 			} else if (strcmp(smode,RI_BLACK) == 0) {
 				initData<T>(newData,newWidth,newHeight,width[0],0,newWidth-width[0],height[0],numSamples,0);
 			}
-	
-	
+
+
 			if (strcmp(tmode,RI_PERIODIC) == 0) {
 				copyData<T>(data[0],width[0],height[0],0,0,width[0],newHeight-height[0],newData,newWidth,newHeight,0,height[0],numSamples);
 			} else if (strcmp(tmode,RI_CLAMP) == 0) {
 				int	i;
-	
+
 				for (i=0;i<newHeight-height[0];i++)
 					copyData<T>(data[0],width[0],height[0],0,height[0]-1,width[0],1,newData,newWidth,newHeight,0,height[0]+i,numSamples);
 			} else if (strcmp(tmode,RI_BLACK) == 0) {
 				initData<T>(newData,newWidth,newHeight,0,height[0],width[0],newHeight-height[0],numSamples,0);
 			}
-			
+
 			// when resizing both dimentions, there's an extra corner to worry about
 			if ((newWidth != width[0]) && (newHeight != height[0])) {
 				if ((strcmp(smode,RI_PERIODIC) == 0) && (strcmp(tmode,RI_PERIODIC) == 0)) {
@@ -647,13 +647,13 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 					initDataValues<T>(newData,newWidth,newHeight,width[0],height[0],newWidth-width[0],newHeight-height[0],numSamples,initValues);
 				}
 			}
-	
+
 			data[0]		=	newData;
 			width[0]	=	newWidth;
 			height[0]	=	newHeight;
 		}
 	}
-	
+
 	validWidth[0]	=	targetWidth;
 	validHeight[0]	=	targetHeight;
 }
@@ -666,10 +666,10 @@ template <class T> void	adjustSize(T **data,int *width,int *height,int *validWid
 // Comments				:	FIXME: filter only when adjusting size
 void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int bitspersample,RtFilterFunc filter,float filterWidth,float filterHeight,int tileSize,void *data,const char *smode,const char *tmode,const char *resizemode) {
 	int validHeight,validWidth;
-	
+
 	if (bitspersample == 8) {
 		adjustSize<unsigned char>((unsigned char **) &data,&width,&height,&validWidth,&validHeight,numSamples,bitspersample,filterWidth,filterHeight,filter,smode,tmode,resizemode);
-		
+
 		// write adjusted sizes
 		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLWIDTH,		validWidth);
 		TIFFSetField(out, TIFFTAG_PIXAR_IMAGEFULLLENGTH,	validHeight);
@@ -712,7 +712,7 @@ void	appendTexture(TIFF *out,int &dstart,int width,int height,int numSamples,int
 // Comments				:
 void	makeTexture(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
-	
+
 	getResizeMode(numParams,params,vals);
 
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
@@ -773,7 +773,7 @@ void	makeSideEnvironment(const char *input,const char *output,TSearchpath *path,
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
 	getResizeMode(numParams,params,vals);
-	
+
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
@@ -852,7 +852,7 @@ void	makeCubicEnvironment(const char *px,const char *py,const char *pz,const cha
 	const char	*names[6];
 
 	getResizeMode(numParams,params,vals);
-	
+
 	names[0]	=	px;
 	names[1]	=	nx;
 	names[2]	=	py;
@@ -884,7 +884,7 @@ void	makeCubicEnvironment(const char *px,const char *py,const char *pz,const cha
 
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,		TIFF_CUBIC_ENVIRONMENT);
 
-				for (i=0;i<6;i++) {	
+				for (i=0;i<6;i++) {
 					int		width,height;
 					TIFF	*inHandle;
 
@@ -927,7 +927,7 @@ void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *
 	char	inputFileName[OS_MAX_PATH_LENGTH];
 
 	getResizeMode(numParams,params,vals);
-	
+
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
@@ -960,8 +960,8 @@ void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *
 			if (output != NULL) {
 				int	dstart	=	0;
 
-				sprintf(modes,"%s,%s",smode,tmode);	
-				
+				sprintf(modes,"%s,%s",smode,tmode);
+
 				// Write out the data
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_SPHERICAL_ENVIRONMENT);
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_WRAPMODES,		modes);
@@ -985,9 +985,9 @@ void	makeSphericalEnvironment(const char *input,const char *output,TSearchpath *
 // Comments				:
 void	makeCylindericalEnvironment(const char *input,const char *output,TSearchpath *path,const char *smode,const char *tmode,RtFilterFunc filt,float fwidth,float fheight,int numParams,const char **params,const void **vals) {
 	char	inputFileName[OS_MAX_PATH_LENGTH];
-	
+
 	getResizeMode(numParams,params,vals);
-	
+
 	if (CRenderer::locateFile(inputFileName,input,path) == FALSE) {
 		error(CODE_NOFILE,"Failed to find \"%s\"\n",input);
 	} else {
@@ -1021,10 +1021,10 @@ void	makeCylindericalEnvironment(const char *input,const char *output,TSearchpat
 				int	dstart	=	0;
 
 				sprintf(modes,"%s,%s",smode,tmode);
-				
+
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_TEXTUREFORMAT,	TIFF_CYLINDER_ENVIRONMENT);
 				TIFFSetField(outHandle, TIFFTAG_PIXAR_WRAPMODES,		modes);
-				
+
 				appendTexture(outHandle,dstart,width,height,numSamples,bitspersample,filter,filterWidth,filterHeight,tileSize,data,smode,tmode,resizeMode);
 				TIFFClose(outHandle);
 			}

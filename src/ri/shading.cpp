@@ -129,9 +129,9 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 				const	double	cu		=	*u++;
 				const	double	cv		=	*v++;
 
-				*s++			=	(float) (((s1[0]*(1.0-ctime) + s2[0]*ctime)*(1.0-cu) + 
-											 (s1[1]*(1.0-ctime) + s2[1]*ctime)*cu)*(1.0-cv) + 
-											((s1[2]*(1.0-ctime) + s2[2]*ctime)*(1.0-cu) + 
+				*s++			=	(float) (((s1[0]*(1.0-ctime) + s2[0]*ctime)*(1.0-cu) +
+											 (s1[1]*(1.0-ctime) + s2[1]*ctime)*cu)*(1.0-cv) +
+											((s1[2]*(1.0-ctime) + s2[2]*ctime)*(1.0-cu) +
 											 (s1[3]*(1.0-ctime) + s2[3]*ctime)*cu)*cv);
 			}
 		} else {
@@ -154,9 +154,9 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 				const	double	cu		=	*u++;
 				const	double	cv		=	*v++;
 
-				*t++			=	(float) (((t1[0]*(1.0-ctime) + t2[0]*ctime)*(1.0-cu) + 
-										     (t1[1]*(1.0-ctime) + t2[1]*ctime)*cu)*(1.0-cv) + 
-											((t1[2]*(1.0-ctime) + t2[2]*ctime)*(1.0-cu) + 
+				*t++			=	(float) (((t1[0]*(1.0-ctime) + t2[0]*ctime)*(1.0-cu) +
+										     (t1[1]*(1.0-ctime) + t2[1]*ctime)*cu)*(1.0-cv) +
+											((t1[2]*(1.0-ctime) + t2[2]*ctime)*(1.0-cu) +
 											 (t1[3]*(1.0-ctime) + t2[3]*ctime)*cu)*cv);
 				u++;
 				v++;
@@ -237,24 +237,24 @@ inline void	complete(int num,float **varying,unsigned int usedParameters,const C
 			time	++;
 		}
 	}
-	
+
 	// Finally, range-correct time
 	// Note: It is important this is last, as before this we assume a 0-1
 	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
-	
+
 		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
-		
+
 		float		*time			=	varying[VARIABLE_TIME];
 		const float idtime			= 	CRenderer::invShutterTime;
 		const float t0				=	CRenderer::shutterOpen;
-		
+
 		for (i=num;i>0;i--) {
 			time[0] = (time[0]*idtime + t0);
 			time++;
 		}
 	}
-	
+
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 	if (usedParameters & PARAMETER_N) {
 		memcpy(varying[VARIABLE_N],varying[VARIABLE_NG],3*num*sizeof(float));
 	}
-	
+
 	// ensure Oi and Ci are always filled in
 	if (!(usedParameters & PARAMETER_CI)) {
 		float			*dest	=	varying[VARIABLE_CI];
@@ -366,18 +366,18 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 			dest	+=	3;
 		}
 	}
-	
+
 	// Finally, range-correct time
 	// Note: It is important this is last, as before this we assume a 0-1
 	// range for time.  After this we must never use time assuing 0-1 range
 	if (usedParameters & (PARAMETER_TIME | PARAMETER_DTIME)) {
-		
+
 		varying[VARIABLE_DTIME][0]	=	CRenderer::shutterClose - CRenderer::shutterOpen;
-		
+
 		float		*time		=	varying[VARIABLE_TIME];
 		const float idtime		= 	CRenderer::invShutterTime;
 		const float t0			=	CRenderer::shutterOpen;
-		
+
 		for (i=num;i>0;i--) {
 			time[0] = (time[0]*idtime + t0);
 			time++;
@@ -396,7 +396,7 @@ inline	void	complete(int num,float **varying,unsigned int usedParameters,const C
 CShadingContext::CShadingContext(int t) : thread(t) {
 	// Initialize the shading state
 	currentShadingState		=	NULL;
-	
+
 	// Initialize the shader state memory stack
 	memoryInit(shaderStateMemory);
 
@@ -458,7 +458,7 @@ CShadingContext::~CShadingContext() {
 		conditionals	=	conditionals->next;
 		delete cConditional;
 	}
-	
+
 	// Shutdown the random number generator
 	randomShutdown();
 
@@ -481,7 +481,7 @@ CShadingContext::~CShadingContext() {
 		freeState(cState);
 	}
 	currentShadingState	=	NULL;
-	
+
 	// Ditch the thread memory stack
 	memoryTini(threadMemory);
 
@@ -581,7 +581,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 			// The transmission must be shade at this point
 			assert(currentAttributes->transmissionHitMode == 's');
-			
+
 			// We need to execute the shaders
 			displacement	=	NULL;	//currentAttributes->displacement;	// We probably don't need to execute the displacement shader
 			surface			=	currentAttributes->surface;
@@ -620,21 +620,21 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			}
 		}
 
-		// Prepare the used parameters by the shaders 
+		// Prepare the used parameters by the shaders
 		usedParameters			|=	currentAttributes->usedParameters | CRenderer::additionalParameters;
-		
+
 		// Prepare the locals
 		for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
 	} else {
 
 		// We are only interested in the surface position, not the color
 #ifdef IGNORE_DISPLACEMENTS_FOR_DICING
-		if (	(currentAttributes->displacement == NULL) || 
+		if (	(currentAttributes->displacement == NULL) ||
 			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS))) ||
 				(displaceOnly & 2)
 			) {
 #else
-		if (	(currentAttributes->displacement == NULL) || 
+		if (	(currentAttributes->displacement == NULL) ||
 			(	(usedParameters & PARAMETER_RAYTRACE) && (!(currentAttributes->flags & ATTRIBUTES_FLAGS_DISPLACEMENTS)))) {
 #endif
 			const int	savedParameters	=	usedParameters;
@@ -644,7 +644,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// to expand them (we're not running shaders) yet.  This causes the
 			// interpolation to local shader vars from the pl not to occur
 			for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
-			
+
 			object->sample(0,numVertices,varying,locals,usedParameters);
 			object->interpolate(numVertices,varying,locals);
 
@@ -670,7 +670,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// We're done here
 			return;
 		}
-		
+
 		// Prepare the locals
 		for (int a=0;a<NUM_ACCESSORS;a++) locals[a] = NULL;
 
@@ -682,7 +682,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// Note: we check for message passing with displacement and prepare appopriately below
 	}
 
-	
+
 	// We're shading
 	savedObject							=	currentShadingState->currentObject;
 	currentShadingState->currentObject	=	object;
@@ -692,7 +692,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 	// Checkpoint the shader state stack
 	memBegin(shaderStateMemory);
-	
+
 	// Allocate the caches for the shaders being executed
 	if (surface != NULL)							locals[ACCESSOR_SURFACE]		=	surface->prepare(shaderStateMemory,varying,numVertices);
 	if (displacement != NULL)						locals[ACCESSOR_DISPLACEMENT]	=	displacement->prepare(shaderStateMemory,varying,numVertices);
@@ -702,7 +702,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		// Verify if we have to prepare other shaders, even though displacing
 		// due to message passing this _has_ to be after the shaderStateMemory checkPoint
 		usedParameters	=	displacement->requiredParameters() | PARAMETER_P | PARAMETER_N;
-		
+
 		if (usedParameters & PARAMETER_MESSAGEPASSING) {
 			// displacement shader uses messsage passing, must prepare but not execute
 			// the surface and atmosphere shaders
@@ -711,12 +711,12 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 		}
 	}
 
-	
+
 	// We do not prepare interior or exterior as these are limited to passing default values (no outputs, they don't recieve pl variables)
 
 	// If we need derivative information, treat differently
 	if ((usedParameters & PARAMETER_DERIVATIVE) && (dim != SHADING_0D)) {	// Notice: we can not differentiate a 0 dimentional point set
-	
+
 		if (dim == SHADING_2D) {											// We're raytracing, so the derivative computation is different
 			const int numRealVertices				=	numVertices;
 			numVertices								*=	3;					// For the extra derivative vertices
@@ -731,7 +731,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			const unsigned int shadingParameters	=	usedParameters;
 			object->sample(0,numRealVertices,varying,locals,usedParameters);
 			usedParameters							=	shadingParameters;		// Restore the required parameters for the second round of shading
-			
+
 			float	*dPdu			=	varying[VARIABLE_DPDU];
 			float	*dPdv			=	varying[VARIABLE_DPDV];
 			float	*du				=	varying[VARIABLE_DU];
@@ -758,7 +758,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 				// These are the 0-1 patch uvs, not the expanded range uvs, so this is OK.
 				const float	dud		=	min(ku * dest * isqrtf(lengthu) + C_EPSILON,1.0f);
 				const float	dvd		=	min(kv * dest * isqrtf(lengthv) + C_EPSILON,1.0f);
-				
+
 				// Create one more shading point at (u + du,v)
 				u[j]		=	u[i] + dud;
 				v[j]		=	v[i];
@@ -813,7 +813,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			// This array holds the projected xy pixel positions for the vertices
 			float		*xy		=	(float *) ralloc(numVertices*2*sizeof(float),threadMemory);
 			const float	*P		=	varying[VARIABLE_P];
-			
+
 			// Project the grid vertices first
 			// PS: The offset is not important, so do not compute it
 			const float maxdPixeldxy = max(CRenderer::dPixeldx,CRenderer::dPixeldy);
@@ -862,7 +862,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						const float C = (cDU[-1] - A*cU[-1]*cU[-1] - B*cU[-1]);							\
 						d		= A*cU[0]*cU[0] + B*cU[0] + C;											\
 					}
-				
+
 				#define extrapolateDerivV()																														\
 					if (vVertices > 3) {																														\
 						const float A =	(cDV[-uVertices*3] - cDV[-uVertices*2])/((cV[-uVertices*3]-cV[-uVertices*2])*(cV[-uVertices*3]-cV[-uVertices*1])) -		\
@@ -904,19 +904,19 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cU		+=	1;
 						cXy		+=	2;
 					}
-	
+
 					extrapolateDerivU();
-					
+
 					cDU[0]		=	d;
 				}
-	
+
 				// Compute the dv,dPdv
 				for (i=0;i<uVertices;i++) {
 					float		*cDV	=	dv	+	i;
 					const float	*cV		=	v	+	i;
 					float		*cXy	=	xy	+	i*2;
 					float		d		=	0;
-	
+
 					for (j=0;j<vVertices-1;j++) {
 						const float	dx		=	cXy[uVertices*2]	- cXy[0];
 						const float	dy		=	cXy[uVertices*2+1]	- cXy[1];
@@ -932,16 +932,16 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						cV		+=	uVertices;
 						cXy		+=	uVertices*2;
 					}
-					
+
 					extrapolateDerivV();
-					
+
 					cDV[0]		=	d;
 				}
-				
+
 			} else {
 				// Non raster orient
 				vector tmp1,tmp2;
-			
+
 				// Compute the du
 				for (i=0;i<vVertices;i++) {
 					const int	tmp		=	i*uVertices;
@@ -949,7 +949,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 					const float	*cU		=	u	+ tmp;
 					float		*cXy	=	xy	+ tmp*2;
 					float		d		=	0;
-	
+
 					P				=	varying[VARIABLE_P]		+	tmp*3;
 					for (j=uVertices-1;j>0;j--) {
 						initv(tmp1,cXy[2]-P[3],cXy[3]-P[4],P[5]-1);
@@ -957,7 +957,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						const float	dx		=	maxdPixeldxy*(cXy[2] - cXy[0]);
 						const float	dy		=	maxdPixeldxy*(cXy[3] - cXy[1]);
 						const float	dz		=	maxdPixeldxy*(lengthv(tmp1) - lengthv(tmp2));
-	
+
 						float		cSr		=	shadingRate*isqrtf(dx*dx + dy*dy + dz*dz);
 						if (cSr > MAX_DIFFERENTIAL_DISCREPANCY)	cSr	=	MAX_DIFFERENTIAL_DISCREPANCY;
 						d		=	cSr*(cU[1] - cU[0]);
@@ -971,19 +971,19 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						P		+=	3;
 						cXy		+=	2;
 					}
-	
+
 					extrapolateDerivU();
-					
+
 					cDU[0]		=	d;
 				}
-	
+
 				// Compute the dv,dPdv
 				for (i=0;i<uVertices;i++) {
 					float		*cDV	=	dv	+	i;
 					const float	*cV		=	v	+	i;
 					float		*cXy	=	xy	+	i*2;
 					float		d		=	0;
-	
+
 					P				=	varying[VARIABLE_P]		+	i*3;
 					for (j=0;j<vVertices-1;j++) {
 						initv(tmp1,cXy[uVertices*2]-P[uVertices*3+0],cXy[uVertices*2+1]-P[uVertices*3+1],P[uVertices*3+2]-1);
@@ -1006,9 +1006,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 						P		+=	uVertices*3;
 						cXy		+=	uVertices*2;
 					}
-					
+
 					extrapolateDerivV();
-					
+
 					cDV[0]		=	d;
 				}
 			}
@@ -1057,20 +1057,20 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 	// Save the memory here
 	memBegin(threadMemory);
-	
+
 	// Set up lighting here incase displacement shader uses lighting
-	
+
 	// No lights are executed yet
 	currentShadingState->lightsExecuted			=	FALSE;
 	currentShadingState->ambientLightsExecuted	=	FALSE;
 	currentShadingState->lightCategory			=	0;
-	
+
 	// Clear out previous lights etc
 	currentShadingState->lights					=	NULL;
 	currentShadingState->alights				=	NULL;
 	currentShadingState->currentLight			=	NULL;
 	currentShadingState->freeLights				=	NULL;
-		
+
 	// Run the displacement shader here
 	if (displacement != NULL) {
 		displacement->execute(this,locals[ACCESSOR_DISPLACEMENT]);
@@ -1085,7 +1085,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 			surface->execute(this,locals[ACCESSOR_SURFACE]);
 		} else {
 			// No surface shader eh, make up a color
-			
+
 
 			// Overwrite the colors if not specified by the primitives
 			if (usedParameters & PARAMETER_CS)	{
@@ -1120,9 +1120,9 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 		// Is there an atmosphere shader ?
 		if (atmosphere != NULL) {
-		
+
 			// Do not execute atmosphere for non-camera rays
-			if (currentRayDepth == 0) {  
+			if (currentRayDepth == 0) {
 				atmosphere->execute(this,locals[ACCESSOR_ATMOSPHERE]);
 			}
 		}
@@ -1147,7 +1147,7 @@ void	CShadingContext::shade(CSurface *object,int uVertices,int vVertices,EShadin
 
 	// Restore the thread memory
 	memEnd(threadMemory);
-	
+
 	// Unwind the stack of shader states
 	memEnd(shaderStateMemory);
 
@@ -1271,7 +1271,7 @@ void			CShadingContext::freeState(CShadingState *cState) {
 	delete [] cState->tags;						vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
 	delete [] cState->lightingTags;				vertexMemory	-=	CRenderer::maxGridSize*3*sizeof(int);
 	delete [] cState->Ns;						vertexMemory	-=	CRenderer::maxGridSize*9*sizeof(float);
-	
+
 	delete cState;
 }
 
@@ -1319,7 +1319,7 @@ void	*CShadingContext::saveState() {
 
 	currentShadingState				=	freeStates;
 	freeStates						=	currentShadingState->next;
-	
+
 	return (void*) savedState;
 }
 
@@ -1332,7 +1332,7 @@ void	*CShadingContext::saveState() {
 // Comments				:
 void	CShadingContext::restoreState(void *state) {
 	CShadingState	*savedState		=	(CShadingState*) state;
-	
+
 	currentShadingState->next		=	freeStates;
 	freeStates						=	currentShadingState;
 
@@ -1430,81 +1430,81 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 		d[1]		=	(float) CRenderer::yres;
 		d[2]		=	(float) 1;
 		return TRUE;
-	} else if (strcmp(name,optionsDeviceFrame) == 0) { 
+	} else if (strcmp(name,optionsDeviceFrame) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::frame;
 		return TRUE;
-	} else if (strcmp(name,optionsDeviceResolution) == 0) { 
+	} else if (strcmp(name,optionsDeviceResolution) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::xres;
 		d[1]		=	(float) CRenderer::yres;
 		d[2]		=	(float) 1;
 		return TRUE;
-	} else if (strcmp(name,optionsFrameAspectRatio) == 0) { 
+	} else if (strcmp(name,optionsFrameAspectRatio) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::frameAR;
 		return TRUE;
-	} else if (strcmp(name,optionsCropWindow) == 0) { 
+	} else if (strcmp(name,optionsCropWindow) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::cropLeft;
 		d[1]		=	(float) CRenderer::cropTop;
 		d[2]		=	(float) CRenderer::cropRight;
 		d[3]		=	(float) CRenderer::cropBottom;
 		return TRUE;
-	} else if (strcmp(name,optionsDepthOfField) == 0) { 
+	} else if (strcmp(name,optionsDepthOfField) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::fstop;
 		d[1]		=	(float) CRenderer::focallength;
 		d[2]		=	(float) CRenderer::focaldistance;
 		return TRUE;
-	} else if (strcmp(name,optionsShutter) == 0) { 
+	} else if (strcmp(name,optionsShutter) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::shutterOpen;
 		d[1]		=	(float) CRenderer::shutterClose;
 		return TRUE;
-	} else if (strcmp(name,optionsClipping) == 0) { 
+	} else if (strcmp(name,optionsClipping) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::clipMin;
 		d[1]		=	(float) CRenderer::clipMax;
 		return TRUE;
-	} else if (strcmp(name,optionsBucketSize) == 0) { 
+	} else if (strcmp(name,optionsBucketSize) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::bucketWidth;
 		d[1]		=	(float) CRenderer::bucketHeight;
 		return TRUE;
-	} else if (strcmp(name,optionsColorQuantizer) == 0) { 
+	} else if (strcmp(name,optionsColorQuantizer) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::colorQuantizer[0];
 		d[1]		=	(float) CRenderer::colorQuantizer[1];
 		d[2]		=	(float) CRenderer::colorQuantizer[2];
 		d[3]		=	(float) CRenderer::colorQuantizer[3];
 		return TRUE;
-	} else if (strcmp(name,optionsDepthQuantizer) == 0) { 
+	} else if (strcmp(name,optionsDepthQuantizer) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::depthQuantizer[0];
 		d[1]		=	(float) CRenderer::depthQuantizer[1];
 		d[2]		=	(float) CRenderer::depthQuantizer[2];
 		d[3]		=	(float) CRenderer::depthQuantizer[3];
 		return TRUE;
-	} else if (strcmp(name,optionsPixelFilter) == 0) { 
+	} else if (strcmp(name,optionsPixelFilter) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::pixelFilterWidth;
 		d[1]		=	(float) CRenderer::pixelFilterHeight;
 		return TRUE;
-	} else if (strcmp(name,optionsGamma) == 0) { 
+	} else if (strcmp(name,optionsGamma) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::gamma;
 		d[1]		=	(float) CRenderer::gain;
 		return TRUE;
-	} else if (strcmp(name,optionsMaxRayDepth) == 0) { 
+	} else if (strcmp(name,optionsMaxRayDepth) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::maxRayDepth;
 		return TRUE;
-	} else if (strcmp(name,optionsRelativeDetail) == 0) { 
+	} else if (strcmp(name,optionsRelativeDetail) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::relativeDetail;
 		return TRUE;
-	} else if (strcmp(name,optionsPixelSamples) == 0) { 
+	} else if (strcmp(name,optionsPixelSamples) == 0) {
 		float	*d	=	(float *) dest;
 		d[0]		=	(float) CRenderer::pixelXsamples;
 		d[1]		=	(float) CRenderer::pixelYsamples;
@@ -1513,7 +1513,7 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 	// User options
 	else if (strncmp(name,attributesUser,strlen(attributesUser)) == 0) {
 		CVariable *var;
-		
+
 		if (CRenderer::userOptions->lookup(name+strlen(attributesUser),var) == TRUE) {
 			if (var->type == TYPE_STRING) {
 				char **d	=	(char **) dest;
@@ -1528,7 +1528,7 @@ int		CShadingContext::options(void *dest,const char *name,CVariable **,int *) {
 			return TRUE;
 		}
 	}
-	
+
 	return FALSE;
 }
 
@@ -1588,7 +1588,7 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 	// User attributes
 	else if (strncmp(name,attributesUser,strlen(attributesUser)) == 0) {
 		CVariable *var;
-		
+
 		if (currentAttributes->userAttributes.lookup(name+strlen(attributesUser),var) == TRUE) {
 			if (var->type == TYPE_STRING) {
 				char **d	=	(char **) dest;
@@ -1603,7 +1603,7 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 			return TRUE;
 		}
 	}
-	
+
 	return FALSE;
 }
 
@@ -1616,7 +1616,7 @@ int		CShadingContext::attributes(void *dest,const char *name,CVariable **,int *)
 // Return Value			:	-
 // Comments				:
 int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int *) {
-	
+
 	if (strcmp(name,rendererinfoRenderer) == 0) {
 		char	**d	=	(char **) dest;
 		d[0]		=	(char *) "Pixie";
@@ -1629,7 +1629,7 @@ int		CShadingContext::rendererInfo(void *dest,const char *name,CVariable **,int 
 		d[3]		=	(float) 0;
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -1688,7 +1688,7 @@ const char	*CShadingContext::shaderName(const char *type) {
 // Comments				:	Sometimes we just don't care about what system it is
 void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,const float *&to) {
 	ECoordinateSystem	dummy;
-	
+
 	findCoordinateSystem(name,from,to,dummy);
 }
 
@@ -1773,7 +1773,7 @@ void		CShadingContext::findCoordinateSystem(const char *name,const float *&from,
 			from		=	identityMatrix;
 			to			=	identityMatrix;
 			break;
-		}	
+		}
 	} else {
 		warning(CODE_BUG,"Unknown coordinate system: %s\n",name);
 		from	=	identityMatrix;
@@ -1811,7 +1811,7 @@ void			CShadingContext::randomInit(uint32_t s) {
     int j;
     state[0]= s & 0xffffffffUL;
     for (j=1; j<N; j++) {
-        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j); 
+        state[j] = (1812433253UL * (state[j-1] ^ (state[j-1] >> 30)) + j);
         state[j] &= 0xffffffffUL;  /* for >32 bit machines */
     }
     next = state;
@@ -1838,7 +1838,7 @@ void			CShadingContext::randomShutdown() {
 void			CShadingContext::next_state() {
     static const uint32_t _uTable[2] = { 0UL, MATRIX_A };
     register signed int j;
-    
+
     register uint32_t *p0;
     register uint32_t *p1;
 
@@ -1854,13 +1854,13 @@ void			CShadingContext::next_state() {
 
 		*p0 = TWIST( *p0, *p1 );
 		*p0 ^= p0[M];
-		++p1; 
+		++p1;
 		++p0;
     }
 
     *p0 = TWIST( *p0, *p1);
     *p0 ^= p0[M];
-    ++p1; 
+    ++p1;
     ++p0;
 
     j = (M-1) >> 1;

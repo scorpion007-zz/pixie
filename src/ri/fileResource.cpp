@@ -126,10 +126,10 @@ FILE	*ropen(const char *name,const char *mode,const char *type,int probe) {
 			fclose(f);
 			return NULL;
 		}
-		
+
 		// intentionally read separately for backward compatibility
 		fread(version+3,1,sizeof(int),f);
-		
+
 		if (version[3] != sizeof(int*)) {
 			// Always report file wordsize errors
 			error(CODE_BADFILE,"File \"%s\" is binary incompatible (generated on a machine with different word size)\n",name);
@@ -188,10 +188,10 @@ FILE	*ropen(const char *name,char *type) {
 		fclose(f);
 		return NULL;
 	}
-	
+
 	// intentionally read separately for backward compatibility
 	fread(version+3,1,sizeof(int),f);
-	
+
 	if (version[3] != sizeof(int*)) {
 		error(CODE_BADFILE,"File \"%s\" is binary incompatible (generated on a machine with different word size)\n",name);
 		fclose(f);

@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	bsplinePatchgrid.cpp
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					Patchgrid implementation
 //
@@ -71,7 +71,7 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 
 	initv(bmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(bmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
-	
+
 	// Note that u basis and v basis are swapped to take the transpose into account done during the precomputation
 	// Note also that we could use the B-spline basis to bound the curve, but Bezier bound is tighter
 	for (i=0;i<4;i++)
@@ -80,12 +80,12 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 	transposem(ut,bsplinebasis);
 	mulmm(geometryV,invBezier,ut);
 	mulmm(geometryU,bsplinebasis,invBezier);
-	
+
 	// alloc off upatches*vpatches*16*vertexSize worth of data
 	const int	vertexSize	=	var->vertexSize;
 	const int	vs			=	(variables->moving ? vertexSize*2 : vertexSize);
 	vertex					=	new float[vs*16*upatches*vpatches];
-	
+
 	for (i=0;i<vpatches;i++) {
 		for (j=0;j<upatches;j++) {
 			int		r,c;
@@ -106,7 +106,7 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 
 			// add to bounds
 			makeCubicBound(bmin,bmax,patchData+0*16,patchData+1*16,patchData+2*16);
-			
+
 			// precompute B*G*B' and stash it
 			for	(k=0;k<vertexSize;k++) {
 				mulmm(tmp,ut,patchData);
@@ -123,7 +123,7 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 					for (c=0;c<4;c++) {
 						int			x	=	(c + j) % uVertices;
 						const float	*d	=	ve + vertexSize + (y*uVertices+x)*vs;
-						
+
 						for	(k=0;k<vertexSize;k++) {
 							patchData[16*k + element(r,c)]		=	*d++;
 						}
@@ -142,7 +142,7 @@ CBSplinePatchGrid::CBSplinePatchGrid(CAttributes *a,CXform *x,CVertexData *var,C
 			}
 		}
 	}
-	
+
 	makeBound(bmin,bmax);
 }
 
@@ -180,13 +180,13 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 	int				vertexSampleStride;
 	const int		upatches		=	uVertices - 3;
 	const int		vpatches		=	vVertices - 3;
-	
+
 
 	if (variables->moving == FALSE) {
 		vertexData			=	vertex;								// No need for interpolation
 		vertexDataStep		=	0;
 		vertexSampleStride	=	vertexSize*16;
-	} else {									
+	} else {
 		if (up & PARAMETER_BEGIN_SAMPLE) {
 			vertexData			=	vertex;							// No need for interpolation
 			vertexDataStep		=	0;
@@ -220,7 +220,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 			}
 		}
 	}
-	
+
 	{	// Do the vertices
 		float	*intr		=	(float *) alloca(numVertices*vertexSize*sizeof(float));
 		float	*dPdu		=	varying[VARIABLE_DPDU] + start*3;
@@ -229,7 +229,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 		float	*intrStart	=	intr;
 		const float um		=	(float) upatches;
 		const float vm		=	(float) vpatches;
-				
+
 		// Interpolate the vertices
 		for (int i=0;i<numVertices;++i) {
 			double			tmp1[4],tmp2[4];
@@ -278,17 +278,17 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 		// Dispatch the vertex data
 		variables->dispatch(intrStart,start,numVertices,varying,locals);
 	}
-	
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			assert(u == varying[VARIABLE_U] + start);
 			assert(v == varying[VARIABLE_V] + start);
 			const int disp	=	vertexSize*16*upatches*vpatches;
-			
+
 			// Interpolate the thing
 			for (int i=0;i<numVertices;++i) {
 				double			tmpStart[4],tmpEnd[4];
@@ -304,7 +304,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 
 				// For x,y,z
 				for (int j=0;j<3;++j,data+=16) {
-				
+
 					// The inner product
 					for (int t=0;t<4;++t) {
 						tmpStart[t]	=	  vcubed*  data[element(0,t)]			+ vsquared*data[element(1,t)]			+ cv*data[element(2,t)]				+ data[element(3,t)];
@@ -314,7 +314,7 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 					// Update the data
 					*dest++			=	(float) ((tmpEnd[0]*ucubed + tmpEnd[1]*usquared + tmpEnd[2]*cu + tmpEnd[3]) - (tmpStart[0]*ucubed + tmpStart[1]*usquared + tmpStart[2]*cu + tmpStart[3]));
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest-3,CRenderer::invShutterTime);
 			}
@@ -323,10 +323,10 @@ void		CBSplinePatchGrid::sample(int start,int numVertices,float **varying,float 
 			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
 		}
 	}
-	
+
 	// Make sure we don't have any zero normals
 	normalFix();
-	
+
 	// Turn off the processed parameters
 	up	&=	~(PARAMETER_P | PARAMETER_DPDU | PARAMETER_DPDV | PARAMETER_NG | PARAMETER_DPDTIME | variables->parameters);
 }
@@ -342,14 +342,14 @@ void		CBSplinePatchGrid::interpolate(int numVertices,float **varying,float ***lo
 	if ((uMult != 1) || (vMult != 1)) {
 		float	*u,*v,*du,*dv,*dPdu,*dPdv;
 		int		i;
-	
+
 		u		=	varying[VARIABLE_U];
 		v		=	varying[VARIABLE_V];
 		du		=	varying[VARIABLE_DU];
 		dv		=	varying[VARIABLE_DV];
 		dPdu	=	varying[VARIABLE_DPDU];
 		dPdv	=	varying[VARIABLE_DPDV];
-	
+
 		for (i=numVertices;i>0;i--) {
 			*u++	=	(*u) * uMult + uOrg;
 			*v++	=	(*v) * vMult + vOrg;
@@ -359,7 +359,7 @@ void		CBSplinePatchGrid::interpolate(int numVertices,float **varying,float ***lo
 			mulvf(dPdv,vMult);	dPdv	+=	3;
 		}
 	}
-	
+
 	if (parameters != NULL)	parameters->dispatch(numVertices,varying,locals);
 }
 

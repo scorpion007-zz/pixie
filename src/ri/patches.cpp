@@ -232,7 +232,7 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 		interpolatev(t1,P10,P10 + vertexSize*4,cRay->time);	P10	=	t1;
 		interpolatev(t2,P01,P01 + vertexSize*4,cRay->time);	P01	=	t2;
 		interpolatev(t3,P11,P11 + vertexSize*4,cRay->time);	P11	=	t3;
-	} 
+	}
 
 
 	const float	*r			=	cRay->from;
@@ -254,7 +254,7 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 	const double	B2	=	b[COMP_Y]*q[COMP_Z] - b[COMP_Z]*q[COMP_Y];
 	const double	C2	=	c[COMP_Y]*q[COMP_Z] - c[COMP_Z]*q[COMP_Y];
 	const double	D2	=	(d[COMP_Y] - r[COMP_Y])*q[COMP_Z] - (d[COMP_Z] - r[COMP_Z])*q[COMP_Y];
-	
+
 
 #define solve()														\
 	if ((v > 0) && (v < 1)) {										\
@@ -308,7 +308,7 @@ void	CBilinearPatch::intersect(CShadingContext *context,CRay *cRay) {
 			}														\
 		}															\
 	}
-	
+
 
 
 	double			roots[2];
@@ -452,11 +452,11 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 			}
 		}
 	}
-	
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			const float	*u		=	varying[VARIABLE_U] + start;
@@ -474,7 +474,7 @@ void	CBilinearPatch::sample(int start,int numVertices,float **varying,float ***l
 					const int	k	=	4*vertexSize + j;
 					dest[j]			=	(float) ((((v0[k]*(1.0 - cu) + v1[k]*cu)*(1.0 - cv)	+ (v2[k]*(1.0 - cu) + v3[k]*cu)*cv - (v0[j]*(1.0 - cu) + v1[j]*cu)*(1.0 - cv)	+ (v2[j]*(1.0 - cu) + v3[j]*cu)*cv)));
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest,CRenderer::invShutterTime);
 			}
@@ -739,7 +739,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 			dPdv			+=	3;
 			N				+=	3;
 		}
-		
+
 		// Sanity check
 		assert(intr == intrStart + numVertices*vertexSize);
 
@@ -753,7 +753,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			assert(u == (varying[VARIABLE_U] + start));
@@ -772,7 +772,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 
 				// For each component
 				for (data=vertex,j=0;j<3;j++,data+=16) {
-				
+
 					// Do the partial computation
 					for (int t=0;t<4;t++) {
 						tmpStart[t]	=	  vcubed*  data[element(0,t)]			+ vsquared*data[element(1,t)]			+ cv*data[element(2,t)]			+ data[element(3,t)];
@@ -782,7 +782,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 					// Compute the result
 					dest[j]			=	(float) ((tmpEnd[0]*ucubed + tmpEnd[1]*usquared + tmpEnd[2]*cu + tmpEnd[3]) - (tmpStart[0]*ucubed + tmpStart[1]*usquared + tmpStart[2]*cu + tmpStart[3]));
 				}
-				
+
 				// Scale the dPdtime
 				mulvf(dest,CRenderer::invShutterTime);
 			}
@@ -791,7 +791,7 @@ void	CBicubicPatch::sample(int start,int numVertices,float **varying,float ***lo
 			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
 		}
 	}
-	
+
 	// Fix the degenerate normals
 	normalFix();
 
@@ -864,7 +864,7 @@ CNURBSPatch::CNURBSPatch(CAttributes *a,CXform *x,CVertexData *v,CParameter *p,i
 
 	// For each basis function
 	// Compute the coefficients
-	for (j=0;j<uOrder;j++) {			
+	for (j=0;j<uOrder;j++) {
 		precompBasisCoefficients(uCoefficients + uOrder*j,uOrder,j,uOrder-1,uKnots);
 	}
 
@@ -1004,7 +1004,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		float	*vertexStart;
 		double	pdu[4];
 		double	pdv[4];
-		
+
 #define computeNURBS(UORDER,VORDER) {																\
 		double	*memBase		=	(double *) alloca((UORDER*3 + VORDER*3)*sizeof(double));		\
 		double	*uPowers		=	memBase;														\
@@ -1142,13 +1142,13 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			break;																					\
 		default:	computeNURBS(uOrder,vOrder);	break;											\
 		}
-		
+
 		// Do the computation
 		compute();
 
 		// Note: make the common case fast: We're computing NG,DPDU and DPDV even if it's not required.
 		// Most of the time though, surface normal is required
-		
+
 		// Dispatch the vertex data
 		variables->dispatch(intrStart,start,numVertices,varying,locals);
 
@@ -1161,14 +1161,14 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		}
 	}
 
-		
+
 	// Compute dPdtime
 	if (up & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME] + start*3;
-		
+
 		// Do we have motion?
 		if (variables->moving) {
-			// OK, here's the tricky point, 
+			// OK, here's the tricky point,
 			const int	disp	=	vertexSize*uOrder*vOrder;
 #undef computeNURBS
 #define computeNURBS(UORDER,VORDER) {															\
@@ -1217,7 +1217,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 		mulvf(dest,CRenderer::invShutterTime);													\
 	}																							\
 	}
-	
+
 		compute();
 
 		} else {
@@ -1225,7 +1225,7 @@ void	CNURBSPatch::sample(int start,int numVertices,float **varying,float ***loca
 			for (int i=0;i<numVertices;++i,dest+=3)	initv(dest,0,0,0);
 		}
 	}
-	
+
 #undef computeNURBS
 #undef compute
 
@@ -1296,7 +1296,7 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 		for (i=0;i<(order-1);i++)	{
 			if (knots[start+order-1] != knots[start])
 				coefficients[i+1]	+=	lowerCoefficients1[i]*(1/(knots[start+order-1] - knots[start]));
-			
+
 			if (knots[start+order] != knots[start+1])
 				coefficients[i+1]	+= -lowerCoefficients2[i]*(1/(knots[start+order]-knots[start+1]));
 		}
@@ -1304,7 +1304,7 @@ void		CNURBSPatch::precompBasisCoefficients(double *coefficients,unsigned int or
 		for (i=0;i<(order-1);i++)	{
 			if (knots[start+order-1] != knots[start])
 				coefficients[i]		+=	-lowerCoefficients1[i]*(knots[start]/ (knots[start+order-1] - knots[start]));
-			
+
 			if (knots[start+order] != knots[start+1])
 				coefficients[i]		+=	 lowerCoefficients2[i]*(knots[start+order]/(knots[start+order]-knots[start+1]));
 		}
@@ -1430,7 +1430,7 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 						zg[element(r,c)]	=	P[COMP_Z];
 					}
 				}
-				
+
 				makeCubicBoundX(bmin,bmax,xg,yg,zg,xform);
 
 				if (pl->data1 != NULL) {
@@ -1445,7 +1445,7 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 							zg[element(r,c)]	=	P[COMP_Z];
 						}
 					}
-					
+
 					if (xform->next != NULL) {
 						makeCubicBoundX(bmin,bmax,xg,yg,zg,xform->next);
 					} else {
@@ -1457,7 +1457,7 @@ CPatchMesh::CPatchMesh(CAttributes *a,CXform *x,CPl *c,int d,int nu,int nv,int u
 			}
 		}
 	}
-	
+
 	makeBound(bmin,bmax);
 
 	// Create the synchronization object
@@ -1583,7 +1583,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 				float			uOrg		=	j * uMult;
 				float			vOrg		=	i * vMult;
 				CObject			*nObject;
-				
+
 				gatherData(context,j,i,2,2,j,i,k,vertex,parameters);
 
 				nObject				=	new CBilinearPatch(attributes,xform,vertexData,parameters,uOrg,vOrg,uMult,vMult,vertex);
@@ -1642,7 +1642,7 @@ void	CPatchMesh::create(CShadingContext *context) {
 
 	// Set the children pointer
 	setChildren(context,allChildren);
-	
+
 	// Release the lock
 	osUnlock(mutex);
 }
@@ -1711,7 +1711,7 @@ CNURBSPatchMesh::CNURBSPatchMesh(CAttributes *a,CXform *x,CPl *c,int nu,int nv,i
 		const float *from = xform->next->from;
 		for (P=pl->data0,i=0;i<(uVertices*vVertices);i++,P+=4) {
 			htpoint	tmp;
-	
+
 			mulmp4(tmp,from,P);
 			mulvf(tmp,1/tmp[3]);
 			addBox(bmin,bmax,tmp);
@@ -1855,7 +1855,7 @@ void	CNURBSPatchMesh::create(CShadingContext *context) {
 
 	vertexData->detach();
 
-	// Set the children 
+	// Set the children
 	setChildren(context,allChildren);
 
 	// Release the lock

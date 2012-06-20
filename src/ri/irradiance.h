@@ -109,7 +109,7 @@ public:
 
 		void					draw();
 		int						keyDown(int key);
-		
+
 		void					bound(float *bmin,float *bmax);
 private:
 		void					writeNode(FILE *,CCacheNode *);
@@ -123,9 +123,9 @@ private:
 		CCacheNode				*root;
 		int						maxDepth;
 		int						flags;
-		
+
 		TMutex					mutex;
-		
+
 		static	int				drawDiscs;					// Which type to draw
 		static	CChannel		cacheChannels[3];
 

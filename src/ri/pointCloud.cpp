@@ -103,28 +103,28 @@ CPointCloud::CPointCloud(const char *n,const float *from,const float *to,FILE *i
 	// Create our data areas
 	flush	=	FALSE;
 	maxdP	=	0;
-	
+
 	osCreateMutex(mutex);
 
-	
+
 	// Try to read the point cloud
 
 	// Read the header
 	readChannels(in);
-	
+
 	// Read the points
 	CMap<CPointCloudPoint>::read(in);
 
 	// Reserve the actual space
 	data.reserve(numItems*dataSize);
-	
+
 	// Read the data
 	fread(data.array,sizeof(float),numItems*dataSize,in);
 	data.numItems	=	numItems*dataSize;
 
 	// Read the maximum radius
 	fread(&maxdP,sizeof(float),1,in);
-	
+
 	// Close the file
 	fclose(in);
 }
@@ -174,16 +174,16 @@ void	CPointCloud::write() {
 
 		// Write out the header and channels
 		writeChannels(out);
-		
+
 		// Write the map
 		CMap<CPointCloudPoint>::write(out);
-	
+
 		// Write the data
 		fwrite(data.array,sizeof(float),numItems*dataSize,out);
 
 		// Read the maximum radius
 		fwrite(&maxdP,sizeof(float),1,out);
-	
+
 		// Close the file
 		fclose(out);
 	} else {
@@ -204,11 +204,11 @@ void	CPointCloud::write() {
 //							Il	must be normalized
 void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius) {
 	const int 				maxFound	=	16;
-	const CPointCloudPoint	**indices	=	(const CPointCloudPoint **)	alloca((maxFound+1)*sizeof(CPointCloudPoint *)); 
-	float					*distances	=	(float	*)					alloca((maxFound+1)*sizeof(float)); 
+	const CPointCloudPoint	**indices	=	(const CPointCloudPoint **)	alloca((maxFound+1)*sizeof(CPointCloudPoint *));
+	float					*distances	=	(float	*)					alloca((maxFound+1)*sizeof(float));
 	CPointLookup			l;
 	int						i,j;
-	const float				scale		=	2.5f;	// By controlling this, we 
+	const float				scale		=	2.5f;	// By controlling this, we
 
 	distances[0]		=	maxdP*maxdP*scale*scale;
 	l.maxFound			=	maxFound;
@@ -221,7 +221,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 	mulvf(l.N,-1);				// Photonmaps have N reversed, we must reverse
 								// N when looking up it it
 	if (dotvv(Nl,Nl) > C_EPSILON) normalizevf(l.N);
-	
+
 	l.gotHeap			=	FALSE;
 	l.indices			=	indices;
 	l.distances			=	distances;
@@ -235,7 +235,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 
 	int		numFound		=	l.numFound;
 	float	totalWeight		=	0;
-	
+
 	for (i=1;i<=numFound;i++) {
 		const	CPointCloudPoint	*p	=	indices[i];
 
@@ -243,7 +243,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 
 		const float	t		=	sqrtf(distances[i]) / (p->dP*scale);
 		const float	weight	=	l.ignoreNormal ? (1-t) : (1-t)*(-dotvv(l.N,p->N));
-		
+
 		float		*dest	=	Cl;
 		const float	*src	=	data.array + p->entryNumber;
 		for (j=0;j<dataSize;j++) {
@@ -251,7 +251,7 @@ void	CPointCloud::lookup(float *Cl,const float *Pl,const float *Nl,float radius)
 		}
 		totalWeight += weight;
 	}
-	
+
 	if (totalWeight > 0) {
 		// Divide the contribution
 		const float weight	= 1.0f/totalWeight;
@@ -300,7 +300,7 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	mulmp(P,to,cP);
 	mulmn(N,from,cN);
 	dP					*=	dPscale;
-	
+
 	osLock(mutex);	// FIXME: use rwlock to allow multiple readers
 	point				=	CMap<CPointCloudPoint>::store(P,N);
 	point->entryNumber	=	data.numItems;
@@ -309,7 +309,7 @@ void	CPointCloud::store(const float *C,const float *cP,const float *cN,float dP)
 	for (int i=0;i<dataSize;i++)	data.push(C[i]);
 
 	maxdP				=	max(maxdP,dP);
-	
+
 	osUnlock(mutex);
 }
 
@@ -324,11 +324,11 @@ void	CPointCloud::getPoint(int i,float *C,float *P,float *N,float *dP) {
 	const	CPointCloudPoint	*p		=	items + i;
 	const float 				*src	=	data.array + p->entryNumber;
 	float						*dest	=	C;
-	
+
 	for (int j=0;j<dataSize;j++) {
 		*dest++		=	*src++;
 	}
-	
+
 	movvv(P,p->P);
 	movvv(N,p->N);
 	dP[0] = p->dP;
@@ -367,11 +367,11 @@ void	CPointCloud::draw() {
 			cdP	=	dP;
 			j	=	chunkSize;
 		}
-		
+
 		movvv(cP,cT->P);
 		movvv(cN,cT->N);
 		*cdP	=	cT->dP;		// was /dPscale;	but should already be in world
-		
+
 		float *DDs = data.array + cT->entryNumber + sampleStart;
 		if (numSamples == 1) {
 			initv(cC,DDs[0]);

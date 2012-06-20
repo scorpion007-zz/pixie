@@ -46,7 +46,7 @@
 						((x) < 0.0 ? -pow(-x, 1.0/3.0) : 0.0))
 
 template <class T> inline	int	solveQuadric(T a,T b,T c,T *r) {
-	
+
 
 	if (a != 0) {
 		const double	delta	=	b*b - 4*a*c;

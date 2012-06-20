@@ -64,7 +64,7 @@ class	CTextureBlock	{
 public:
 	void				*data;				// Where the block data is stored (NULL if the block has been paged out)
 	CTexBlockThreadData	*threadData;
-	
+
 #ifdef TEXTURE_PERBLOCK_LOCK
 	TMutex				mutex;
 #endif
@@ -152,7 +152,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 	#ifdef TEXTURE_PERBLOCK_LOCK
 		osLock(CRenderer::textureMutex);
 	#endif
-	
+
 	memBegin(context->threadMemory);
 
 	const int thread	=	context->thread;
@@ -166,7 +166,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 			i++;
 		}
 	}
-	
+
 
 	// Collect those blocks into an array
 	activeBlocks	=	(CTextureBlock **) ralloc(i*sizeof(CTextureBlock *),context->threadMemory);
@@ -188,19 +188,19 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 
 		CRenderer::textureUsedMemory[thread]	-=	cBlock->size;
 		cBlock->threadData[thread].data			=	NULL;
-		
+
 		#ifdef TEXTURE_PERBLOCK_LOCK
 			osLock(cBlock->mutex);
 		#endif
-		
+
 		if (--cBlock->refCount == 0) {
 			stats.textureSize						-=	cBlock->size;
 			stats.textureMemory						-=	cBlock->size;
-			
+
 			delete [] (unsigned char *) cBlock->data;
 			cBlock->data					=	NULL;
 		}
-		
+
 		#ifdef TEXTURE_PERBLOCK_LOCK
 			osUnlock(cBlock->mutex);
 		#endif
@@ -208,7 +208,7 @@ static inline void	textureMemFlush(CTextureBlock *entry,CShadingContext *context
 	}
 
 	memEnd(context->threadMemory);
-	
+
 	#ifdef TEXTURE_PERBLOCK_LOCK
 		osUnlock(CRenderer::textureMutex);
 	#endif
@@ -248,19 +248,19 @@ static inline unsigned char	*textureAllocateBlock(CTextureBlock *entry,CShadingC
 // Return Value			:	Pointer to the new texture
 // Comments				:
 static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,int w,int h,int dir,CShadingContext *context) {
-	
+
 	#ifndef TEXTURE_PERBLOCK_LOCK
 		osLock(CRenderer::textureMutex);
 	#else
 		osLock(entry->mutex);
 	#endif
-	
+
 	// if we already have the data, use that and increment the reference count
 	if (entry->data != NULL) {
 		entry->threadData[context->thread].data	=	entry->data;
 		entry->refCount++;
-		
-		#ifndef TEXTURE_PERBLOCK_LOCK 
+
+		#ifndef TEXTURE_PERBLOCK_LOCK
 			osUnlock(CRenderer::textureMutex);
 		#else
 			osUnlock(entry->mutex);
@@ -278,7 +278,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	// thread-unsafe part of libtiff.  It's important the innards of the handler
 	// don't do anything which would be problematic if more than one thread
 	// executed it
-	
+
 	// Set the error handler so we don't crash
 	//TIFFSetErrorHandler(tiffErrorHandler);
 	//TIFFSetWarningHandler(tiffErrorHandler);
@@ -287,7 +287,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	TIFF	*in		=	TIFFOpen(name,"r");
 	void	*data	=	NULL;
 	if (in != NULL) {		// Error, we opened this file before
-							// The stupid user must have deleted the 
+							// The stupid user must have deleted the
 							// file or unmounted the drive while in progress
 		TIFFSetDirectory(in,dir);
 
@@ -329,7 +329,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 				unsigned char	*tdata;
 
 				memBegin(context->threadMemory);
-				
+
 				tdata		=	(unsigned char *) ralloc(width*height*pixelSize,context->threadMemory);
 
 				// Read the entire image
@@ -364,7 +364,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 					for (int c = 0; c<numSamples; ++c) {
 						TIFFReadTile (in, buffer, x, y, 0, c);
 						for (unsigned int i = 0; i<tileWidth*tileHeight; ++i) {
-							memcpy (cdata + (i*numSamples+c)*bytesPerSample,buffer+i*bytesPerSample, bytesPerSample);					                         
+							memcpy (cdata + (i*numSamples+c)*bytesPerSample,buffer+i*bytesPerSample, bytesPerSample);
 						}
 					}
 				} else {
@@ -394,7 +394,7 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 								memcpy (cdata + (i*numSamples+c)*bytesPerSample,buffer+i*bytesPerSample, bytesPerSample);
 							}
 						}
-					} else {	
+					} else {
 						TIFFReadTile(in,data,x,y,0,0);
 					}
 				}
@@ -414,9 +414,9 @@ static inline void	textureLoadBlock(CTextureBlock *entry,char *name,int x,int y,
 	}
 
 	// See note below about out of order architectures.  The functions above take care of this
-	
+
 	assert(entry->refCount == 0);
-	
+
 	entry->refCount = 1;
 	entry->data								=	data;
 	entry->threadData[context->thread].data	=	data;
@@ -441,7 +441,7 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 	cEntry->refCount					=	0;
 	cEntry->threadData					=	new CTexBlockThreadData[CRenderer::numThreads];
 	cEntry->size						=	size;
-	
+
 	#ifdef TEXTURE_PERBLOCK_LOCK
 		osCreateMutex(cEntry->mutex);
 	#endif
@@ -450,7 +450,7 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 		cEntry->threadData[i].lastRefNumber		=	0; // FIXME: is this right?
 							// should be CRenderer::textureRefNumber ???
 	}
-	
+
 	// Place cEntry on list
 	cEntry->prev						=	NULL;
 	cEntry->next						=	CRenderer::textureUsedBlocks;
@@ -466,13 +466,13 @@ static inline void	textureRegisterBlock(CTextureBlock *cEntry,int size) {
 // Return Value			:	Pointer to the new block
 // Comments				:
 static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
-	
+
 	if (cEntry->next != NULL)	cEntry->next->prev						=	cEntry->prev;
 	if (cEntry->prev != NULL)	cEntry->prev->next						=	cEntry->next;
 	else						CRenderer::textureUsedBlocks			=	cEntry->next;
 
 	//assert(cEntry->refCount == 0);//? bad idea?
-	
+
 	if (cEntry->data != NULL) {
 		stats.textureSize	-=	cEntry->size;
 		stats.textureMemory	-=	cEntry->size;
@@ -484,9 +484,9 @@ static inline void	textureUnregisterBlock(CTextureBlock *cEntry) {
 		}
 		delete [] (unsigned char *) cEntry->data;
 	}
-	
+
 	delete[] cEntry->threadData;
-	
+
 	#ifdef TEXTURE_PERBLOCK_LOCK
 		osDeleteMutex(cEntry->mutex);
 	#endif
@@ -551,7 +551,7 @@ public:
 							free(name);
 						}
 
-	void				lookup(float *r,float s,float t,CShadingContext *context) { 
+	void				lookup(float *r,float s,float t,CShadingContext *context) {
 							s		*=	width;					// To the pixel space
 							t		*=	height;
 							s		-=	0.5;					// Pixel centers
@@ -672,14 +672,14 @@ public:
 protected:
 					// The pixel lookup
 			void	lookupPixel(float *res,int x,int y,CShadingContext *context) {
-						
+
 						const int	thread	=	context->thread;
 
 						if (dataBlock.threadData[thread].data == NULL) {
 							// The data is cached out
 							textureLoadBlock(&dataBlock,name,0,0,fileWidth,fileHeight,directory,context);
 						}
-						
+
 
 						// Texture cache management
 						(*CRenderer::textureRefNumber[thread])++;
@@ -687,7 +687,7 @@ protected:
 
 						int	xi		=	x+1;
 						int	yi		=	y+1;
-						
+
 						// these must be after the xi,yi calculation
 						if (x < 0)			x  = (sMode == TEXTURE_PERIODIC) ? (x + width)   : 0;
 						if (y < 0)			y  = (tMode == TEXTURE_PERIODIC) ? (y + height)  : 0;
@@ -783,7 +783,7 @@ protected:
 
 						int	xi		=	x+1;
 						int	yi		=	y+1;
-						
+
 						// these must be after the xi,yi calculation
 						// x,y are relative to this layer
 						if (x < 0)			x  = (sMode == TEXTURE_PERIODIC) ? (x + width)   : 0;
@@ -818,7 +818,7 @@ protected:
 #undef access
 					}
 
-						
+
 
 	CTextureBlock	**dataBlocks;
 	int				xTiles,yTiles;
@@ -948,7 +948,7 @@ public:
 							if (i >= (numLayers-1)) i =	numLayers-2;
 
 							layer0		=	layers[i];
-							layer1		=	layers[i+1];	
+							layer1		=	layers[i+1];
 							offset		=	l - i;
 							offset		=	min(offset,1);
 
@@ -1022,7 +1022,7 @@ public:
 							mulvf(result,tmp);
 						}
 
-	
+
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = (float) layers[0]->width; r[1] = (float) layers[0]->height; }
 	int 				getNumChannels()			{ return layers[0]->numSamples; }
@@ -1098,9 +1098,9 @@ public:
 							int						i;
 							float					totalContribution	=	0;
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
-							
+
 							const float jitter = 1.0f-1.0f/(float)scratch->textureParams.samples;
-							
+
 							initv(result,0,0,0);		// Result is black
 							for (i=(int) scratch->textureParams.samples;i>0;i--) {
 								float			s,t;
@@ -1111,7 +1111,7 @@ public:
 								// stratify the sample so that with low sample counts we don't jitter too much
 								const float		x	=	(r[0]-0.5f)*jitter+0.5f;
 								const float		y	=	(r[1]-0.5f)*jitter+0.5f;
-								
+
 								s					=	(u[0]*(1-x) + u[1]*x)*(1-y)	+
 														(u[2]*(1-x) + u[3]*x)*y;
 								t					=	(v[0]*(1-x) + v[1]*x)*(1-y)	+
@@ -1172,11 +1172,11 @@ public:
 							const float	tmp	=	1 / totalContribution;
 							mulvf(result,tmp);
 						}
-	
+
 	// textureinfo support
 	void				getResolution(float *r) 	{ r[0] = (float) layer->width; r[1] = (float) layer->height; }
 	int 				getNumChannels()			{ return layer->numSamples; }
-	
+
 	CTextureLayer		*layer;						// There's only one layer
 };
 
@@ -1201,7 +1201,7 @@ public:
 
 	void				lookup(float *result,const float *D0,const float *D1,const float *D2,const float *D3,CShadingContext *context) {
 							float					totalContribution	=	0;
-							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);			
+							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
 							const float				jitter				=	1.0f-1.0f/(float)scratch->traceParams.samples;
 
 							result[0]	=	0;
@@ -1213,7 +1213,7 @@ public:
 
 								// stratify the sample so that with low sample counts we don't jitter too much
 								const float x				=	(r[0]-0.5f)*jitter+0.5f;
-								const float y				=	(r[1]-0.5f)*jitter+0.5f;					
+								const float y				=	(r[1]-0.5f)*jitter+0.5f;
 								const float	contribution	=	scratch->textureParams.filter(x-0.5f,y-0.5f,1,1);
 
 								totalContribution	+=	contribution;
@@ -1226,12 +1226,12 @@ public:
 								mulmp4(tmp,toNDC,cP);
 								float	s			=	tmp[0] / tmp[3];
 								float	t			=	tmp[1] / tmp[3];
-								
+
 								if (scratch->textureParams.blur > 0) {
 									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
 									t				+=	scratch->textureParams.blur*(r[3] - 0.5f);
 								}
-								
+
 								if ((s < 0) || (s > 1) || (t < 0) || (t > 1)) {
 									continue;
 								}
@@ -1243,7 +1243,7 @@ public:
 							result[1]	=	result[0];
 							result[2]	=	result[0];
 						}
-	
+
 	// textureinfo support
 	void				getResolution(float *r) 		{ side->getResolution(r); }
 	const char			*getTextureType()				{ return "shadow"; }
@@ -1297,10 +1297,10 @@ public:
 							// new-style tsm file
 							tileSizes	=	new int[header.xTiles*header.yTiles];
 							fread(tileSizes,sizeof(int),header.xTiles*header.yTiles,in);
-							
+
 							// Save the index start
 							fileStart		=	ftell(in);
-							
+
 							// Init the tiles
 							tiles	=	new CDeepTile*[header.yTiles];
 							for (int k=0,i=0;i<header.yTiles;++i) {
@@ -1320,7 +1320,7 @@ public:
 							}
 
 							delete[] tileSizes;
-								
+
 							fclose(in);
 						}
 
@@ -1344,7 +1344,7 @@ public:
 							float					totalContribution	=	0;
 							const CShadingScratch	*scratch			=	&(context->currentShadingState->scratch);
 							const float				jitter				=	1.0f-1.0f/(float)scratch->traceParams.samples;
-							
+
 							result[0]	=	0;
 							result[1]	=	0;
 							result[2]	=	0;
@@ -1374,12 +1374,12 @@ public:
 								mulmp4(tmp,header.toNDC,cP);
 								s					=	tmp[0] / tmp[3];
 								t					=	tmp[1] / tmp[3];
-								
+
 								if (scratch->textureParams.blur > 0) {
 									s				+=	scratch->textureParams.blur*(r[2] - 0.5f);
 									t				+=	scratch->textureParams.blur*(r[3] - 0.5f);
 								}
-								
+
 								if ((s < 0) || (s >= 1) || (t < 0) || (t >= 1)) {
 									continue;
 								}
@@ -1401,7 +1401,7 @@ public:
 
 								(*CRenderer::textureRefNumber[thread])++;
 								cTile->block.threadData[thread].lastRefNumber	=	*CRenderer::textureRefNumber[thread];
-								
+
 								if (cTile->block.threadData[thread].data == NULL) {
 									loadTile(bx,by,context);
 								}
@@ -1439,14 +1439,14 @@ public:
 							result[1]	/=	totalContribution;
 							result[2]	/=	totalContribution;
 						}
-	
+
 	// textureinfo support
 	void				getResolution(float *r) 		{ r[0] = (float) header.xres; r[1] = (float) header.yres; }
 	const char			*getTextureType()				{ return "shadow"; }
 	int 				getNumChannels()				{ return 4; }
 	int 				getViewMatrix(float *m)			{ movmm(m,header.toCamera); return TRUE; }
 	int 				getProjectionMatrix(float *m)	{ movmm(m,header.toNDC); return TRUE; }
-	
+
 private:
 	void				loadTile(int x,int y,CShadingContext *context) {
 
@@ -1497,21 +1497,21 @@ private:
 									while(*data != -C_INFINITY)	data	+=	4;
 								}
 							}
-							
+
 							// This is a function call, which the compiler thinks could access
-							// any of memory.  Place it here, to ensure the compiler does not 
+							// any of memory.  Place it here, to ensure the compiler does not
 							// hoist the store of the data before we finish computing the
 							// data starts and ends on archictectures like PPC which are massively
 							// out of order wrt memory store completion
 							// the osUnlock will take care of the real barrier
 							fclose(in);
-							
+
 							assert(cTile->block.refCount == 0);
-							
+
 							cTile->block.refCount							=	1;
 							cTile->block.data								=	dataStart;
 							cTile->block.threadData[context->thread].data	=	dataStart;
-							
+
 							#ifndef TEXTURE_PERBLOCK_LOCK
 								osUnlock(CRenderer::textureMutex);
 							#else
@@ -1563,7 +1563,7 @@ public:
 							NZ,
 						} ESide;
 
-	
+
 						typedef enum {
 							XYZ		=	0,
 							XZY,
@@ -1599,7 +1599,7 @@ public:
 								addvv(middle,D2);
 								addvv(middle,D3);
 								mulvf(middle,1.0f/4.0f);
-								
+
 								// Scale the directions along the mid point with the blur
 								subvv(tmp[0],D0,middle);
 								normalizevf(tmp[0]);
@@ -1625,7 +1625,7 @@ public:
 								addvv(tmp[3],D3);
 								D3	=	tmp[3];
 							}
-						
+
 							for (int i=(int) scratch->traceParams.samples;i>0;--i) {
 								float	t;
 								float	r[2];
@@ -1665,8 +1665,8 @@ public:
 								switch(order) {
 								case XYZ:
 								case XZY:
-									if (D[COMP_X] > 0)	{	
-										side	=	sides[PX];	
+									if (D[COMP_X] > 0)	{
+										side	=	sides[PX];
 										t		=	1 / D[COMP_X];
 										u		=	(-D[COMP_Z]*t+1)*0.5f;
 										v		=	(-D[COMP_Y]*t+1)*0.5f;
@@ -1680,12 +1680,12 @@ public:
 								case YXZ:
 								case YZX:
 									if (D[COMP_Y] > 0) {
-										side	=	sides[PY];	
+										side	=	sides[PY];
 										t		=	1 / D[COMP_Y];
 										u		=	(D[COMP_X]*t+1)*0.5f;
 										v		=	(D[COMP_Z]*t+1)*0.5f;
 									} else	{
-										side	=	sides[NY];	
+										side	=	sides[NY];
 										t		=	-1 / D[COMP_Y];
 										u		=	(D[COMP_X]*t+1)*0.5f;
 										v		=	(-D[COMP_Z]*t+1)*0.5f;
@@ -1725,7 +1725,7 @@ public:
 	int 				getNumChannels()			{ return sides[0]->getNumChannels(); }
 	int 				getViewMatrix(float *m)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
+
 	CTexture			*sides[6];
 };
 
@@ -1775,7 +1775,7 @@ public:
 	int 				getNumChannels()			{ return side->getNumChannels(); }
 	int 				getViewMatrix(float *m)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
+
 	CTexture			*side;
 };
 
@@ -1799,7 +1799,7 @@ public:
 							float		u[4],v[4];
 							double		a,b,c;
 							vector		D,Dsamp;
-							
+
 							// Note Cylinderical maps (EnvLatL maps) are Z is north
 							// -pi is top +pi is bottom, hence sign flip in z
 
@@ -1808,12 +1808,12 @@ public:
 								movvv(Dsamp,D);
 								u[0]				=	(atan2f(D[COMP_Y],D[COMP_X]) +(float)  C_PI) * (1.0f / (2.0f* (float) C_PI));
 								v[0]				=	asin(-D[COMP_Z]) * (1.0f / (float) C_PI) + 0.5f;
-								
+
 								c = (D[COMP_X]*D[COMP_X]+D[COMP_Y]*D[COMP_Y])*2.0*C_PI;
 								a = -D[COMP_Y]/c;
 								b = D[COMP_X]/c;
 								c = 1.0f/(C_PI*sqrt(1.0f-D[COMP_Z]*D[COMP_Z] + C_EPSILON));	// would be -ve but cancels with -y
-										
+
 								normalizev(D,D1);
 								subvv(D,Dsamp);
 								u[1]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Y]);
@@ -1823,12 +1823,12 @@ public:
 								subvv(D,Dsamp);
 								u[2]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Y]);
 								v[2]				=	v[0] + (float) (c*D[COMP_Z]);
-								
+
 								normalizev(D,D3);
 								subvv(D,Dsamp);
 								u[3]				=	u[0] + (float) (a*D[COMP_X] + b*D[COMP_Y]);
 								v[3]				=	v[0] + (float) (c*D[COMP_Z]);
-								
+
 								side->lookup4(result,u,v,context);
 							} else {
 								initv(result,0,0,0);
@@ -1841,7 +1841,7 @@ public:
 	int 				getNumChannels()			{ return side->getNumChannels(); }
 	int 				getViewMatrix(float *m)		{ return FALSE; }
 	int 				getProjectionMatrix(float*)	{ return FALSE; }
-	
+
 	CTexture			*side;
 };
 
@@ -1869,7 +1869,7 @@ public:
 /// \brief					Dummy
 // Return Value			:
 // Comments				:
-float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) { 
+float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) {
 	return 0;
 }
 
@@ -1880,7 +1880,7 @@ float		CDummyTexture::lookupz(float u,float v,float z,CShadingContext *context) 
 /// \brief					Dummy
 // Return Value			:
 // Comments				:
-void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context) { 
+void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context) {
 	initv(dest,context->currentShadingState->scratch.textureParams.fill);
 }
 
@@ -1891,7 +1891,7 @@ void		CDummyTexture::lookup(float *dest,float u,float v,CShadingContext *context
 /// \brief					Dummy
 // Return Value			:
 // Comments				:
-void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingContext *context) { 
+void		CDummyTexture::lookup4(float *dest,const float *u,const float *v,CShadingContext *context) {
 	initv(dest,context->currentShadingState->scratch.textureParams.fill);
 }
 
@@ -2137,8 +2137,8 @@ static	CTexture	*texLoad(const char *name,const char *aname,TIFF *in,int &dstart
 				}
 			}
 		}
-	} 
-	
+	}
+
 	// Were we able to read the texture ?
 	if (cTexture == NULL) {
 
@@ -2236,7 +2236,7 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 		if (TIFFGetField(in,TIFFTAG_PIXAR_TEXTUREFORMAT ,&textureFormat) == 1) {
 
 			if (strcmp(textureFormat,TIFF_CUBIC_ENVIRONMENT) == 0) {
-				// We're loading a cubic environment 
+				// We're loading a cubic environment
 				int			directory	=	0;
 				CTexture	*sides[6];
 
@@ -2276,7 +2276,7 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 
 				cTexture	=	new CShadow(name,localToNDC,localToCamera,side);
 			}
-		} 
+		}
 	}
 
 	return cTexture;
@@ -2291,22 +2291,22 @@ CEnvironment		*CRenderer::environmentLoad(const char *name,TSearchpath *path,flo
 void			CRenderer::initTextures(int mm) {
 	// Set up our texturing
 	const int maxPerThread			=	(int) ceil((float)mm/CRenderer::numThreads);
-	
+
 	CRenderer::textureUsedBlocks	=	NULL;
-	
+
 	CRenderer::textureUsedMemory	=	new int[CRenderer::numThreads];
 	CRenderer::textureMaxMemory		=	new int[CRenderer::numThreads];
-	
+
 	CRenderer::textureRefNumber		=	new	int*[CRenderer::numThreads];
-	
+
 	for (int i=0;i<CRenderer::numThreads;++i) {
 		CRenderer::textureMaxMemory[i]		=	maxPerThread;
 		CRenderer::textureUsedMemory[i]		=	0;
-		
+
 		CRenderer::textureRefNumber[i]		=	new int;
 		*CRenderer::textureRefNumber[i]		=	0;
 	}
-	
+
 	// Note: all memory should have been cleared by previous shutdown
 }
 
@@ -2319,18 +2319,18 @@ void			CRenderer::initTextures(int mm) {
 void			CRenderer::shutdownTextures() {
 
 	// Flush all the memory (blocks will be killed by earlier file shutdown)
-	
+
 	//for (int i=0;i<CRenderer::numThreads;i++) {
 	//	textureMemFlush(NULL,i,TRUE);
 	//	assert(CRenderer::textureUsedMemory[i] == 0);
 	//}
-	
+
 	assert(CRenderer::textureUsedBlocks == NULL);
-	
+
 	// free up our texturing counters
 	delete[] CRenderer::textureUsedMemory;
 	delete[] CRenderer::textureMaxMemory;
-	
+
 	// Get rid of the reference counter
 	for (int i=0;i<CRenderer::numThreads;++i) delete CRenderer::textureRefNumber[i];
 	delete[] CRenderer::textureRefNumber;

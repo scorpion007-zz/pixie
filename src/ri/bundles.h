@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	bundles.h
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					Special ray bundle classes
 //
@@ -141,7 +141,7 @@ public:
 
 	int				numOutputs;				// List of outputs that would require shading
 	float			**outputs;
-	CGatherVariable	*outputVars;	
+	CGatherVariable	*outputVars;
 
 	int				numNonShadeOutputs;		// List of outputs that do not require shading
 	float			**nonShadeOutputs;
@@ -151,7 +151,7 @@ public:
 	int				remainingSamples;		// The number of remaining samples
 
 	int				numSamples;				// The number of samples
-	int				uniformDist;				
+	int				uniformDist;
 };
 
 

@@ -80,7 +80,7 @@ CSphereLight::~CSphereLight() {
 // Comments				:
 void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 	CShadingState	*currentShadingState	=	context->currentShadingState;
-	
+
 #define sampleSphere(cP)								\
 	while(TRUE) {										\
 		cP[COMP_X]	=	2*context->urand()-1;			\
@@ -137,10 +137,10 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 		const float		bias					=	currentShadingState->currentObject->attributes->bias;
 		int				numVertices				=	currentShadingState->numRealVertices;
 		CShadedLight	*cLight;
-		
+
 		if (currentShadingState->numActive == 0)
 			return;
-		
+
 		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight),context->threadMemory);
 		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices,context->threadMemory);
 		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*),context->threadMemory);
@@ -158,7 +158,7 @@ void					CSphereLight::illuminate(CShadingContext *context,float **locals) {
 			if (*tags++ == 0) {
 				vector			P;
 				float			visibility	=	0;
-				
+
 				for (j=numSamples;j>0;j--) {
 					sampleSphere(P);
 					normalizev(P);
@@ -360,7 +360,7 @@ CQuadLight::CQuadLight(CAttributes *a,CXform *x) : CShaderInstance(a,x) {
 	numSamples	=	1;
 	reverse		=	(a->flags & ATTRIBUTES_FLAGS_INSIDE);
 	flags		=	SHADERFLAGS_NONAMBIENT;
-	
+
 	subvv(D0,corners[1],corners[0]);
 	subvv(D1,corners[2],corners[0]);
 	crossvv(N,D0,D1);
@@ -465,10 +465,10 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		int				numLitPoints			=	0;
 		CShadedLight	*cLight;
 		int				*lightTags;
-		
+
 		if (currentShadingState->numActive == 0)
 			return;
-		
+
 		cLight						=	(CShadedLight*) ralloc(sizeof(CShadedLight),context->threadMemory);
 		cLight->lightTags			=	(int*)			ralloc(sizeof(int)*numVertices,context->threadMemory);
 		cLight->savedState			=	(float**)		ralloc(2*sizeof(float*),context->threadMemory);
@@ -479,12 +479,12 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 		float		*L					=	cLight->savedState[0];
 		float		*Cl					=	cLight->savedState[1];
 		const float	*time				=	currentShadingState->varying[VARIABLE_TIME];
-		
-		// GSHTODO: do something to check Ps vs N angle before allocating light
-		
-		
 
-		
+		// GSHTODO: do something to check Ps vs N angle before allocating light
+
+
+
+
 		lightTags = cLight->lightTags;
 		for (int i=currentShadingState->numRealVertices;i>0;i--,Ps+=3,time++) {
 			if (*lightTags == 0) {
@@ -499,7 +499,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 						interpolatev(P0,corners[0],corners[1],u);
 						interpolatev(P1,corners[2],corners[3],u);
 						interpolatev(P,P0,P1,context->urand());
-						
+
 						// Evaluate visibility between P and Ps
 						movvv(ray.from,Ps);
 						subvv(ray.dir,P,Ps);
@@ -540,7 +540,7 @@ void					CQuadLight::illuminate(CShadingContext *context,float **locals) {
 				Cl	+=	3;
 			}
 		}
-		
+
 		if (numLitPoints > 0) {
 			// Only save the light if it has active points
 			cLight->next				=	*lights;

@@ -43,7 +43,7 @@
 	if ((_flags & RASTER_SHADE_HIDDEN) &&
 		(_flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE)) &&
 		(_flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE))) {
-		
+
 		shadeGrid(grid,FALSE);
 		rasterDrawPrimitives(grid);
 		return;
@@ -147,7 +147,7 @@
 		nSample->opacity[1]		=	((v0c[0]*(1-jt) + v0c[displacement+0]*jt)*(1-u) + (v1c[0]*(1-jt) + v1c[displacement+0]*jt)*u)*(1-v) + ((v2c[0]*(1-jt) + v2c[displacement+0]*jt)*(1-u) + (v3c[0]*(1-jt) + v3c[displacement+0]*jt)*u)*v;	\
 		v0c++;	v1c++;	v2c++;	v3c++;															\
 		nSample->opacity[2]		=	((v0c[0]*(1-jt) + v0c[displacement+0]*jt)*(1-u) + (v1c[0]*(1-jt) + v1c[displacement+0]*jt)*u)*(1-v) + ((v2c[0]*(1-jt) + v2c[displacement+0]*jt)*(1-u) + (v3c[0]*(1-jt) + v3c[displacement+0]*jt)*u)*v;
-		
+
 #else
 
 	#define colorOpacityUpdate()																\
@@ -320,7 +320,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-//This macro is the entry point that checks if the pixel passes a depth test and if we need 
+//This macro is the entry point that checks if the pixel passes a depth test and if we need
 // to shade the grid or not
 #ifdef STOCHASTIC_UNSHADED
 // We're not shaded yet, so if we pass the depth test, we need to back and shade the grid
@@ -396,9 +396,9 @@ ymax					=	min(ymax,yres);
 
 int	x,y;
 
-for (y = ymin; y <= ymax; y++) 
+for (y = ymin; y <= ymax; y++)
 {
-	for (x = xmin; x <= xmax; x++) 
+	for (x = xmin; x <= xmax; x++)
 	{
 		CPixel		*pixel		=	fb[y] + x;
 		int			i,j;
@@ -558,7 +558,7 @@ for (j=0;j<vdiv;j++) {
 		ymax		=	min(ymax,yres);
 
 
-		// Figure our if we have to do the slow rasterization	
+		// Figure our if we have to do the slow rasterization
 #ifdef STOCHASTIC_FOCAL_BLUR
 	#define SLOW_RASTER
 #endif
@@ -754,5 +754,5 @@ for (j=0;j<vdiv;j++) {
 
 
 
-	
+
 

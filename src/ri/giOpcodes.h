@@ -103,7 +103,7 @@
 									jmp(argument(0));													\
 								}																		\
 							}
-	
+
 #else
 #define GATHEREXPR_PRE
 #endif
@@ -165,7 +165,7 @@ DEFOPCODE(GatherElse	,"gatherElse"	,1,	GATHERELSEEXPR_PRE,NULL_EXPR,NULL_EXPR,NU
 							} else {																\
 								delete lastGather;													\
 							}
-								
+
 #else
 #define GATHERENDEXPR_PRE
 #endif

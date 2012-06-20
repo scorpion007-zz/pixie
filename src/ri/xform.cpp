@@ -60,7 +60,7 @@ CXform::CXform() {
 // Description			:
 /// \brief					Create an exact copy of another xform
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CXform::CXform(CXform *a) {
 	atomicIncrement(&stats.numXforms);
 
@@ -80,7 +80,7 @@ CXform::CXform(CXform *a) {
 // Description			:
 /// \brief					Destructor
 // Return Value			:	-
-// Comments				:	
+// Comments				:
 CXform::~CXform() {
 	atomicDecrement(&stats.numXforms);
 
@@ -475,11 +475,11 @@ void		CXform::updateBound(float *bmin,float *bmax,int numPoints,const float *P) 
 	vector		tmp;
 	int			i;
 	const float	*cP;
-	
+
 	for (i=numPoints,cP=P;i>0;i--,cP+=3) {
 		mulmp(tmp,from,cP);
 		addBox(bmin,bmax,tmp);
 	}
-	
+
 	if (next != NULL)	next->updateBound(bmin,bmax,numPoints,P);
 }

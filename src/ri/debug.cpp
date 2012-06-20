@@ -70,7 +70,7 @@ CDebugView::CDebugView(const char *fileName,int append) {
 // Return Value			:	-
 // Comments				:
 CDebugView::CDebugView(FILE *in,const char *fn) {
-	
+
 	file		=	in;
 	writing		=	FALSE;
 	fileName	=	fn;

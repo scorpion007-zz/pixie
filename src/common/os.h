@@ -45,7 +45,7 @@ class CRWLock {
     HANDLE  mutex;
     HANDLE  writerMutex;
 	LONG	readCount;
-	
+
     friend void osCreateRWLock(CRWLock &);
     friend void osDeleteRWLock(CRWLock &);
     friend void osReadLock(CRWLock &);
@@ -61,7 +61,7 @@ class CRWLock {
 #define	pclose			_pclose
 #define	j1				_j1
 #define	TThread			HANDLE
-#define	TMutex			CRITICAL_SECTION 
+#define	TMutex			CRITICAL_SECTION
 #define	TSemaphore		HANDLE
 #define TRWLock         CRWLock
 #define	TFunPrefix		DWORD WINAPI
@@ -285,7 +285,7 @@ inline	void osReadLock(TRWLock &l) {
 	}
 	// Signal that there are readers
 	WaitForSingleObject(l.readerEvent, INFINITE);
-#else	
+#else
 	pthread_rwlock_rdlock(&l);
 #endif
 }
@@ -352,7 +352,7 @@ const	char	osModuleExtension[]		=	"dll";
 //const	char	osModuleExtension[]		=	"dylib";
 
 // loadable libs on darwin are supposed to be .bundle
-// but automake/libtool chooses .so and it can't be 
+// but automake/libtool chooses .so and it can't be
 // changed.  Xcode can be
 const	char	osModuleExtension[]		=	"so";
 #else		// OSX

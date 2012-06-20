@@ -90,7 +90,7 @@ void	CPLLookup::bind(const char *name,int &opIndex,int step,void *data,CShaderIn
 // Comments				:
 void	CPLLookup::add(const char *name,int opIndex,int step,void *data,size_t dest) {
 	TParamBinding	*cBinding;
-	
+
 	if (data != NULL)	cBinding	=	uniforms + numUniforms++;
 	else				cBinding	=	varyings + numVaryings++;
 
@@ -629,7 +629,7 @@ void		COcclusionLookup::init(CShadingScratch *scratch,const CAttributes *attribu
 	scratch->occlusionParams.environment		=	NULL;					// Overwritten on the fly
 	scratch->occlusionParams.cacheHandle		=	attributes->irradianceHandle;				// Use the attribute by default
 	scratch->occlusionParams.cacheMode			=	attributes->irradianceHandleMode;			// Use the attribute by default
-	
+
 	scratch->traceParams.samples				=	1;
 	scratch->traceParams.maxDist				=	C_INFINITY;
 	scratch->traceParams.coneAngle				=	0;

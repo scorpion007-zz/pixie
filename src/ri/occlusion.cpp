@@ -174,7 +174,7 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 	int xmax;
 	int ymin;
 	int ymax;
-	
+
 	// search for a small enough query area, to keep query cost down
 	// this has the nice property that large objects are less accurately
 	// queried than small ones (where there are chance to be many)
@@ -193,7 +193,7 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		// Clamp the bound in the current bucket
 		xmin					=	max(xmin,0);
 		ymin					=	max(ymin,0);
-		
+
 		// Notes:
 		//		This is correct but inefficient due to querying
 		//			xmax		=	min(xmax,(1<<queryDepth)-1);
@@ -204,7 +204,7 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		//		We're using a recurrance, this
 		// 			(bw*2+(1<<d))>>d , d = (depth-queryDepth)
 		// 		is equivalent but probably slower
-		
+
 		xmax					=	min(xmax,w-1);
 		ymax					=	min(ymax,h-1);
 
@@ -215,10 +215,10 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 		// terminate search if we find a sufficiently small area
 		if ((xmax-xmin) <= 4) break;
 		if ((ymax-ymin) <= 4) break;
-	
+
 		// update offset
 		nodeOffset				+=	(1<<queryDepth)*(1<<queryDepth);
-		
+
 		// Deal with odd sized buckets at this depth
 		h = (h+(h&1))>>1;
 		w = (w+(w&1))>>1;
@@ -229,9 +229,9 @@ int COcclusionCuller::probeRect(int *xbound,int *ybound, int bw, int bh, int bl,
 	for(int y=ymin;y<=ymax;y++) {
 		COcclusionNode **ne = n;
 		for(int x=xmin;x<=xmax;x++) {
-			
+
 			if (zmin <= (*ne)->zmax) return TRUE;
-			
+
 			ne++;
 		}
 		n += 1<<queryDepth;

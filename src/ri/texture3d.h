@@ -68,7 +68,7 @@ public:
 	virtual					~CTexture3d();
 
 							// For storing/querying data with radius
-	virtual	void			lookup(float *,const float *,const float *,float)		= 0;	
+	virtual	void			lookup(float *,const float *,const float *,float)		= 0;
 	virtual	void			store(const float *,const float *,const float *,float)	= 0;
 
 							// For irradiance cache type of queries
@@ -76,7 +76,7 @@ public:
 
 							// Resolve the names to channels
 	void					resolve(int n,const char **names,int *entry,int *size);
-	
+
 							// ptcAPI interface
 	void					queryChannels(int *,const char **,const char **);
 	int						getDataSize()			{ return dataSize; }
@@ -90,13 +90,13 @@ protected:
 	void					defineChannels(int,char **,char **);
 	void					writeChannels(FILE *);
 	void					readChannels(FILE *);
-	
+
 	matrix					from,to;			// The transformation to the coordinate system
 	matrix					toNDC;				// The viewing transform
 	float					dPscale;			// The amount we need to scale dP by
 	int						numChannels;		// Number of channels
 	CChannel				*channels;			// List of channels
-	
+
 	friend class CRemotePtCloudChannel;
 };
 
@@ -109,11 +109,11 @@ protected:
 // Comments				:
 inline	void	texture3Dflatten(float *dest,int n,const float **data,int *entry,int *size) {
 	int	i;
-	
+
 	// For every channel
 	for (i=0;i<n;i++) {
 		const float	*src	=	*data++;
-		
+
 		// Unroll for the common cases
 		switch (size[i]) {
 		case 0:
@@ -144,11 +144,11 @@ inline	void	texture3Dflatten(float *dest,int n,const float **data,int *entry,int
 // Comments				:
 inline	void	texture3DflattenInterpolated(float *dest,int n,const float **data,int *entry,int *size, int uVertices) {
 	int	i;
-		
+
 	// For every channel
 	for (i=0;i<n;i++) {
 		const float	*src	=	*data++;
-		
+
 		// Unroll for the common cases
 		switch (size[i]) {
 		case 0:
@@ -188,11 +188,11 @@ inline	void	texture3DflattenInterpolated(float *dest,int n,const float **data,in
 // Comments				:
 inline	void	texture3Dunpack(const float *src,int n,float **data,int *entry,int *size) {
 	int	i;
-	
+
 	// For every channel
 	for (i=0;i<n;i++) {
 		float	*dest	=	*data++;
-		
+
 		// Unroll for the common cases
 		switch (size[i]) {
 		case 0:

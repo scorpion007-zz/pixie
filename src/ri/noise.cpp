@@ -138,7 +138,7 @@ template <class T>	T  noise(T x,T y,const unsigned char *perm) {
     iy1 = (iy0 + 1) & 0xff;
     ix0 = ix0 & 0xff;
     iy0 = iy0 & 0xff;
-    
+
     t = FADE( fy0 );
     s = FADE( fx0 );
 
@@ -171,7 +171,7 @@ template <class T>	T  pnoise(T x,T y, int px, int py,const unsigned char *perm) 
     iy1 = (( iy0 + 1 ) % py) & 0xff;
     ix0 = ( ix0 % px ) & 0xff;
     iy0 = ( iy0 % py ) & 0xff;
-    
+
     t = FADE( fy0 );
     s = FADE( fx0 );
 
@@ -208,7 +208,7 @@ template <class T>	T  noise(T x,T y,T z,const unsigned char *perm) {
     ix0 = ix0 & 0xff;
     iy0 = iy0 & 0xff;
     iz0 = iz0 & 0xff;
-    
+
     r = FADE( fz0 );
     t = FADE( fy0 );
     s = FADE( fx0 );
@@ -232,7 +232,7 @@ template <class T>	T  noise(T x,T y,T z,const unsigned char *perm) {
     nx1 = LERP( r, nxy0, nxy1 );
 
     n1 = LERP( t, nx0, nx1 );
-    
+
     return 0.5f * (1.0f + 0.936f * ( LERP( s, n0, n1 ) ) );
 }
 
@@ -261,7 +261,7 @@ template <class T>	T   pnoise(T x,T y,T z,int px,int py,int pz,const unsigned ch
     ix0 = ( ix0 % px ) & 0xff;
     iy0 = ( iy0 % py ) & 0xff;
     iz0 = ( iz0 % pz ) & 0xff;
-    
+
     r = FADE( fz0 );
     t = FADE( fy0 );
     s = FADE( fx0 );
@@ -285,7 +285,7 @@ template <class T>	T   pnoise(T x,T y,T z,int px,int py,int pz,const unsigned ch
     nx1 = LERP( r, nxy0, nxy1 );
 
     n1 = LERP( t, nx0, nx1 );
-    
+
     return 0.5f * (1.0f + 0.936f * ( LERP( s, n0, n1 ) ) );
 }
 
@@ -325,17 +325,17 @@ template <class T>	T  noise(T x,T y,T z,T w,const unsigned char *perm) {
     nxyz0 = grad(perm[ix0 + perm[iy0 + perm[iz0 + perm[iw0]]]], fx0, fy0, fz0, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy0 + perm[iz0 + perm[iw1]]]], fx0, fy0, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix0 + perm[iy0 + perm[iz1 + perm[iw0]]]], fx0, fy0, fz1, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy0 + perm[iz1 + perm[iw1]]]], fx0, fy0, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
-        
+
     nx0 = LERP ( r, nxy0, nxy1 );
 
     nxyz0 = grad(perm[ix0 + perm[iy1 + perm[iz0 + perm[iw0]]]], fx0, fy1, fz0, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy1 + perm[iz0 + perm[iw1]]]], fx0, fy1, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix0 + perm[iy1 + perm[iz1 + perm[iw0]]]], fx0, fy1, fz1, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy1 + perm[iz1 + perm[iw1]]]], fx0, fy1, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
@@ -347,7 +347,7 @@ template <class T>	T  noise(T x,T y,T z,T w,const unsigned char *perm) {
     nxyz0 = grad(perm[ix1 + perm[iy0 + perm[iz0 + perm[iw0]]]], fx1, fy0, fz0, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy0 + perm[iz0 + perm[iw1]]]], fx1, fy0, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix1 + perm[iy0 + perm[iz1 + perm[iw0]]]], fx1, fy0, fz1, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy0 + perm[iz1 + perm[iw1]]]], fx1, fy0, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
@@ -357,7 +357,7 @@ template <class T>	T  noise(T x,T y,T z,T w,const unsigned char *perm) {
     nxyz0 = grad(perm[ix1 + perm[iy1 + perm[iz0 + perm[iw0]]]], fx1, fy1, fz0, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy1 + perm[iz0 + perm[iw1]]]], fx1, fy1, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix1 + perm[iy1 + perm[iz1 + perm[iw0]]]], fx1, fy1, fz1, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy1 + perm[iz1 + perm[iw1]]]], fx1, fy1, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
@@ -409,17 +409,17 @@ template <class T>	T  pnoise(T x,T y,T z, float w,int px,int py,int pz,int pw,co
     nxyz0 = grad(perm[ix0 + perm[iy0 + perm[iz0 + perm[iw0]]]], fx0, fy0, fz0, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy0 + perm[iz0 + perm[iw1]]]], fx0, fy0, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix0 + perm[iy0 + perm[iz1 + perm[iw0]]]], fx0, fy0, fz1, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy0 + perm[iz1 + perm[iw1]]]], fx0, fy0, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
-        
+
     nx0 = LERP ( r, nxy0, nxy1 );
 
     nxyz0 = grad(perm[ix0 + perm[iy1 + perm[iz0 + perm[iw0]]]], fx0, fy1, fz0, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy1 + perm[iz0 + perm[iw1]]]], fx0, fy1, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix0 + perm[iy1 + perm[iz1 + perm[iw0]]]], fx0, fy1, fz1, fw0);
     nxyz1 = grad(perm[ix0 + perm[iy1 + perm[iz1 + perm[iw1]]]], fx0, fy1, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
@@ -431,7 +431,7 @@ template <class T>	T  pnoise(T x,T y,T z, float w,int px,int py,int pz,int pw,co
     nxyz0 = grad(perm[ix1 + perm[iy0 + perm[iz0 + perm[iw0]]]], fx1, fy0, fz0, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy0 + perm[iz0 + perm[iw1]]]], fx1, fy0, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix1 + perm[iy0 + perm[iz1 + perm[iw0]]]], fx1, fy0, fz1, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy0 + perm[iz1 + perm[iw1]]]], fx1, fy0, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );
@@ -441,7 +441,7 @@ template <class T>	T  pnoise(T x,T y,T z, float w,int px,int py,int pz,int pw,co
     nxyz0 = grad(perm[ix1 + perm[iy1 + perm[iz0 + perm[iw0]]]], fx1, fy1, fz0, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy1 + perm[iz0 + perm[iw1]]]], fx1, fy1, fz0, fw1);
     nxy0 = LERP( q, nxyz0, nxyz1 );
-        
+
     nxyz0 = grad(perm[ix1 + perm[iy1 + perm[iz1 + perm[iw0]]]], fx1, fy1, fz1, fw0);
     nxyz1 = grad(perm[ix1 + perm[iy1 + perm[iz1 + perm[iw1]]]], fx1, fy1, fz1, fw1);
     nxy1 = LERP( q, nxyz0, nxyz1 );

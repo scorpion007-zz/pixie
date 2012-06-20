@@ -92,7 +92,7 @@ void	exitFunction() {
 			for (i=0;i<gargc;++i)	argv[i]	=	gargv[i];
 			argv[i++]	=	(char *) "-q";
 			argv[i]		=	NULL;
-			
+
 			// use execvp to search PATH, incase pixie
 			// isn't on the default search path
 #ifdef _WIN32
@@ -132,8 +132,8 @@ void	printVersion() {
 // Return Value			:	-
 // Comments				:
 void	printUsage() {
-	printf("Usage: rndr <options> file.rib [file.rib ...]\n");	
-	printf("Listing several RIB files concatenates them before rendering.\n");	
+	printf("Usage: rndr <options> file.rib [file.rib ...]\n");
+	printf("Listing several RIB files concatenates them before rendering.\n");
 	printf("\nOptions:\n");
 	printf("  -f <range>      Render only a subsequence of frames\n");
 	printf("                    -f 43     = Render only the 43rd frame\n");
@@ -170,15 +170,15 @@ void	riThread(void *w) {
 	T32		*buffer	=	(T32 *) w;
 	char	managerString[1024];
 	T32		a;
-	
+
 	a.integer	=	0;
 	send((SOCKET) buffer[0].integer,(char *) &a,sizeof(T32),0);
-	
+
 	sprintf(managerString,"#rib:%s net:client=%d",(char *) &buffer[1].character,buffer[0].integer);
-	
+
 	// I may want to do this in a seperate process
 	RiBegin(managerString);
-	
+
 #ifndef _WIN32
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
@@ -212,7 +212,7 @@ void	rndrc(char *ribFile,int port) {
 	char		managerString[1024];
 	SOCKET		sock;
 	struct		sockaddr_in	client;
-	
+
 #ifdef _WIN32
 	WSADATA wsaData;
 
@@ -230,7 +230,7 @@ void	rndrc(char *ribFile,int port) {
 #endif
 
 	unsigned int	attemptAddress	=	INADDR_ANY;
-	
+
 	// Here we include robustness for Windows not allowing bind / connect to ANY
 retryBind:
 
@@ -239,7 +239,7 @@ retryBind:
 		if (silent == FALSE)	fprintf(stderr,"Socket error\n");
 		return;
 	}
-	
+
 	// Ensure there's no delay on network transactions
 	int val = 1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(const char *) &val,sizeof(int));
@@ -247,11 +247,11 @@ retryBind:
 	setsockopt(sock,IPPROTO_TCP,TCP_NODELAY,(const char *) &val,sizeof(int));
 
 	// connect to server
-	
+
 	client.sin_family		= AF_INET;
 	client.sin_addr.s_addr	= htonl(attemptAddress);
 	client.sin_port			= htons(port);
-	
+
 	if (connect(sock, (struct sockaddr *) &client, sizeof(client)) < 0) {
 		// Retry with loopback
 		if (attemptAddress != INADDR_LOOPBACK) {
@@ -263,13 +263,13 @@ retryBind:
 		closesocket(sock);
 		return;
 	}
-	
+
 	// Run the rib
-	
+
 	sprintf(managerString,"#rib:%s net:locclient=%d",ribFile,sock);
-	
+
 	RiBegin(managerString);
-	
+
 #ifndef _WIN32
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
@@ -352,17 +352,17 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
     }
     listenPort = ntohs(me.sin_port);
 
-	
+
 	// Save socket so we can close it on fatal errors
 	listenSock = sock;
-	
+
 	// Listen to incoming connections
 	if (listen(sock,SOMAXCONN) < 0) {
 		if (silent == FALSE)	fprintf(stderr,"Socket error\n");
 		j	=	closesocket(sock);
 		return FALSE;
-	}	
-	
+	}
+
 	// fork or launch the children
 	{
 		char		portbuf[20];
@@ -372,7 +372,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 
 		// The command line arguments
 		char 		* const argv[]	=	{gargv[0],(char *) "-q",(char *) "-c",portbuf,ribFile,NULL};
-		
+
 		for(int k=0;k<numChildren;k++){
 			#ifdef _WIN32
 				// use _spawnvp to search PATH, incase pixie
@@ -405,12 +405,12 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 			#endif
 		}
 	}
-		
+
 	// pre-accept the local servers
-	
+
 	sprintf(tmp,"locservers=");
 	tmp += strlen(tmp);
-	
+
 	// accept the connections
 	for(i=0;i<numChildren;i++) {
 		SOCKET		peer;
@@ -418,7 +418,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 		sockaddr_in	serv;
 		fd_set		fds;
 		timeval		timeout;
-		
+
 		// implement a timeout for sockets (so we don't wait for ever for subprocesses)
 		FD_ZERO(&fds);
 		FD_SET(sock,&fds);
@@ -429,19 +429,19 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 			j	=	closesocket(sock);
 			return FALSE;
 		}
-		
+
 		// finally if we didn't time out, accept the connection
 		peer	=	accept(sock,(sockaddr *) &serv,&servLen);
-		
+
 		#ifdef SO_NOSIGPIPE
 			val = 1;
 			setsockopt(peer,SOL_SOCKET,SO_NOSIGPIPE,(const char *) &val,sizeof(int));
 		#endif
-			
+
 		if (peer != INVALID_SOCKET) {
 			// record peer socket
 			localServerSockets[numLocalServers++] = peer;
-			
+
 			if (i < numChildren-1)	sprintf(tmp,"%d,",peer);
 			else					sprintf(tmp,"%d",peer);
 			tmp += strlen(tmp);
@@ -454,7 +454,7 @@ int	runLocalServers(int numChildren,char *ribFile,char *managerString) {
 
 	// Close socket before exiting
 	j	=	closesocket(sock);
-		
+
 	return TRUE;
 }
 
@@ -524,18 +524,18 @@ void	rndrd(int port) {
 
 	// Save socket so we can close it on fatal errors
 	listenSock = sock;
-	
+
 	// Listen to incoming connections
 	listen(sock,SOMAXCONN);
 	while(running == TRUE) {
 		SOCKET		peer;
 		socklen_t	servLen	=	sizeof(sockaddr_in);
 		sockaddr_in	serv;
-		
+
 		peer	=	accept(sock,(sockaddr *) &serv,&servLen);
-		
+
 		if (peer != INVALID_SOCKET) {
-	
+
 			// If supported / needed, disable sigpipe (needs to be an connected socket)
 			#ifdef SO_NOSIGPIPE
 				val = 1;
@@ -553,10 +553,10 @@ void	rndrd(int port) {
 				assert(sizeof(SOCKET) == sizeof(int));
 
 				riThread((void *) buffer);
-				
+
 				running = TRUE;
 			}
-	
+
 			// Close peer socket
 			closesocket(peer);
 		}
@@ -590,7 +590,7 @@ int main(int argc, char* argv[]) {
 	int				displayProgress	=	FALSE;
 	int				numThreads		=	-1;
 	int				localChildren	=	0;
-	
+
 	// Enable memory leak detection/report
 #ifdef _WIN32
 #ifdef _DEBUG
@@ -638,7 +638,7 @@ int main(int argc, char* argv[]) {
 				if (silent == FALSE)	fprintf(stderr,"Was expecting client port\n");
 				exit(1);
 			}
-			
+
 			if(sscanf(argv[i],"%d",&clientport) != 1) {
 				if (silent == FALSE)	fprintf(stderr,"Unrecognized client port\n");
 				exit(1);
@@ -667,7 +667,7 @@ int main(int argc, char* argv[]) {
 		} else if (strcmp(argv[i],"-k") == 0) {
 			server			=	TRUE;
 			killservers		=	TRUE;
-			
+
 			i++;
 			if (i >= argc) {
 				if (silent == FALSE)	fprintf(stderr,"Was expecting list of servers\n");
@@ -687,7 +687,7 @@ int main(int argc, char* argv[]) {
 			localserver		=	TRUE;
 
 			if (localChildren > MAX_LOCALSERVERS) {
-			
+
 				if (silent == FALSE)	fprintf(stderr,"Cannot run more than %d local processes\n",MAX_LOCALSERVERS);
 				localChildren = MAX_LOCALSERVERS;
 			}
@@ -717,18 +717,18 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	
+
 	// Read from STDIN if no source given
 	if (source == NULL)
 		source = strdup("-");
-	
+
 	// Validate option combinations
 	if ((client | server | localserver) && (client ^ server ^ localserver) == 0) {
 		fprintf(stderr,"Invalid combination of client and server options\n");
 		free(source);
 		exit(1);
 	}
-	
+
 	// FIXME: remove once multithreaded netrenders are working
 	if ((client | server | localserver) && numThreads > 0) {
 		fprintf(stderr,"Using threads is currently not possible for network or multiprocess renders; turning off threads.\n");
@@ -742,14 +742,14 @@ int main(int argc, char* argv[]) {
 			free(source);
 			exit(1);
 		}
-		
+
 		noRestart	=	FALSE;
 		rndrd(port);
 		free(source);
 		exit(0);
 
 	}
-	
+
 	// Deal with stdin renders
 	if (strcmp(source,"-") == 0) {
 		if ((client | server | localserver)  && (silent == FALSE) && (killservers != TRUE)) {
@@ -758,11 +758,11 @@ int main(int argc, char* argv[]) {
 			exit(1);
 		}
 	}
-	
+
 	// Launch local servers if needed
 	if (localChildren != 0) {
 		noRestart	=	TRUE;
-		
+
 		// verify RIBs exists
 		char *pstart = source;
 		char *pend;
@@ -777,7 +777,7 @@ int main(int argc, char* argv[]) {
 			if (pend)	*pend = ':';
 			pstart = pend + 1;
 		} while(pend);
-		
+
 		// run teh servers
 		if (runLocalServers(localChildren,source,managerString) == FALSE) {
 			if (silent == FALSE)	fprintf(stderr,"Failed to launch subprocesses\n");
@@ -785,14 +785,14 @@ int main(int argc, char* argv[]) {
 			exit(1);
 		}
 	}
-	
+
 	// Launch as spawned local server if needed
 	if (clientport != 0) {
 		rndrc(source,clientport);
 		free(source);
 		exit(0);
 	}
-	
+
 	// Create the command line for the ri
 	if (client | server | localserver) {
 		sprintf(managerString2,"#rib:%s net:%s",source,managerString);
@@ -810,14 +810,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	RiBegin(managerString2);
-	
+
 #ifndef _WIN32
 	signal(SIGHUP,printStatsHandler);
 #ifdef SIGINFO
 	signal(SIGINFO,printStatsHandler);
 #endif
 #endif
-	
+
 	if (silent			==	TRUE)	RiErrorHandler(RiErrorIgnore);
 	if (displayStats	==	TRUE)	{
 		RtInt	level		=	3;
@@ -832,7 +832,7 @@ int main(int argc, char* argv[]) {
 	if (numThreads > 0) {
 		RiOption(RI_LIMITS,RI_NUMTHREADS,&numThreads,RI_NULL);
 	}
-	
+
 	if (!killservers) {
 		char *pstart = source;
 		char *pend;

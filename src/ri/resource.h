@@ -44,9 +44,9 @@ class CResource {
 public:
 					CResource(const char *name,CAttributes *attributes,CXform *xform);
 					~CResource();
-	
+
 	void			restore(CAttributes *attributes,CXform *xform);
-	
+
 	char			*name;
 	CAttributes		*attributes;
 	CXform			*xform;

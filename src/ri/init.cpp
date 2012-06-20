@@ -95,7 +95,7 @@ void		convertColorFrom(float *out,const float *in,ECoordinateSystem s)	{
 				if (in[2] <=0.5)	m2 = in[2]*(1+in[1]);
 				else				m2 = in[2]+in[1]-in[2]*in[1];
 				m1	= 2*in[2]-m2;
-				
+
 				h	=	in[0] + (1.0f/3.0f);	HueToRGB(out[0],m1,m2,h);
 				h	=	in[0];					HueToRGB(out[1],m1,m2,h);
 				h	=	in[0] - (1.0f/3.0f);	HueToRGB(out[2],m1,m2,h);
@@ -321,7 +321,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 											conditionals->prev		=	lastConditional;						\
 											lastConditional			=	conditionals;							\
 											conditionals			=	lastConditional->next;
-											
+
 
 //	End a conditional block execution
 #define		endConditional()				lastConditional->next	=	conditionals;							\
@@ -369,7 +369,7 @@ void	CRendererContext::init(CProgrammableShaderInstance *currentShaderInstance) 
 #define		runCategoryLights(lP,lN,lT,lC)	scripterror("Light source exec during init code\n");
 
 // The misc macros
-#define		DEFLINKOPCODE(name,text,nargs)				case OPCODE_##name:		
+#define		DEFLINKOPCODE(name,text,nargs)				case OPCODE_##name:
 #define		DEFLINKFUNC(name,text,prototype,par)		case FUNCTION_##name:
 
 // Break the shader execution

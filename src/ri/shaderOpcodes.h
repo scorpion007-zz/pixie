@@ -76,11 +76,11 @@
 											Clsave	+=	3;													\
 										}																	\
 									}
-					
+
 
 #define	ILLUMINATION1EXPR_POST		if ((numActive == 0) || (*currentLight == NULL))						\
 										jmp(endIndex);
-										
+
 
 
 DEFOPCODE(Illumination1	,"illuminance"	,3, ILLUMINATION1EXPR_PRE(NULL_EXPR,ILLUMINATION_RUNLIGHTS), NULL_EXPR, NULL_EXPR, ILLUMINATION1EXPR_POST,0)
@@ -129,11 +129,11 @@ DEFOPCODE(IlluminationCat1 ,"illuminance",4, ILLUMINATION1EXPR_PRE(ILLUMINATION1
 											Clsave	+=	3;													\
 										}																	\
 									}
-					
+
 
 #define	ILLUMINATION2EXPR_POST		if ((numActive == 0) || (*currentLight == NULL))						\
 										jmp(endIndex);
-										
+
 
 
 DEFOPCODE(Illumination2	,"illuminance"	,5, ILLUMINATION2EXPR_PRE(NULL_EXPR,ILLUMINATION_RUNLIGHTS), NULL_EXPR, NULL_EXPR, ILLUMINATION2EXPR_POST,0)
@@ -301,7 +301,7 @@ DEFOPCODE(Illuminate3	,"illuminate"	,4, ILLUMINATE3EXPR_PRE, NULL_EXPR, NULL_EXP
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // illuminateend
 // Create a new shaded light
-// Save L,Cl,Ol 
+// Save L,Cl,Ol
 #ifdef INIT_SHADING
 #define	ILLUMINATEEND_PRE
 #else
@@ -439,7 +439,7 @@ DEFOPCODE(Solar2	,"solar"	,3, SOLAR2EXPR_PRE, NULL_EXPR, NULL_EXPR, SOLAR2EXPR_P
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // solarend
 // Create a new shaded light
-// Save L,Cl,Ol 
+// Save L,Cl,Ol
 #ifdef INIT_SHADING
 #define SOLAREND_PRE
 #else

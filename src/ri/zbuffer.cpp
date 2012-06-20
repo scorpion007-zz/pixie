@@ -55,7 +55,7 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 
 	totalWidth				=	CRenderer::bucketWidth*CRenderer::pixelXsamples + 2*CRenderer::xSampleOffset;
 	totalHeight				=	CRenderer::bucketHeight*CRenderer::pixelYsamples + 2*CRenderer::ySampleOffset;
-	
+
 
 	// Allocate the framebuffer (globalMemory is checkpointed)
 	fb		=	(float **) ralloc(totalHeight*sizeof(float *),CRenderer::globalMemory);
@@ -76,7 +76,7 @@ CZbuffer::CZbuffer(int thread) : CReyes(thread) , COcclusionCuller() {
 // Return Value			:	-
 // Comments				:
 CZbuffer::~CZbuffer() {
-	
+
 	// Framebuffer is allocated from the frame memory
 }
 

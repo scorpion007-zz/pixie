@@ -39,7 +39,7 @@
 // Description			:	The user options/attributes
 // Comments				:
 /// \note					We may want to call this class CUserVariables
-class CUserAttributeDictionary {	
+class CUserAttributeDictionary {
 	CVariable *attribs;
 
 public:
@@ -52,7 +52,7 @@ public:
 	// Return Value			:
 	// Comments				:
 	CUserAttributeDictionary() : attribs(NULL) { }
-	
+
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	~CUserAttributeDictionary
@@ -71,7 +71,7 @@ public:
 
 				for (int i=0;i<cAttr->numFloats;i++) free(tmp[i]);
 
-				delete[] (char**) cAttr->defaultValue; 
+				delete[] (char**) cAttr->defaultValue;
 			} else {
 				delete[] (float*) cAttr->defaultValue;
 			}
@@ -80,7 +80,7 @@ public:
 			cAttr = tAttr;
 		}
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	=
@@ -90,10 +90,10 @@ public:
 	// Comments				:
 	CUserAttributeDictionary &operator=(const CUserAttributeDictionary &rhs) {
 		attribs = NULL;//FIXME
-		
+
 		CVariable *cAttr = rhs.attribs;
 		CVariable *pAttr = NULL;
-		
+
 		while (cAttr != NULL)  {
 			CVariable *tAttr = new CVariable;
 			*tAttr = *cAttr;
@@ -119,10 +119,10 @@ public:
 			cAttr	=	cAttr->next;
 			pAttr	=	tAttr;
 		}
-		
+
 		return *this;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	insert
@@ -133,39 +133,39 @@ public:
 	void insert(CVariable *var,const void *value) {
 		CVariable *cAttr	=	attribs;
 		CVariable *pAttr	=	NULL;
-		
+
 		while (cAttr != NULL)  {
 			int cmp = strcmp(cAttr->name,var->name);
-			
+
 			if (cmp > 0)	break;	// past the place it would be
 			if (cmp == 0)	{		// exact match, remove this element
 				if (pAttr != NULL)	pAttr->next	=	cAttr->next;
 				else				attribs		=	cAttr->next;
-				
+
 				if (cAttr->type == TYPE_STRING) {
 					char **tmp = (char**) cAttr->defaultValue;
 					for (int i=0;i<cAttr->numFloats;i++) free(tmp[i]);
-					delete[] (char**) cAttr->defaultValue; 
+					delete[] (char**) cAttr->defaultValue;
 				} else {
 					delete[] (float*) cAttr->defaultValue;
 					delete cAttr;
 				}
-				
+
 				// unlink the dead attribute
 				if (pAttr == NULL)	cAttr = NULL;
 				else				cAttr = pAttr->next;
 				break;
 			}
-			
+
 			// Advance
 			pAttr = cAttr;
 			cAttr = cAttr->next;
 		}
-		
+
 		// cAttr now points to the loation _before_ which to insert
 		CVariable *nAttr = new CVariable;
 		*nAttr = *var;
-		
+
 		if (pAttr != NULL) {
 			// insert after pAttr
 			nAttr->next	= 	cAttr;
@@ -175,7 +175,7 @@ public:
 			nAttr->next =	attribs;
 			attribs		=	nAttr;
 		}
-		
+
 		// store the value
 		if (var->type == TYPE_STRING) {
 			nAttr->defaultValue	= (float*) new char *[var->numFloats];
@@ -188,7 +188,7 @@ public:
 			memcpy(nAttr->defaultValue,value,sizeof(float)*var->numFloats);
 		}
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////
 	// Class				:	CUserAttributeDictionary
 	// Method				:	lookup
@@ -200,13 +200,13 @@ public:
 		CVariable *cAttr	=	attribs;
 		while (cAttr != NULL)  {
 			int cmp = strcmp(cAttr->name,name);
-			
+
 			if (cmp > 0)	return FALSE;	// past the place it would be
 			if (cmp == 0)	{				// exact match, return this element
 				var = cAttr;
 				return TRUE;
 			}
-			
+
 			cAttr = cAttr->next;
 		}
 		return FALSE;

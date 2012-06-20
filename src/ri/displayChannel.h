@@ -42,9 +42,9 @@ typedef enum {
 	AOV_FILTER_MIN,
 	AOV_FILTER_MAX,
 	AOV_FILTER_AVERAGE,
-	
+
 	AOV_FILTER_SPECIALFILTERS = AOV_FILTER_AVERAGE,
-	
+
 	AOV_FILTER_GAUSSIAN,		// standard pixel filter types
 	AOV_FILTER_BOX,
 	AOV_FILTER_TRIANGLE,
@@ -66,7 +66,7 @@ public:
 						CDisplayChannel();
 						~CDisplayChannel();
 						CDisplayChannel(const char*,CVariable*,int,int,int entry = -1);
-	
+
 	char				name[64];		// Name of the channel
 	CVariable			*variable;		// The variable representing channel (may be NULL)
 	float				*fill;			// The sample defaults

@@ -59,7 +59,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 #ifdef HAVE_LIBPNG
 	char* type	= (char *)findParameter("type",STRING_PARAMETER,1);		// Display "name" "type" "mode" ...
 	int len = strlen(name);
-	if ( 
+	if (
 		 // Name contains "png" and type is not specifically "tiff"
 		 ( (len > 4 && strcmp(&name[len-4],".png")==0) && ( type && strcmp(type, "tiff") != 0 ) )
 		 // or type is specifically "png"
@@ -73,7 +73,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 #endif
 	if (!fb)
 		fb = new CFileFramebufferTIFF(name,width,height,numSamples,samples,findParameter);
-	
+
 	if (!fb->success()) {	// If we could not create the image file, return NULL
 		delete fb;
 		return NULL;
@@ -91,7 +91,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Comments				:
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
 	CFileFramebuffer	*fb	=	(CFileFramebuffer *) im;
-	
+
 	assert(fb != NULL);
 
 	fb->write(x,y,w,h,data);

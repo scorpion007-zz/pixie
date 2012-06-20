@@ -193,14 +193,14 @@ void	CStats::printStats(int level) {
 		info(CODE_STATS,"       Num Samples: %d (indirectdiffuse), %d (occlusion)\n",numIndirectDiffuseSamples,numOcclusionSamples);
 		info(CODE_STATS,"          Num Rays: %d (indirectdiffuse), %d (occlusion)\n",numIndirectDiffuseRays,numOcclusionRays);
 		info(CODE_STATS," Photonmap Lookups: %d\n",numIndirectDiffusePhotonmapLookups);
-		
+
 		info(CODE_STATS,"->3D Textures\n");
 		info(CODE_STATS,"       Peak memory: %d (bytes)\n",brickmapPeakMem);
 		info(CODE_STATS,"           lookups: %d (times)\n",numBrickmapLookups);
 		info(CODE_STATS,"        Cache Hits: %d (times)\n",numBrickmapCacheHits);
 		info(CODE_STATS,"   Bricks paged in: %d (bricks)\n",numBrickmapCachePageins);
 		info(CODE_STATS,"  Bricks paged out: %d (bricks)\n",numBrickmapCachePageouts);
-		
+
 		info(CODE_STATS,"->Tessellation Cache\n");
 		info(CODE_STATS,"       Peak memory: %d (bytes)\n",tesselationPeakMemory);
 		info(CODE_STATS,"            memory: %d (bytes)\n",tesselationMemory);

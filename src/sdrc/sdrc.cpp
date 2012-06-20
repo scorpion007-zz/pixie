@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
 	char 			*includeEnv = osEnvironment(INCLUDE);
 	int				error = ERR_NONE;
 	int				quiet = FALSE;
-	
+
 	sourceFiles					=	new CList<char *>;
 
 	dsoPath						=	new TSearchpath;
@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
 	ppargv[ppargc++]			=	"6";
 	ppargv[ppargc++]			=	"-d";
 	ppargv[ppargc++]			=	defineProgramName;
-	
+
 	if (includeEnv != NULL) {
 		ppargv[ppargc++]		=	"-i";
 		ppargv[ppargc++]		=	includeEnv;
@@ -213,7 +213,7 @@ int main(int argc, char* argv[]) {
 		printUsage();
 		exit(1);
 	}
-	
+
 	// Process the arguments
 	for (i=1;i<argc;i++) {
 		if (strcmp(argv[i],argumentSuppressWarnings) == 0) {
@@ -255,14 +255,14 @@ int main(int argc, char* argv[]) {
 		} else if (argv[i][0] == '-' && argv[i][1] != 0) {
 			// Starts with '-' but not matched any option
 			if (!(settings & (COMPILER_SUPPRESS_WARNINGS|COMPILER_SUPPRESS_ERRORS)))
-				fprintf(stderr,"Unknown option '%s'\n", argv[i]);			
+				fprintf(stderr,"Unknown option '%s'\n", argv[i]);
 		} else {
 			// Save the files
 			sourceFiles->push(strdup(argv[i]));
 			argv[i]	=	NULL;
 		}
 	}
-	
+
 	ppargv[ppargc++]	=	"-v";
 
 	// Go over the arguments and replace the wildcards
@@ -288,25 +288,25 @@ int main(int argc, char* argv[]) {
 		fprintf(stderr,"no input files\n");
 		exit(0);
 	};
-	
+
 	// If using -o only one file can be processed
 	if (outName != NULL && sourceFiles->numItems > 1) {
 		fprintf(stderr,"Named output file requires single input file\n");
 		exit(1);
 	};
-		
+
 		// Get a temp file
 	char tempfile[OS_MAX_PATH_LENGTH];
 	char tempdir[OS_MAX_PATH_LENGTH];
 	osTempdir(tempdir,sizeof(tempdir));
 	osCreateDir(tempdir);
 	osTempname(tempdir,"sdrc",tempfile);
-	
+
 	for (sourceFile=sourceFiles->first();error==ERR_NONE,sourceFile!=NULL;sourceFile=sourceFiles->next()) {
 
 		if (!quiet)	fprintf(stderr,"Compiling %s\n",sourceFile);
 
-		FILE	*in	=	fopen(tempfile,"w+");		
+		FILE	*in	=	fopen(tempfile,"w+");
 		if (in == NULL) {
 			fprintf(stderr,"Failed to create a temporary file\n");
 			error = ERR_FILE;
@@ -344,7 +344,7 @@ int main(int argc, char* argv[]) {
 	osDeleteDir(tempdir);
 			free(sourceFile);
 	delete sourceFiles;
-	
+
 	TSearchpath	*cPath,*nPath;
 	for (cPath=dsoPath;cPath!=NULL;) {
 		nPath	=	cPath->next;

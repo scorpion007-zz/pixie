@@ -140,7 +140,7 @@ public:
 		CClipPlane					*next;			// Next clipping plane
 	};
 
-	
+
 								COptions();
 								COptions(const COptions *);
 	virtual						~COptions();
@@ -202,7 +202,7 @@ public:
 
 	vector						opacityThreshold;								// The opacity threshold
 	vector						zvisibilityThreshold;							// The visibility threshold for z files and noncomp aovs
-	
+
 	CDisplay					*displays;										// List of displays to send the output
 
 	CClipPlane					*clipPlanes;									// List of used defined clipping planes
@@ -220,7 +220,7 @@ public:
 	float						shutterOpen,shutterClose;						// Motion blur stuff
 	float						shutterOffset;									// Shutter offset
 
-	unsigned int				flags;											// Flags	
+	unsigned int				flags;											// Flags
 
 								////////////////////////////////////////////////////////////////////
 								// Pixie dependent options
@@ -246,7 +246,7 @@ public:
 	int							netXBuckets,netYBuckets;						// The meta bucket size
 
 	int							threadStride;									// The number of buckets to distribute to threads at a time
-	
+
 	int							geoCacheMemory;									// The ammount of memory to dedicate to tesselation caches
 
 	int							maxEyeSplits;									// Maximum number of eye splits
@@ -255,14 +255,14 @@ public:
 	float						tsmThreshold;									// Transparency shadow map threshold
 
 	char						*causticIn,*causticOut;							// The caustics in/out file name
-	char						*globalIn,*globalOut;							// The global photon map 
+	char						*globalIn,*globalOut;							// The global photon map
 
 	int							numEmitPhotons;									// The number of photons to emit for the scene
 
 	int							shootStep;										// The number of rays to shoot at a time
 
 	EDepthFilter				depthFilter;									// Holds the depth filter type
-	
+
 	CUserAttributeDictionary	userOptions;									// User options
 };
 

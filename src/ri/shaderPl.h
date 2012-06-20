@@ -110,7 +110,7 @@ public:
 		static void			staticInit(CShadingScratch *scratch);
 
 		CTexture			*map;
-		RtFilterFunc		filter;	
+		RtFilterFunc		filter;
 };
 
 
@@ -142,7 +142,7 @@ public:
 		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 
 		CEnvironment		*map;
-		RtFilterFunc		filter;	
+		RtFilterFunc		filter;
 };
 
 
@@ -190,7 +190,7 @@ public:
 		void				bind(const char *name,int &opIndex,int step,void *data,CShaderInstance *shader);
 		void				init(CShadingScratch *scratch,const CAttributes *attributes);
 		void				postBind(CShadingScratch *scratch);
-		
+
 		CTexture3d			*map;									// The texture we're lookup up
 		int					numChannels;							// The number of channels bake3d provides
 		const char			*channelName[TEXTURE3D_MAX_CHANNELS];

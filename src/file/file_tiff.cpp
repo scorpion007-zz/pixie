@@ -42,8 +42,8 @@
 // Description			:
 /// \brief					Holds the framebuffer
 // Comments				:
-CFileFramebufferTIFF::CFileFramebufferTIFF(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter): 
-CFileFramebuffer() 
+CFileFramebufferTIFF::CFileFramebufferTIFF(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction findParameter):
+CFileFramebuffer()
 {
 	int			i;
 	float		*tmp;
@@ -51,13 +51,13 @@ CFileFramebuffer()
 	float		worldToCamera[16];
 	char		*software;
 	const char	*compression	=	NULL;
-	
+
 	// Open the image file
 	image				=	TIFFOpen(name,"w");
-	
+
 	// If we could not open the file, there's nothing to do
 	if (image == NULL)	return;
-	
+
 	// Copy the quantization data
 	if ((tmp = (float *) findParameter("quantize",FLOAT_PARAMETER,4))) {
 		qzero			=	tmp[0];
@@ -70,18 +70,18 @@ CFileFramebuffer()
 		qmin			=	0;
 		qmax			=	0;
 	}
-	
+
 	// Get the gamma correction stuff (only if we're not depth)
 	if (strcmp(samples,"z") != 0) {
-		
+
 		if ((tmp = (float *) findParameter("dither",FLOAT_PARAMETER,1))) {
 			qamp			=	tmp[0];
 		}
-		
+
 		if ((tmp = (float *) findParameter("gamma",FLOAT_PARAMETER,1))) {
 			gamma			=	tmp[0];
 		}
-		
+
 		if ((tmp = (float *) findParameter("gain",FLOAT_PARAMETER,1))) {
 			gain			=	tmp[0];
 		}
@@ -91,29 +91,29 @@ CFileFramebuffer()
 		gamma			=	1;
 		gain			=	1;
 	}
-	
+
 	// World to screen matrix
 	if ((tmp = (float *) findParameter("NP",FLOAT_PARAMETER,16))) {
 		int	i;
-		
+
 		for (i=0;i<16;i++) {
 			worldToNDC[i]	=	tmp[i];
 		}
 	}
-	
+
 	// World to Camera matrix
 	if ((tmp = (float *) findParameter("Nl",FLOAT_PARAMETER,16))) {
 		int	i;
-		
+
 		for (i=0;i<16;i++) {
 			worldToCamera[i]	=	tmp[i];
 		}
 	}
-	
+
 	software	=	(char *) findParameter("Software",STRING_PARAMETER,1);
-	
+
 	compression	=	(char *) findParameter("compression",STRING_PARAMETER,1);
-	
+
 	if (qmax == 0) {
 		bitspersample	=	32;
 		sampleformat	=	SAMPLEFORMAT_IEEEFP;
@@ -127,7 +127,7 @@ CFileFramebuffer()
 		bitspersample	=	8;
 		sampleformat	=	SAMPLEFORMAT_UINT;
 	}
-	
+
 	// Set the tiff fields
 	TIFFSetField(image, TIFFTAG_IMAGEWIDTH,			(unsigned long) width);
 	TIFFSetField(image, TIFFTAG_IMAGELENGTH,		(unsigned long) height);
@@ -141,10 +141,10 @@ CFileFramebuffer()
 	TIFFSetField(image, TIFFTAG_SAMPLESPERPIXEL,	(unsigned short) numSamples);
 	TIFFSetField(image, TIFFTAG_PIXAR_MATRIX_WORLDTOSCREEN,	worldToNDC);
 	TIFFSetField(image, TIFFTAG_PIXAR_MATRIX_WORLDTOCAMERA,	worldToCamera);
-	
+
 	// Compute the size of a pixel
 	pixelSize	=	numSamples*bitspersample / 8;
-	
+
 	// The default compression is LZW
 	ttag_t tiffcompression = COMPRESSION_LZW;
 	if (compression == NULL)
@@ -157,7 +157,7 @@ CFileFramebuffer()
 		tiffcompression = COMPRESSION_ADOBE_DEFLATE;
 	else if (strcmp(compression,"none") == 0)
 		tiffcompression = COMPRESSION_NONE;
-	
+
 	// Check codec availability in libtiff
 	if (tiffcompression != COMPRESSION_NONE && !TIFFIsCODECConfigured(tiffcompression)) {
 		if (TIFFIsCODECConfigured(COMPRESSION_LZW))
@@ -166,40 +166,40 @@ CFileFramebuffer()
 			tiffcompression = COMPRESSION_NONE;
 	}
 	TIFFSetField(image, TIFFTAG_COMPRESSION, tiffcompression);
-	
-	if (tiffcompression == COMPRESSION_LZW || tiffcompression == COMPRESSION_DEFLATE 
+
+	if (tiffcompression == COMPRESSION_LZW || tiffcompression == COMPRESSION_DEFLATE
 		|| tiffcompression == COMPRESSION_ADOBE_DEFLATE || tiffcompression == COMPRESSION_PIXARLOG ) {
 		ttag_t predictor = PREDICTOR_HORIZONTAL;
 		if (sampleformat == SAMPLEFORMAT_IEEEFP)
 			predictor = PREDICTOR_FLOATINGPOINT;
 		TIFFSetField(image, TIFFTAG_PREDICTOR, predictor);
-	}		
-	
+	}
+
 	if (numSamples == 1)
 		TIFFSetField(image, TIFFTAG_PHOTOMETRIC,	PHOTOMETRIC_MINISBLACK);
 	else
 		TIFFSetField(image, TIFFTAG_PHOTOMETRIC,	PHOTOMETRIC_RGB);
-	
+
 	if (numSamples == 4) {
 		unsigned short sampleinfo = EXTRASAMPLE_ASSOCALPHA;
 		TIFFSetField(image, TIFFTAG_EXTRASAMPLES, 1, &sampleinfo);
 	}
-	
+
 	if (software != NULL)	TIFFSetField(image, TIFFTAG_SOFTWARE,		software);
-	
+
 	lastSavedLine	=	0;
 	scanlines		=	new unsigned char*[height];
 	scanlineUsage	=	new int[height];
-	
+
 	for (i=0;i<height;i++) {
 		scanlines[i]		=	NULL;
 		scanlineUsage[i]	=	width;
 	}
-	
+
 	this->width			=	width;
 	this->height		=	height;
 	this->numSamples	=	numSamples;
-	
+
 	osCreateMutex(fileMutex);
 }
 
@@ -210,7 +210,7 @@ CFileFramebuffer()
 /// \brief					Dtor
 // Return Value			:	-
 // Comments				:
-CFileFramebufferTIFF::~CFileFramebufferTIFF() 
+CFileFramebufferTIFF::~CFileFramebufferTIFF()
 {
 	int	i;
 
@@ -219,16 +219,16 @@ CFileFramebufferTIFF::~CFileFramebufferTIFF()
 
 	TIFFClose(image);
 	osDeleteMutex(fileMutex);
-					
+
 	for (i=0;i<height;i++) {
-		if (scanlines[i] != NULL)	
+		if (scanlines[i] != NULL)
 			delete [] (unsigned char *) scanlines[i];
 	}
-					
+
 	delete [] scanlines;
 	delete [] scanlineUsage;
 }
-	
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFileFramebufferTIFF
 // Method				:	write
@@ -236,23 +236,23 @@ CFileFramebufferTIFF::~CFileFramebufferTIFF()
 /// \brief					Write image data to the file
 // Return Value			:	-
 // Comments				:
-void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data) 
+void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data)
 {
 	int				i,j;
 	int				check		=	FALSE;
 	int				numChannels	=	w*h*numSamples;
-	
+
 	if (image == NULL)	return;
-	
+
 	// Apply the gamma correction if applicable
 	if ((gamma != 1) || (gain != 1)) {
 		float	invGamma	=	1 / gamma;
-		
+
 		for (i=0;i<numChannels;i++) {
 			data[i]	=	powf(gain*data[i],invGamma);
 		}
 	}
-	
+
 	// Apply the quantization if applicable
 	if (qmax > 0) {
 		for (i=0;i<numChannels;i++) {
@@ -262,26 +262,26 @@ void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data)
 			else if (data[i] > qmax)	data[i]	=	qmax;
 		}
 	}
-	
+
 	// Lock the file
 	osLock(fileMutex);
-	
+
 	// Record the data
 	for (i=0;i<h;i++) {
 		unsigned char	*scan;
-		
+
 		if (scanlines[i+y] == NULL) {
 			scanlines[i+y]	=	scan	=	new unsigned char[width*pixelSize];
 		} else {
 			scan			=	(unsigned char *) scanlines[i+y];
 		}
-		
+
 		switch(bitspersample) {
 			case 8:
 			{
 				const float		*src	=	&data[i*w*numSamples];
 				unsigned char	*dest	=	&((unsigned char *) scan)[x*numSamples];
-				
+
 				for (j=0;j<w*numSamples;j++) {
 					*dest++		=	(unsigned char) *src++;
 				}
@@ -291,7 +291,7 @@ void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data)
 			{
 				const float		*src	=	&data[i*w*numSamples];
 				unsigned short	*dest	=	&((unsigned short *) scan)[x*numSamples];
-				
+
 				for (j=0;j<w*numSamples;j++) {
 					*dest++		=	(unsigned short) *src++;
 				}
@@ -301,14 +301,14 @@ void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data)
 				if (sampleformat == SAMPLEFORMAT_IEEEFP) {
 					const float	*src	=	&data[i*w*numSamples];
 					float		*dest	=	&((float *) scan)[x*numSamples];
-					
+
 					for (j=0;j<w*numSamples;j++) {
 						*dest++		=	*src++;
 					}
 				} else {
 					const float		*src	=	&data[i*w*numSamples];
 					unsigned int	*dest	=	&((unsigned int *) scan)[x*numSamples];
-					
+
 					for (j=0;j<w*numSamples;j++) {
 						*dest++		=	(unsigned int) *src++;
 					}
@@ -317,11 +317,11 @@ void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data)
 			default:
 				break;
 		}
-		
+
 		scanlineUsage[i+y]	-=	w;
 		if (scanlineUsage[i+y] <= 0)	check	=	TRUE;
 	}
-	
+
 	if (check) {
 		for (;lastSavedLine<height;lastSavedLine++) {
 			if (scanlineUsage[lastSavedLine] == 0) {
@@ -335,9 +335,9 @@ void CFileFramebufferTIFF::write(int x,int y,int w,int h,float *data)
 			}
 		}
 	}
-	
+
 	// Release the file
 	osUnlock(fileMutex);
-}	
+}
 
 

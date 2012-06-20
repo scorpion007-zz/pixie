@@ -131,7 +131,7 @@ void			CRenderer::initDeclarations() {
 	declareVariable(RI_PROGRESS,			"int");
 
 	// File display variables
-	
+
 	declareVariable("quantize",				"float[4]");
 	declareVariable("dither",				"float");
 	declareVariable("gamma",				"float");
@@ -243,23 +243,23 @@ void			CRenderer::initDeclarations() {
 	tmp2 = new CDisplayChannel("rgb",NULL,3,0);
 	displayChannels->push(tmp2);
 	declaredChannels->insert(tmp2->name,tmp2);
-	
+
 	tmp2 = new CDisplayChannel("rgba",NULL,4,0);
 	displayChannels->push(tmp2);
 	declaredChannels->insert(tmp2->name,tmp2);
-	
+
 	tmp2 = new CDisplayChannel("a",NULL,1,3);
 	displayChannels->push(tmp2);
 	declaredChannels->insert(tmp2->name,tmp2);
-	
+
 	tmp2 = new CDisplayChannel("z",NULL,1,4);
 	displayChannels->push(tmp2);
 	declaredChannels->insert(tmp2->name,tmp2);
-	
+
 	tmp2 = new CDisplayChannel("rgbaz",NULL,5,0);
 	displayChannels->push(tmp2);
 	declaredChannels->insert(tmp2->name,tmp2);
-	
+
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -329,7 +329,7 @@ void			CRenderer::shutdownDeclarations() {
 // Comments				:
 void			CRenderer::defineCoordinateSystem(const char *name,const float *from,const float *to,ECoordinateSystem type) {
 	CNamedCoordinateSystem	*newEntry;
-	
+
 	assert(definedCoordinateSystems	!=	NULL);
 
 	// Check if this system has been defined already
@@ -417,7 +417,7 @@ CVariable		*CRenderer::declareVariable(const char *name,const char *type,int mar
 	CVariable	cVariable,*nVariable;
 
 	assert(declaredVariables	!=	NULL);
-	
+
 	if (parseVariable(&cVariable,name,type)) {
 		// Parse successful, insert the variable into the dictionary
 		CVariable	*oVariable;
@@ -459,15 +459,15 @@ CVariable		*CRenderer::declareVariable(const char *name,const char *type,int mar
 		nVariable->defaultValue				=	NULL;
 		nVariable->accessor					=	-1;
 		variables							=	nVariable;
-		
+
 		// Insert the variable into the variables trie
 		declaredVariables->insert(nVariable->name,nVariable);
 
 		// Make the variable global if it needs to be global
 		if (nVariable->storage == STORAGE_GLOBAL) {
-			makeGlobalVariable(nVariable);			
+			makeGlobalVariable(nVariable);
 		}
-		
+
 		return nVariable;
 	} else {
 		return NULL;
@@ -549,13 +549,13 @@ int		CRenderer::getGlobalID(const char *name) {
 CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 	CDisplayChannel *oChannel;
 	CVariable		cVariable,*oVariable;
-	
+
 	assert(declaredChannels	!=	NULL);
-	
+
 	if (parseVariable(&cVariable,NULL,type) == FALSE) {
 		return NULL;
 	}
-	
+
 	if (declaredChannels->find(cVariable.name,oChannel) == TRUE) {
 		if ((oChannel->numSamples == cVariable.numFloats) &&
 			((cVariable.storage != STORAGE_GLOBAL) || oChannel->outType == cVariable.entry)) {
@@ -566,7 +566,7 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 		}
 	} else {
 		oVariable = declareVariable(NULL,type);
-		
+
 		if (oVariable == NULL) {
 			error(CODE_SYSTEM,"Channel definition \"%s\" is ill formed\n",type);
 		} else {
@@ -575,7 +575,7 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 			oChannel = new CDisplayChannel(oVariable->name,oVariable,samples,-1,outType);
 			declaredChannels->insert(oChannel->name,oChannel);
 			displayChannels->push(oChannel);
-			
+
 			return oChannel;
 		}
 	}
@@ -591,9 +591,9 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(const char *type) {
 // Comments				:
 CDisplayChannel		*CRenderer::declareDisplayChannel(CVariable *var) {
 	CDisplayChannel *oChannel;
-	
+
 	assert(declaredChannels	!=	NULL);
-	
+
 	if (declaredChannels->find(var->name,oChannel) == TRUE) {
 		if (oChannel->variable == var) {
 			return oChannel;
@@ -604,7 +604,7 @@ CDisplayChannel		*CRenderer::declareDisplayChannel(CVariable *var) {
 		oChannel = new CDisplayChannel(var->name,var,var->numFloats,-1,var->entry);
 		declaredChannels->insert(oChannel->name,oChannel);
 		displayChannels->push(oChannel);
-		
+
 		return oChannel;
 	}
 
@@ -632,12 +632,12 @@ CDisplayChannel		*CRenderer::retrieveDisplayChannel(const char *name) {
 // Method				:	resetDisplayChannelUsage
 // Description			:
 /// \brief					Mark all AOV channels as unused
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void CRenderer::resetDisplayChannelUsage() {
 	int i,n = displayChannels->numItems;
 	CDisplayChannel **dsp = displayChannels->array;
-	
+
 	for (i=0;i<n;i++,dsp++) {
 		if ((*dsp)->variable != NULL) {
 			(*dsp)->sampleStart = -1;
@@ -652,9 +652,9 @@ void CRenderer::resetDisplayChannelUsage() {
 /// \brief					Register a file as a temporary
 //						:	 Optionally register for deletion at frame-end
 //						:	 certain files (namely those which are netrender temporaries)
-//						:	 would otherwise be found in preference to the merged 
+//						:	 would otherwise be found in preference to the merged
 //						:	 client-side file, and must be removed before next frame.
-// Return Value			:	
+// Return Value			:
 // Comments				:
 /// \note					Also removes any netFileMappings for the file
 void CRenderer::registerFrameTemporary(const char *name, int deleteFile) {
@@ -664,7 +664,7 @@ void CRenderer::registerFrameTemporary(const char *name, int deleteFile) {
 	if (frameTemporaryFiles == NULL) {
 		frameTemporaryFiles = new CArray<const char*>;
 	}
-	
+
 	frameTemporaryFiles->push(tmp);
 }
 

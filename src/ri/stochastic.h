@@ -56,7 +56,7 @@ protected:
 	int			probeArea(int *xbound,int *ybound, int bw, int bh, int bl, int bt, float zmin) {
 					return probeRect(xbound,ybound,bw,bh,bl,bt,zmin);
 				}
-	
+
 private:
 
 	///////////////////////////////////////////////////////////////////////
@@ -97,22 +97,22 @@ private:
 
 	void		filterSamples(int,CFragment **,float *);
 	void		deepShadowCompute();
-	
+
 	bool
 	processPixel(
 		__in CRasterGrid* grid,
 		__in int displacement,
 		__in CPixel* pixel,
 		__in const float* vertices);
-	
+
 	void
 	newFragment(
 		__out CFragment** ppSample);
-	
+
 	void
 	deleteFragment(
 		__in CFragment* sample);
-	
+
 	void
 	drawExtraSamples(
 		__out CFragment* nSample,
@@ -125,23 +125,23 @@ private:
 		__in const float* v2,
 		__in const float* v3,
 		__in int displacement);
-	
+
 	void
 	findSample(
 		__out CFragment** dest,
 		__in CPixel* pixel,
 		__in float z);
-	
+
 	bool
 	lodCheck(
 		__in CRasterGrid *grid,
 		__in CPixel* pixel);
-	
+
 	void
 	updateOpaque(
 		__in CPixel* pixel,
 		__in float z);
-	
+
 	bool
 	checkPixel(
 		__in bool useLessThan,
@@ -153,30 +153,30 @@ private:
 		__out float* pZ,
 		__out float* pU,
 		__out float* pV);
-	
+
 	void
 	depthFilterIfZMin(
 		__in CPixel* pixel);
-	
+
 	void
 	depthFilterElseZMin(
 		__in CPixel* pixel,
 		__in float z);
-	
+
 	void
 	depthFilterTouchNodeZMin(
 		__in CPixel* pixel,
 		__in float z);
-	
+
 	void
 	depthFilterIfZMid(
 		__in CPixel* pixel);
-	
+
 	void
 	depthFilterElseZMid(
 		__in CPixel* pixel,
 		__in float z);
-	
+
 	void
 	depthFilterTouchNodeZMid(
 		__in CPixel* pixel,
@@ -187,7 +187,7 @@ private:
 		__in CPixel* pixel,
 		__in CFragment* nSample,
 		__in bool useZMid);
-	
+
 	void
 	colorOpacityUpdate(
 		__out CFragment* nSample,
@@ -200,7 +200,7 @@ private:
 		__in const float* v2c,
 		__in const float* v3c,
 		__in int displacement);
-	
+
 	void
 	drawPixel(
 		__in CRasterGrid* grid,
@@ -214,7 +214,7 @@ private:
 		__in const float* v3,
 		__in bool useZMid,
 		__in int displacement);
-	
+
 	bool
 	drawPixelCheck(
 		__in CRasterGrid* grid,
@@ -234,15 +234,15 @@ private:
 	CFragment	*freeFragments;
 	int			numFragments;
 	float		*extraSampleMemory;
-	
+
 	int			width, height;
 	int			top, left, right, bottom;
 	int			sampleWidth, sampleHeight;
-	
+
 	CSobol<2>	apertureGenerator;
-	
+
 	// Define prototypes for the rasterization functions
-	
+
 	#define DEFINE_STOCHASTIC_FUNPROTOS
 	#include "stochasticPrimitives.h"
 	#undef DEFINE_STOCHASTIC_FUNPROTOS

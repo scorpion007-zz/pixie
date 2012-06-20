@@ -70,7 +70,7 @@ public:
 	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *);
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
-	
+
 	void					(*subdivisionFunction)(void *,float);
 	void					(*freeFunction)(void *);
 	void					*data;
@@ -96,7 +96,7 @@ public:
 	void					intersect(CShadingContext *,CRay *);
 	void					dice(CShadingContext *);
 	void					instantiate(CAttributes *,CXform *,CRendererContext *) const;
-	
+
 	CObject					*instance;
 	int						processed;
 };

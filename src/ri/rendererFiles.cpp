@@ -101,7 +101,7 @@ void		CRenderer::shutdownFiles() {
 		osEnumerate(tmp,rcClearTemp,NULL);
 		osDeleteDir(temporaryPath);
 	}
-	
+
 	// Ditch the DSO shaders that have been loaded
 	CDSO	*cDso;
 	for (cDso=dsos;cDso!=NULL;) {
@@ -112,7 +112,7 @@ void		CRenderer::shutdownFiles() {
 		free(cDso->prototype);
 		delete cDso;
 		cDso	=	nDso;
-	}	
+	}
 
 	// Ditch the loaded files
 	assert(globalFiles != NULL);
@@ -157,7 +157,7 @@ int	CRenderer::locateFile(char *result,const char *name,TSearchpath *searchpath)
 			name = mapping->to;
 		}
 	}
-	
+
 	if (strchr(name,OS_DIR_SEPERATOR)) {
 		// Supplied path
 	// Check if the file exists
@@ -224,9 +224,9 @@ CTexture	*CRenderer::getTexture(const char *name) {
 
 	assert(name != NULL);
 	assert(frameFiles != NULL);
-	
+
 	if (frameFiles->find(name,tex) == FALSE) {
-	
+
 		// Load the texture
 		tex	=	textureLoad(name,texturePath);
 
@@ -254,9 +254,9 @@ CEnvironment	*CRenderer::getEnvironment(const char *name) {
 
 	assert(name != NULL);
 	assert(frameFiles != NULL);
-	
+
 	if (frameFiles->find(name,tex) == FALSE) {
-	
+
 		tex	=	environmentLoad(name,texturePath,toWorld);
 
 		if (tex == NULL)	{
@@ -317,7 +317,7 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 
 	assert(name != NULL);
 	assert(frameFiles != NULL);
-	
+
 	// Check the memory first
 	if (frameFiles->find(name,cache) == FALSE){
 		char				fileName[OS_MAX_PATH_LENGTH];
@@ -337,7 +337,7 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 		} else {
 			flags	=	CACHE_SAMPLE;
 		}
-		
+
 		// Try to read the file
 		cache		=	NULL;
 		if (flags & CACHE_READ) {
@@ -358,7 +358,7 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 						// always remove the file mapping when writing
 						registerFrameTemporary(name,FALSE);
 					}
-					
+
 					// Create the cache
 					if (strcmp(type,fileIrradianceCache) == 0) {
 						cache	=	new CIrradianceCache(name,flags,in,from,to,NULL);
@@ -374,16 +374,16 @@ CTexture3d		*CRenderer::getCache(const char *name,const char *mode,const float *
 		if (cache == NULL) {
 			// If we're netrendering and writing, treat specially
 			if ((netClient != INVALID_SOCKET) && (flags & CACHE_WRITE)) {
-				flags			&=	~CACHE_WRITE;		// don't flush cache to 
+				flags			&=	~CACHE_WRITE;		// don't flush cache to
 				createChannel	=	TRUE;
 				// always remove the file mapping when writing
 				registerFrameTemporary(name,FALSE);
 			}
-			
+
 			// go ahead and create the cache
 			cache	=	new CIrradianceCache(name,flags,NULL,from,to,CRenderer::toNDC);
 		}
-		
+
 		// Create channels if possible
 		if (createChannel == TRUE) {
 			if (cache != NULL) {
@@ -409,7 +409,7 @@ CTextureInfoBase	*CRenderer::getTextureInfo(const char *name) {
 
 	assert(name != NULL);
 	assert(frameFiles != NULL);
-	
+
 	if (frameFiles->find(name,tex) == FALSE){
 		// try environments first
 		tex	=	environmentLoad(name,texturePath,toWorld);
@@ -443,21 +443,21 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 
 	assert(name != NULL);
 	assert(frameFiles != NULL);
-	
+
 	if (frameFiles->find(name,texture3d) == FALSE){
 
 		if (from == NULL) {
 			from	=	world->from;
 			to		=	world->to;
 		}
-		
+
 		// If we are writing, it must be a point cloud
 		if (write == TRUE) {
-			
+
 			if (netClient != INVALID_SOCKET) {
 				CPointCloud	*cloud	=	new CPointCloud(name,world->from,world->to,CRenderer::toNDC,channels,FALSE);
 				texture3d			=	cloud;
-			
+
 				// Ensure we unmap the file when done.  Do not delete it
 				// as we mark the file to never be written in the server
 				registerFrameTemporary(name,FALSE);
@@ -466,7 +466,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 				// alloate a point cloud which will be written to disk
 				texture3d	=	new CPointCloud(name,from,to,CRenderer::toNDC,channels,TRUE);
 			}
-			
+
 		} else {
 			// Locate the file
 			if (locateFile(fileName,name,texturePath)) {
@@ -485,7 +485,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 			} else {
 				in		=	NULL;
 			}
-			
+
 			if (in == NULL) {
 				// allocate a dummy blank-channel point cloud
 				error(CODE_BADTOKEN,"Cannot find or open Texture3D file \"%s\"\n",name);
@@ -494,7 +494,7 @@ CTexture3d			*CRenderer::getTexture3d(const char *name,int write,const char* cha
 				registerFrameTemporary(name,FALSE);
 			}
 		}
-				
+
 		frameFiles->insert(texture3d->name,texture3d);
 	}
 
@@ -516,7 +516,7 @@ CShader		*CRenderer::getShader(const char *name,TSearchpath *path) {
 	if (strcmp(name,RI_DEFAULTSURFACE) == 0)	name	=	RI_MATTE;
 
 	assert(globalFiles != NULL);
-	
+
 	// Check if we already loaded this shader before ...
 	cShader		=	NULL;
 	if (globalFiles->find(name,file)) {
@@ -707,7 +707,7 @@ CDSO				*CRenderer::getDSO(const char *name,const char *prototype) {
 	CDSO				*cDso;
 
 	assert(name != NULL);
-	
+
 	// Check if the DSO had been loaded before
 	for (cDso=dsos;cDso!=NULL;cDso=cDso->next) {
 		if (strcmp(cDso->name,name) == 0) {
@@ -715,8 +715,8 @@ CDSO				*CRenderer::getDSO(const char *name,const char *prototype) {
 				return	cDso;
 			}
 		}
-	}	
-	
+	}
+
 	dsoInitFunction		init;
 	dsoExecFunction		exec;
 	dsoCleanupFunction	cleanup;

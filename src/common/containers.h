@@ -126,7 +126,7 @@ public:
 							delete [] buckets;
 						}
 
-				
+
 						// Insert another item into the hash
 	void				insert(keyType k,valType v)	{
 							int				index	=	key(k);
@@ -165,7 +165,7 @@ public:
 
 									if (h1 == NULL) buckets[index]	=	h->next;
 									else			h1->next		=	h->next;
-										
+
 									delete h;
 
 									return TRUE;
@@ -479,7 +479,7 @@ public:
 							allItems	=	newItems;
 							stepSize	*=	2;
 						}
-		
+
 						// Insert the item
 						i	= numItems++;
 						j	= i >> 1;
@@ -494,7 +494,7 @@ public:
 						allItems[i].priority		=	priority;
 					}
 
-		
+
 		int			getMax(ItemType *item,PriorityType &priority) {
 						if (numItems <= 1) return FALSE;
 
@@ -503,16 +503,16 @@ public:
 						return TRUE;
 					}
 
-		
+
 		int			removeMax(ItemType *item,PriorityType &priority) {
 						int			i = 1, j;
 						CPqueueItem	*lItem;
 
 						if (numItems <= 1) return FALSE;
-					
+
 						item[0]		=	allItems[1].item;
 						priority	=	allItems[1].priority;
-					
+
 						numItems--;
 						lItem		=	&allItems[numItems];
 
@@ -570,10 +570,10 @@ private:
 // Comments				:
 template <class T>	class CMemPool {
 public:
-	
+
 						CMemPool(int itemsPerBank = 100) {
 							this->itemsPerBank	=	itemsPerBank;	// The number of items to allocate at a time
-							allocatedBanks		=	NULL;		
+							allocatedBanks		=	NULL;
 							freeItems			=	NULL;
 						}
 
@@ -593,7 +593,7 @@ public:
 								T			*cItem;
 								cItem		=	(T *) freeItems;
 								freeItems	=	(T64 *) freeItems->pointer;
-								return cItem;	
+								return cItem;
 							} else {
 								T64			*cBank;
 								int			i;
@@ -617,7 +617,7 @@ public:
 
 								cItem		=	(T *) freeItems;
 								freeItems	=	(T64 *) freeItems->pointer;
-								return cItem;	
+								return cItem;
 							}
 						}
 
@@ -690,7 +690,7 @@ public:
 						~CMemStack() {
 							while((stack = firstPage) != NULL) {
 								firstPage	=	stack->next;
-								
+
 								memoryDeletePage(stack);
 							}
 						}
@@ -824,7 +824,7 @@ public:
 								 array				=	newArray;
 							}
 						}
-						
+
 		T				& operator[](int index) {
 							assert(index < numItems);
 							return array[index];

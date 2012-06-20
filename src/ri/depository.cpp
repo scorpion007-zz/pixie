@@ -65,8 +65,8 @@ CDepository::~CDepository() {
 void		CDepository::lookup(float *C,const float *P,const float *N) {
 	int						numFound	=	0;
 	int						maxFound	=	5;
-	const CDepositorySample	**indices	=	(const CDepositorySample **)	alloca((maxFound+1)*sizeof(CDepositorySample *)); 
-	float					*distances	=	(float	*)						alloca((maxFound+1)*sizeof(float)); 
+	const CDepositorySample	**indices	=	(const CDepositorySample **)	alloca((maxFound+1)*sizeof(CDepositorySample *));
+	float					*distances	=	(float	*)						alloca((maxFound+1)*sizeof(float));
 	CLookup					l;
 	float					totalWeight;
 
@@ -105,7 +105,7 @@ void		CDepository::lookup(float *C,const float *P,const float *N) {
 		C[1]		+=	p->C[1]*weight;
 		C[2]		+=	p->C[2]*weight;
 		C[3]		+=	p->C[3]*weight;
-		totalWeight	+=	weight;						
+		totalWeight	+=	weight;
 	}
 
 	if (totalWeight > 0) {

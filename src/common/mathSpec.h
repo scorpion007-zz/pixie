@@ -152,9 +152,9 @@ inline	SCALAR_TYPE	interpolatea(const SCALAR_TYPE s1,const SCALAR_TYPE s2,const 
 		} else {
 			return	s1	+	(SCALAR_TYPE) (d*alpha);
 		}
-		
 
-		
+
+
 	} else {
 		return interpolatea(s2,s1,1-alpha);
 	}
@@ -211,7 +211,7 @@ inline	void	mulmp(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *s
 	const	SCALAR_TYPE	y		=	s1[element(1,0)]*s2[0]+s1[element(1,1)]*s2[1]+s1[element(1,2)]*s2[2]+s1[element(1,3)];
 	const	SCALAR_TYPE	z		=	s1[element(2,0)]*s2[0]+s1[element(2,1)]*s2[1]+s1[element(2,2)]*s2[2]+s1[element(2,3)];
 	const	SCALAR_TYPE	w		= 	s1[element(3,0)]*s2[0]+s1[element(3,1)]*s2[1]+s1[element(3,2)]*s2[2]+s1[element(3,3)];
-	
+
 
 	if (w != 1) {
 		const double	l	=	1 / (double) w;
@@ -230,7 +230,7 @@ inline	void	mulmv(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *s
 	const	SCALAR_TYPE	x		=	s1[element(0,0)]*s2[0]+s1[element(0,1)]*s2[1]+s1[element(0,2)]*s2[2];
 	const	SCALAR_TYPE	y		=	s1[element(1,0)]*s2[0]+s1[element(1,1)]*s2[1]+s1[element(1,2)]*s2[2];
 	const	SCALAR_TYPE	z		=	s1[element(2,0)]*s2[0]+s1[element(2,1)]*s2[1]+s1[element(2,2)]*s2[2];
-	
+
 	result[0]	=	x;
 	result[1]	=	y;
 	result[2]	=	z;
@@ -251,7 +251,7 @@ inline	void	mulmp4(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *
 	const	SCALAR_TYPE	y		=	s1[element(1,0)]*s2[0]+s1[element(1,1)]*s2[1]+s1[element(1,2)]*s2[2]+s1[element(1,3)]*s2[3];
 	const	SCALAR_TYPE	z		=	s1[element(2,0)]*s2[0]+s1[element(2,1)]*s2[1]+s1[element(2,2)]*s2[2]+s1[element(2,3)]*s2[3];
 	const	SCALAR_TYPE	w		= 	s1[element(3,0)]*s2[0]+s1[element(3,1)]*s2[1]+s1[element(3,2)]*s2[2]+s1[element(3,3)]*s2[3];
-	
+
 
 	result[0]	=	x;
 	result[1]	=	y;
@@ -265,7 +265,7 @@ inline	void	mulmv4(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *
 	const	SCALAR_TYPE	y		=	s1[element(1,0)]*s2[0]+s1[element(1,1)]*s2[1]+s1[element(1,2)]*s2[2];
 	const	SCALAR_TYPE	z		=	s1[element(2,0)]*s2[0]+s1[element(2,1)]*s2[1]+s1[element(2,2)]*s2[2];
 	const	SCALAR_TYPE	w		= 	s1[element(3,0)]*s2[0]+s1[element(3,1)]*s2[1]+s1[element(3,2)]*s2[2];
-	
+
 	result[0]	=	x;
 	result[1]	=	y;
 	result[2]	=	z;
@@ -308,7 +308,7 @@ inline	void	mulpm4(SCALAR_TYPE *result,const SCALAR_TYPE *s1,const SCALAR_TYPE *
 	const	SCALAR_TYPE	y		=	s1[0]*s2[element(0,1)] + s1[1]*s2[element(1,1)] + s1[2]*s2[element(2,1)] + s1[3]*s2[element(3,1)];
 	const	SCALAR_TYPE	z		=	s1[0]*s2[element(0,2)] + s1[1]*s2[element(1,2)] + s1[2]*s2[element(2,2)] + s1[3]*s2[element(3,2)];
 	const	SCALAR_TYPE	w		=	s1[0]*s2[element(0,3)] + s1[1]*s2[element(1,3)] + s1[2]*s2[element(2,3)] + s1[3]*s2[element(3,3)];
-	
+
 
 	result[0]	=	x;
 	result[1]	=	y;
@@ -535,7 +535,7 @@ inline	SCALAR_TYPE		nearestBox(const SCALAR_TYPE *bmin,const SCALAR_TYPE *bmax,c
 
 		if (tnear > tfar) return C_INFINITY;
 	}
-	
+
 	// return nearest t if we're external
 	return (SCALAR_TYPE) tnear;
 }
@@ -552,7 +552,7 @@ inline	void	reflect(SCALAR_TYPE *r,const SCALAR_TYPE *I,const SCALAR_TYPE *N) {
 inline	void	refract(SCALAR_TYPE *r,const SCALAR_TYPE *I,const SCALAR_TYPE *N,SCALAR_TYPE eta) {
 	VECTOR_TYPE	vtmp;
 	SCALAR_TYPE	IdotN,k;
-	IdotN	=	dotvv(N,I); 
+	IdotN	=	dotvv(N,I);
 	k		=	1 - eta*eta*(1-IdotN*IdotN);
 	if (k <= 0) {
 		//initv(r,0);
@@ -636,7 +636,7 @@ void	rotatem(SCALAR_TYPE *,SCALAR_TYPE,SCALAR_TYPE,SCALAR_TYPE,const SCALAR_TYPE
 void	rotatem(SCALAR_TYPE *,const SCALAR_TYPE *);
 void	skewm(SCALAR_TYPE *,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE,const SCALAR_TYPE);
 
-bool	
+bool
 invertm(
 	SCALAR_TYPE *d,
 	const SCALAR_TYPE *s);
@@ -834,11 +834,11 @@ inline	void	qfromR(SCALAR_TYPE *q,const SCALAR_TYPE *R) {
 			b = sqrt( 1.0 + R[element(1,1)] - R[element(0,0)] - R[element(2,2)])*0.5;
 			a = (R[element(0,1)] + R[element(1,0)] ) / (4*b);
 			c = (R[element(1,2)] + R[element(2,1)] ) / (4*b);
-			d = (R[element(0,2)] - R[element(2,0)] ) / (4*b); 
+			d = (R[element(0,2)] - R[element(2,0)] ) / (4*b);
 		} else {
 			c = sqrt(1.0 + R[element(2,2)] - R[element(0,0)] - R[element(1,1)])*0.5;
 			a = (R[element(0,2)] + R[element(2,0)] ) / (4*c);
-			b = (R[element(1,2)] + R[element(2,1)] ) / (4*c);			
+			b = (R[element(1,2)] + R[element(2,1)] ) / (4*c);
 			d = (R[element(1,0)] - R[element(0,1)] ) / (4*c);
 		}
 	}

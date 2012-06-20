@@ -139,7 +139,7 @@ public:
 		void				intersect(CShadingContext *,CRay *)	{	}
 		void				dice(CShadingContext *rasterizer);
 		void				instantiate(CAttributes *,CXform *,CRendererContext *) const;
-		
+
 
 private:
 		void				create(CShadingContext *context);

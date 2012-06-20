@@ -96,7 +96,7 @@ CDelayedObject::~CDelayedObject() {
 // Return Value			:	-
 // Comments				:
 void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
-		
+
 	// Process the object
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
@@ -117,7 +117,7 @@ void	CDelayedObject::intersect(CShadingContext *context,CRay *cRay) {
 // Return Value			:	-
 // Comments				:
 void	CDelayedObject::dice(CShadingContext *r) {
-	
+
 	// Process the object
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
@@ -204,7 +204,7 @@ CDelayedInstance::~CDelayedInstance() {
 // Return Value			:	-
 // Comments				:
 void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
-	
+
 	// Process the instance
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);
@@ -224,7 +224,7 @@ void	CDelayedInstance::intersect(CShadingContext *context,CRay *cRay) {
 // Return Value			:	-
 // Comments				:
 void	CDelayedInstance::dice(CShadingContext *r) {
-	
+
 	// Process the instance
 	if (processed == FALSE) {
 		osLock(CRenderer::delayedMutex);

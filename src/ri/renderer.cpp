@@ -311,14 +311,14 @@ void		CRenderer::beginRenderer(CRendererContext *c,const char *ribFile,const cha
 
 	// Init the network (if applicable)
 	initNetwork(ribFile,riNetString);
-	
+
 	// Init the light sources we use
 	allLights						=	new CArray<CShaderInstance *>;
 
 	// Record the start overhead
 	stats.rendererStartOverhead		=	osCPUTime() - startTime;
 
-	// Create a temporary directory for the lifetime of the renderer		
+	// Create a temporary directory for the lifetime of the renderer
 	// Make the temporary directory pid-unique in case we have more than one on a given host
 	osTempdir(temporaryPath, OS_MAX_PATH_LENGTH);
 
@@ -458,7 +458,7 @@ static void	copyOptions(const COptions *o) {
 	CRenderer::numEmitPhotons			=	o->numEmitPhotons;
 	CRenderer::shootStep				=	o->shootStep;
 	CRenderer::depthFilter				=	o->depthFilter;
-	
+
 	CRenderer::userOptions				=	&(o->userOptions);
 }
 
@@ -605,7 +605,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	shutterTime			=	shutterClose - shutterOpen;
 	if (shutterTime <= 0 ) 	invShutterTime	=	1.0f;
 	else					invShutterTime	=	1.0f/shutterTime;
-	
+
 	// Clear samplemotion if we don't have any motionblur
 	// If we do, keep the user option to turn it off
 	if (!(flags & OPTIONS_FLAGS_MOTIONBLUR))	flags	&=	~OPTIONS_FLAGS_SAMPLEMOTION;
@@ -617,7 +617,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	} else {
 		lengthA			=	sqrtf(dxdPixel*dxdPixel + dydPixel*dydPixel) / imagePlane;
 		lengthB			=	0;
-	}	
+	}
 
 	// Compute the matrices related to the camera transformation
 	if (projection == OPTIONS_PROJECTION_PERSPECTIVE) {
@@ -641,7 +641,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		toNDC[element(3,1)]		=	0;
 		toNDC[element(3,2)]		=	1;
 		toNDC[element(3,3)]		=	0;
-		
+
 		// Screen
 		toScreen[element(0,0)]	=	imagePlane;
 		toScreen[element(0,1)]	=	0;
@@ -683,7 +683,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		toNDC[element(3,1)]		=	0;
 		toNDC[element(3,2)]		=	0;
 		toNDC[element(3,3)]		=	1;
-		
+
 		// Screen
 		toScreen[element(0,0)]	=	1;
 		toScreen[element(0,1)]	=	0;
@@ -793,7 +793,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 		// Allocate the pixel filter (globalMemory is checkpointed)
 		pixelFilterKernel						=	(float *) ralloc(filterWidth*filterHeight*sizeof(float),CRenderer::globalMemory);
-	
+
 		// Evaluate the pixel filter, ignoring the jitter as it is apperently what other renderers do as well
 		float	totalWeight	=	0;
 		int		sx,sy;
@@ -822,7 +822,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 	currentXBucket			=	0;
 	currentYBucket			=	0;
 	currentPhoton			=	0;
-	
+
 	// Initialize the extend of the world
 	initv(worldBmin,C_INFINITY,C_INFINITY,C_INFINITY);
 	initv(worldBmax,-C_INFINITY,-C_INFINITY,-C_INFINITY);
@@ -838,14 +838,14 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 
 	// Error handling
 	offendingObject			=	NULL;
-	
+
 	// Initialize remote channels
 	remoteChannels			=	new CArray<CRemoteChannel*>;
 	declaredRemoteChannels	=	new CTrie<CRemoteChannel*>;
 
 	// Misc startup
 	hiderFlags	=	0;
-	
+
 	// Compute the clipping data
 	beginClipping();
 
@@ -856,9 +856,9 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		// need a single thread in charge of that, so we only get one nack
 		numThreads = 1;
 	}
-	
+
 	// All of these must be after we determine the number of threads
-	
+
 	// Initialize tesselations
 	CTesselationPatch::initTesselations(geoCacheSize);
 
@@ -883,10 +883,10 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		error(CODE_BADTOKEN,"Hider \"%s\" unavailable\n",hider);
 		CStochastic::preDisplaySetup();
 	}
-	
+
 	// Set up displays
 	beginDisplays();
-	
+
 	// Start the contexts
 	numActiveThreads	=	numThreads;
 	contexts			=	new CShadingContext*[numThreads];
@@ -918,7 +918,7 @@ void		CRenderer::beginFrame(const COptions *o,CAttributes *a,CXform *x) {
 		assert(contexts[i] != NULL);
 
 		contexts[i]->updateState();
-	}			
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -961,10 +961,10 @@ void		CRenderer::endFrame() {
 
 	// terminate the texturing  (must be after we kill the files)
 	shutdownTextures();
-		
+
 	// Shutdown the texturing system
 	CBrickMap::shutdownBrickMap();
-	
+
 	// Cleanup the tesselations
 	CTesselationPatch::shutdownTesselations();
 
@@ -979,14 +979,14 @@ void		CRenderer::endFrame() {
 		for (i=0;i<numTemps;i++) {
 			int			removeFile	= (*tempFiles)[0];
 			const char	*fileName 	= &(*tempFiles)[1];
-			
+
 			// Remove file if needed
 			if (removeFile) {
 				if (osFileExists(fileName) == TRUE) {
 					osDeleteFile(fileName);
 				}
 			}
-			
+
 			// Remove temp file mapping if it exists
 			if (netFileMappings != NULL) {
 				CNetFileMapping* mapping;
@@ -994,7 +994,7 @@ void		CRenderer::endFrame() {
 					delete mapping;
 				}
 			}
-			
+
 			tempFiles++;
 		}
 		frameTemporaryFiles->destroy();
@@ -1014,10 +1014,10 @@ void		CRenderer::endFrame() {
 			fatal(CODE_BADTOKEN,"Invalid net command\n");
 		}
 	}
-	
+
 	// Clear our cooy of the user options
 	CRenderer::userOptions = NULL;
-	
+
 	// Restore the memory to the checkpoint, effectively deallocating everything we allocated for the frame
 	memRestore(frameCheckpoint,globalMemory);
 
@@ -1130,7 +1130,7 @@ void		CRenderer::renderFrame() {
 	movvv(root->bmax,worldBmax);
 	root->setChildren(contexts[0],root->children);
 	numRenderedBuckets = 0;
-	
+
 	// Render the frame
 	if (netNumServers != 0) {
 		int				i;
@@ -1165,7 +1165,7 @@ void		CRenderer::renderFrame() {
 			netBuffer.integer	=	NET_READY;
 			rcSend(netClient,&netBuffer,1*sizeof(T32));
 		}
-		
+
 		// Spawn the threads
 		threads	=	(TThread *) alloca(numThreads*sizeof(TThread));
 		for (i=0;i<numThreads;i++) {

@@ -79,7 +79,7 @@ for (i=grid->numVertices;i>0;i--,vertices+=numVertexSamples,bounds+=4,sizes+=2) 
 							sample[2]	=	vertices[4];
 							sample[3]	=	vertices[5];
 						}
-						
+
 						// Update the occlusion cache
 						COcclusionNode	*cNode	=	getNode(x,y);
 

@@ -268,7 +268,7 @@ gettoken(f)
 						}
 					fail = TRUE;
 /* Error -- loop will fail */		continue;
-				    
+
 						case F_LAST:
 					fail = TRUE;	/* Force failure */
 					continue;	/* after an f|F|l|L */
@@ -536,7 +536,7 @@ memmov(f,t,l)
 	register	char	*f;
 	register	char	*t;
 	register unsigned	l;
-	{    
+	{
 	while(l--)
 		*t++ = *f++;
 	}

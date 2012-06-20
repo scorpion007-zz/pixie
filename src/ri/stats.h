@@ -106,7 +106,7 @@ public:
 	int				numSplits;						// The stats that come from CPatch
 	int				numVsplits,numUsplits,numUVsplits;
 
-	
+
 
 	int				numTextureMisses;				// The number of texture misses
 	int				transferredTextureData;			// The amount the texture data transmitted

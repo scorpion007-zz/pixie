@@ -92,8 +92,8 @@ inline	float	isqrtf(float number) {
 	float		x2, y;
 	const float	threehalfs = 1.5F;
 	union { float f; uint32_t i; } u;
-	
-	
+
+
 	x2 = number * 0.5F;
 	y  = number;
 	u.f = number;

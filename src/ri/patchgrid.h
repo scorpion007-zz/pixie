@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////
 //
 //  File				:	patchgrid.h
-//  Classes				:	
+//  Classes				:
 //  Description			:
 /// \brief					This implements a grid of bilinear patches
 //

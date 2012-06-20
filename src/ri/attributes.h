@@ -93,12 +93,12 @@ typedef enum {
 // Class				:	CAttributes
 // Description			:
 /// \brief					This class encapsulates the attributes attached
-//							to a surface. Surfaces that have the same set of 
+//							to a surface. Surfaces that have the same set of
 //							attributes share a common clone to avoid unnecessary
 //							memory allocation.
 // Comments				:
 class CAttributes : public CRefCounter {
-public: 
+public:
 							CAttributes();
 							CAttributes(const CAttributes *);
 		virtual				~CAttributes();
@@ -109,7 +109,7 @@ public:
 		CVariable			*findParameter(const char *);				// Find a shader parameter
 		void				restore(const CAttributes *other,int shading,int geometrymodification,int geometrydefinition,int hiding);
 		int					find(const char *name,const char *category,EVariableType &type,const void *&value,int &intValue,float &floatValue) const;
-		
+
 		CAttributes			*next;										// points to the next attribute if there's motion blur
 
 		CShaderInstance		*surface;									// Shaders attached to the primitive
@@ -139,7 +139,7 @@ public:
 
 		float				shadingRate;								// Shading rate for this primitive
 		float				motionFactor;								// Amount to increase shading rate when motion blurring
-						
+
 		char				*name;										// The name of the object if any
 
 		int					numUProbes,numVProbes;						// The samples to gather when estimating the extend of a patch
@@ -170,11 +170,11 @@ public:
 		int					maxDiffuseDepth;							// The maximum number of diffuse bounces before going to the photon map
 		int					maxSpecularDepth;							// The maximum number of specular bounces before giving up
 		int					shootStep;									// The step size for shooting rays for the attached object
-		
+
 		float				lodRange[4];								// LOD variables
 		float				lodSize;
 		float				lodImportance;
-		
+
 		CUserAttributeDictionary		userAttributes;					// Duh.
 
 static	char				findHitMode(const char *mode);

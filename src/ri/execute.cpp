@@ -207,7 +207,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 											conditionals->prev		=	lastConditional;						\
 											lastConditional			=	conditionals;							\
 											conditionals			=	lastConditional->next;
-											
+
 
 //	End a conditional block execution
 #define		endConditional()				lastConditional->next	=	conditionals;							\
@@ -510,7 +510,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 #define		runLights(lP,lN,lT)				runLightsTemplate(lP,lN,lT,NORMALLIGHT_PRE,NULL_EXPR)
 
 // The misc macros
-#define		DEFLINKOPCODE(name,text,nargs)				case OPCODE_##name:		
+#define		DEFLINKOPCODE(name,text,nargs)				case OPCODE_##name:
 #define		DEFLINKFUNC(name,text,prototype,par)		case FUNCTION_##name:
 
 // Break the shader execution
@@ -521,7 +521,7 @@ void	CShadingContext::execute(CProgrammableShaderInstance *cInstance,float **loc
 
 	// This is the current shader we're executing
 	CShader		*currentShader			=	cInstance->parent;
-	
+
 	assert((currentShadingState->numActive+currentShadingState->numPassive) == currentShadingState->numVertices);
 
 	currentShadingState->currentShaderInstance	=	cInstance;
@@ -551,7 +551,7 @@ execStart:
 	const ESlCode	opcode	=	(ESlCode)	code->opcode;	// Get the opcode
 	int				*tags	=	tagStart;					// Set the tags to the start
 
-	
+
 #define		DEFOPCODE(name,text,nargs,expr_pre,expr,expr_update,expr_post,params)					\
 			case OPCODE_##name:																		\
 			{																						\
@@ -696,7 +696,7 @@ execEnd:
 		if (!(currentShader->usedParameters & PARAMETER_NONAMBIENT)) {
 			const float	*Cl		=	varying[VARIABLE_CL];
 			float		*Clsave;
-			
+
 			// Save the ambient junk
 			Clsave	= (*alights)->savedState[1];
 			tags	= tagStart;
@@ -730,7 +730,7 @@ execEnd:
 #undef		nextLight
 #undef		allLights
 #undef		currentLight
-#undef		saveLight	
+#undef		saveLight
 #undef		uniformGlobal
 #undef		varyingGlobal
 #undef		DEFOPCODE

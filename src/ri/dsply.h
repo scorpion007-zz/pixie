@@ -77,7 +77,7 @@ typedef int		(*TDisplayDataFunction)(void *,int,int,int,int,float *);
 typedef int		(*TDisplayRawDataFunction)(void *,int,int,int,int,void *);
 typedef void	(*TDisplayFinishFunction)(void *);
 
-extern "C" {				
+extern "C" {
 	LIB_EXPORT	void						*displayStart(const char *name,int width,int height,int numSamples,const char *samples,TDisplayParameterFunction);
 	LIB_EXPORT	int							displayData(void *im,int x,int y,int w,int h,float *data);
 	LIB_EXPORT	int							displayRawData(void *im,int x,int y,int w,int h,void *data);

@@ -142,7 +142,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 
 	// Read the class data
 	readChannels(file);
-	
+
 	fread(bmin,1,sizeof(vector),file);
 	fread(bmax,1,sizeof(vector),file);
 	fread(center,1,sizeof(vector),file);
@@ -188,7 +188,7 @@ CBrickMap::CBrickMap(FILE *in,const char *name,const float *from,const float *to
 /// \note					Use this contructor to compute from sctratch
 CBrickMap::CBrickMap(const char *name,const float *bmi,const float *bma,const float *from,const float *to,const float *toNDC,CChannel *ch,int nc,int md = 10) : CTexture3d(name,from,to,toNDC,nc,ch) {
 	int	i;
-	
+
 	// Init the data
 	nextMap			=	brickMaps;
 	brickMaps		=	this;
@@ -240,7 +240,7 @@ CBrickMap::~CBrickMap() {
 			break;
 		}
 	}
-	
+
 	// Free the hash table
 	for (i=0;i<BRICK_HASHSIZE;i++) {
 		while((cNode=activeBricks[i]) != NULL) {
@@ -379,7 +379,7 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 	subvv(P,bmin);
 	mulmn(N,from,cN);
 	if (dotvv(N,N) > 0) normalizev(N);
-	
+
 	// Lock the structure
 	osLock(mutex);
 
@@ -416,9 +416,9 @@ void	CBrickMap::store(const float *data,const float *cP,const float *cN,float dP
 							cVoxel->weight	=	0;
 							cVoxel->next	=	NULL;
 							for (i=0;i<dataSize;i++)	data[i]	=	0;
-							
+
 							currentMemory	+=	sizeof(CVoxel) + dataSize*sizeof(float);
-							
+
 							// Mark the brick as needing new storage
 							// Note: we will need to compact the map afterwards
 							cNode->fileIndex = -1;
@@ -472,7 +472,7 @@ void		CBrickMap::lookup(float *data,const float *cP,const float *cN,float dP) {
 
 	if (dotvv(N,N) > 0) normalizev(N);
 	else				normalFactor = 0.0f;
-	
+
 	if (depth < 0) {
 		depth	=	0;
 		depthf	=	0;
@@ -509,14 +509,14 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 	// Find the brick we want to look at
 	forEachBrick(depth)
 		int		cDepth,cx,cy,cz;
-		
+
 		// iterate all levels until we hit a valid sample
 		for (cx=x,cy=y,cz=z,cDepth=depth;cDepth>=0;cx=cx>>1,cy=cy>>1,cz=cz>>1,cDepth--) {
-		
+
 			// Get the current brick
 			if ((cBrick	=	findBrick(cx,cy,cz,cDepth,FALSE,NULL)) != NULL) {
 				forEachVoxel(cx,cy,cz,cDepth)
-					
+
 					// Find the voxel with the closest normal
 					for (;cVoxel!=NULL;cVoxel=cVoxel->next) {
 						const float	weight		=	cWeight*cVoxel->weight*(normalFactor*dotvv(cVoxel->N,N) + (1.0f-normalFactor));
@@ -524,19 +524,19 @@ void		CBrickMap::lookup(const float *P,const float *N,float dP,float *data,int d
 						if (weight > 0) {
 							int			j;
 							const float	*src	=	(float *) (cVoxel+1);
-		
+
 							for (j=0;j<dataSize;j++)	data[j]	+=	src[j]*weight;
 							totalWeight	+=	weight;
 						}
 					}
 				}
 			}
-			
+
 			// If we hit anything, we're done
 			if(totalWeight > 0) break;
 		}
 	}
-		
+
 	// Normalize the data
 	if (totalWeight > 0) {
 		totalWeight	=	1/totalWeight;
@@ -577,7 +577,7 @@ void				CBrickMap::finalize() {
 			int		i;
 
 			// Make sure we iterate over the children
-#define	push(__x,__y,__z,__depth)	*stack++	=	__x;	*stack++	=	__y;	*stack++	=	__z;	*stack++	=	__depth;		
+#define	push(__x,__y,__z,__depth)	*stack++	=	__x;	*stack++	=	__y;	*stack++	=	__z;	*stack++	=	__depth;
 			push(2*x,	2*y,	2*z,	depth+1);
 			push(2*x+1,	2*y,	2*z,	depth+1);
 			push(2*x,	2*y+1,	2*z,	depth+1);
@@ -591,31 +591,31 @@ void				CBrickMap::finalize() {
 			// Normalize the voxel data
 			for (cVoxel=cBrick->voxels,i=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE;i>0;i--) {
 				float			*vdata		=	(float*) (cVoxel+1);
-				
+
 				// Deal with normalizing incoherent normals data
 				while(TRUE) {
 					float		*data		=	(float *) (cVoxel+1);
 					if (cVoxel->weight > 0) {
 						const float	invWeight	=	1 / cVoxel->weight;
 						int			j;
-						
+
 						if (dotvv(cVoxel->N,cVoxel->N) > 0) normalizev(cVoxel->N);
 						for (j=0;j<dataSize;j++)	data[j]	*=	invWeight;
 						cVoxel->weight	=	1;
 					}
-					
+
 					if (cVoxel->next != NULL) {
 						cVoxel = cVoxel->next;
 					} else {
 						break;
 					}
 				}
-			
+
 				cVoxel			=	(CVoxel*) (vdata + dataSize);
 			}
 		}
 	}
-	
+
 	// Flush all the bricks to disk
 	flushBrickMap(TRUE);
 
@@ -625,7 +625,7 @@ void				CBrickMap::finalize() {
 
 	// Write the class data here
 	writeChannels(file);
-	
+
 	// Write the class data
 	fwrite(bmin,sizeof(vector),1,file);
 	fwrite(bmax,sizeof(vector),1,file);
@@ -712,42 +712,42 @@ CBrickMap::CBrick	*CBrickMap::newBrick(int clear) {
 /// \brief					Load a brick
 // Return Value			:	-
 // Comments				:
-CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {	
+CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {
 	CBrick	*cBrick	=	newBrick(FALSE);
 	CVoxel	*cVoxel,*tVoxel;
 	int		i,j;
 
 	atomicIncrement(&stats.numBrickmapCachePageins);
-	
+
 	// Seek to the right position in file
 	if (file == NULL)	file	=	ropen(name,"w+",fileBrickMap);
 	fseek(file,fileIndex,SEEK_SET);
 
 	uint32_t bs[BRICK_PRESENCE_LONGS];
 	uint32_t b;
-	
+
 	// work out which top-level voxels are present
 	fread(bs,sizeof(uint32_t)*BRICK_PRESENCE_LONGS,1,file);
-	
+
 	// read those that are
 	for(i=0,cVoxel=cBrick->voxels;i<BRICK_PRESENCE_LONGS;i++){
 		b = bs[i];
-		
+
 		for(j=BRICK_VOXEL_BATCH;j>0;j--) {
 			float *vdata = (float*) (cVoxel + 1);
-	
+
 			if (b & 0x80000000L) {
 				fread(cVoxel,sizeof(CVoxel) + sizeof(float)*dataSize,1,file);
-	
+
 				if (cVoxel->next != NULL) {
 					cVoxel->next	=	NULL;
-					
+
 					while (TRUE) {
 						tVoxel		 = (CVoxel*) new char[sizeof(CVoxel) + dataSize*sizeof(float)];
 						currentMemory	+=	sizeof(CVoxel) + dataSize*sizeof(float);
-						
+
 						fread(tVoxel,sizeof(CVoxel) + sizeof(float)*dataSize,1,file);
-						
+
 						if (tVoxel->next != NULL) {
 							tVoxel->next	=	cVoxel->next;
 							cVoxel->next	=	tVoxel;
@@ -764,17 +764,17 @@ CBrickMap::CBrick	*CBrickMap::loadBrick(int fileIndex) {
 				cVoxel->next	=	NULL;
 				initv(cVoxel->N,0);
 			}
-			
+
 			b = b<<1;
-			
+
 			cVoxel = (CVoxel*) (vdata + dataSize);
 		}
 	}
-	
+
 	if (currentMemory > stats.brickmapPeakMem) 	stats.brickmapPeakMem = currentMemory;
 
 	// Return the brick
-	return cBrick;	
+	return cBrick;
 }
 
 
@@ -805,28 +805,28 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 	int			i,j,k,vCnt,nullCnt,numCulled;
 
 	FILE		*outfile 	=	ropen(outFileName,"wb+",fileBrickMap);
-	
+
 	// Use our own temp memory so we don't get mutex-reentrancy locking issues
 	CMemPage	*tempMemory = NULL;
 	memoryInit(tempMemory);
 	memBegin(tempMemory);
-	
+
 	CVoxel		*tempVoxel	=	(CVoxel*)		ralloc(sizeof(CVoxel) + dataSize*sizeof(float),tempMemory);
 	CBrickNode	**newHash	=	(CBrickNode**)	ralloc(BRICK_HASHSIZE*sizeof(CBrickNode*),tempMemory);
 	float 		*dataMean	=	(float*)		ralloc(2*dataSize*sizeof(float),tempMemory);
 	float 		*dataVar	=	dataMean + dataSize;
-	
+
 	// Initialize the hash
 	for (i=0;i<BRICK_HASHSIZE;i++)  newHash[i] = NULL;
-	
+
 	// Collect the loaded bricks into an array
 	numCulled	=	0;
 	numNodes	=	0;
 	nullCnt		=	0;
 	for (i=0;i<BRICK_HASHSIZE;i++) {
-		
+
 		for (cNode=activeBricks[i];cNode!=NULL;cNode=cNode->next) {
-		
+
 			// Make sure we have the data
 			if (cNode->brick == NULL) {
 				// Get the thing resident
@@ -834,20 +834,20 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 				cNode->brick->referenceNumber	=	referenceNumber;
 			}
 			cBrick = cNode->brick;
-			
+
 			// Calculate variance
-			
+
 			for (j=0;j<dataSize;j++) dataMean[j] = dataVar[j] = 0;
-			
+
 			vCnt = 0;
-			
+
 			for (cVoxel=cBrick->voxels,k=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE;k>0;k--) {
 				float			*vdata		=	(float*) (cVoxel+1);
-				
+
 				// Deal with normalizing incoherent normals data
 				while(TRUE) {
 					float		*data		=	(float *) (cVoxel+1);
-					
+
 					if(cVoxel->weight >0) {
 						for (j=0;j<dataSize;j++)	dataMean[j]	+=	data[j];
 						vCnt++;
@@ -859,43 +859,43 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 						break;
 					}
 				}
-			
+
 				cVoxel			=	(CVoxel*) (vdata + dataSize);
 			}
-			
+
 			// Skip if we have no data in this brick
 			if (vCnt == 0) {
 				numCulled++;
 				continue;
 			}
-			
+
 			float invCnt = 1.0f/(float)vCnt;
 			for (j=0;j<dataSize;j++)	dataMean[j] *= invCnt;
-			
+
 			for (cVoxel=cBrick->voxels,k=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE;k>0;k--) {
 				float			*vdata		=	(float*) (cVoxel+1);
-				
+
 				// Deal with normalizing incoherent normals data
 				while(TRUE) {
 					float		*data		=	(float *) (cVoxel+1);
-					
+
 					if(cVoxel->weight >0) {
 						for (j=0;j<dataSize;j++) {
 							float d = (data[j]-dataMean[j]);
 							dataVar[j]	+=	d*d;
 						}
 					}
-					
+
 					if (cVoxel->next != NULL) {
 						cVoxel = cVoxel->next;
 					} else {
 						break;
 					}
 				}
-			
+
 				cVoxel			=	(CVoxel*) (vdata + dataSize);
 			}
-			
+
 			float maxVar = 0;
 			for (j=0;j<dataSize;j++) {
 				dataVar[j] *=	invCnt;
@@ -909,70 +909,70 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 				numCulled++;
 				continue;
 			}
-			
-			
+
+
 			CBrickNode *tNode	=	(CBrickNode*) ralloc(sizeof(CBrickNode),tempMemory);
-			
+
 			// Initialize temporary node data over
 			*tNode				=	*cNode;
 			tNode->next			=	newHash[i];
 			newHash[i]			= 	tNode;
 			tNode->brick		=	NULL;
 			numNodes++;
-			
+
 			// write it out to a new location
 			fseek(outfile,0,SEEK_END);
 			tNode->fileIndex	=	ftell(outfile);
-			
+
 			uint32_t bs[BRICK_PRESENCE_LONGS];
 			uint32_t b;
-			
+
 			// Work out for each voxel if there is anything at all
 			for (k=0,cVoxel=cBrick->voxels;k<BRICK_PRESENCE_LONGS;k++) {
 				b = 0;
-				
+
 				for (j=BRICK_VOXEL_BATCH;j>0;j--) {
 					float *vdata = (float*) (cVoxel + 1);
-					
+
 					b = b<<1;
-					
+
 					while (cVoxel != NULL) {
 						if (cVoxel->weight > 0){
 							b |= 1;
 						}
 						cVoxel = cVoxel->next;
 					}
-					
+
 					cVoxel = (CVoxel*) (vdata + dataSize);
 				}
-				
+
 				bs[k] = b;
 			}
-			
+
 			// Write the voxel-presence bits
 			fwrite(bs,sizeof(uint32_t)*BRICK_PRESENCE_LONGS,1,outfile);
-			
+
 			// Write each voxel which exists
 			for(j=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE,cVoxel=cBrick->voxels;j>0;j--) {
 				float *vdata = (float*) (cVoxel + 1);
-				
+
 				int skippedLast = FALSE;
 				tVoxel			= NULL;
-				
+
 				while (cVoxel != NULL) {
-				
+
 					skippedLast = FALSE;
-					
+
 					if (cVoxel->weight > 0) {
 						fwrite(cVoxel,sizeof(CVoxel)+sizeof(float)*dataSize,1,outfile);
 						tVoxel = cVoxel;
 					} else {
 						skippedLast = TRUE;
 					}
-					
+
 					cVoxel = cVoxel->next;
 				}
-				
+
 				if ((skippedLast == TRUE) && (tVoxel != NULL)) {
 					// That last voxel we wrote had a bad next value...
 					fseek(outfile,-(long)(sizeof(CVoxel)+dataSize*sizeof(float)),SEEK_CUR);
@@ -983,13 +983,13 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 					// but keep the file write pointer correct
 					fseek(outfile,sizeof(float)*dataSize,SEEK_CUR);
 				}
-				
+
 				cVoxel = (CVoxel*) (vdata + dataSize);
 			}
 		}
 	}
 	//fprintf(stderr,"%d bricks culled.  %d null voxels not written\n",numCulled,nullCnt);
-	
+
 	// Write out temporary node hash
 	// Save the current file position. This is the file index
 	fseek(outfile,0,SEEK_END);
@@ -997,7 +997,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 
 	// Write the class data here
 	writeChannels(outfile);
-	
+
 	fwrite(bmin,sizeof(vector),1,outfile);
 	fwrite(bmax,sizeof(vector),1,outfile);
 	fwrite(center,sizeof(vector),1,outfile);
@@ -1017,7 +1017,7 @@ void				CBrickMap::compact(const char *outFileName,float maxVariation) {
 
 	// Write the position of the file header right at the end
 	fwrite(&headerOffset,sizeof(int),1,outfile);
-	
+
 	fclose(outfile);
 
 	memEnd(tempMemory);
@@ -1053,27 +1053,27 @@ void				CBrickMap::draw() {
 										1, 0, 0,
 										1, 0, 1,
 										0, 0, 1,
-										
+
 										0, 1, 0,
 										1, 1, 0,
 										1, 1, 1,
 										0, 1, 1,
-										
+
 										0, 0, 0,
 										1, 0, 0,
 										1, 1, 0,
 										0, 1, 0,
-										
+
 										0, 0, 1,
 										1, 0, 1,
 										1, 1, 1,
 										0, 1, 1,
-										
+
 										0, 0, 0,
 										0, 1, 0,
 										0, 1, 1,
 										0, 0, 1,
-										
+
 										1, 0, 0,
 										1, 1, 0,
 										1, 1, 1,
@@ -1085,7 +1085,7 @@ void				CBrickMap::draw() {
 		j	=	chunkSize;
 		float	*pts = cubePoints;
 		for(int k =0; k<6; k++) {
-			
+
 			#define emitLn(i)						\
 				if (j == 0) {						\
 					drawLines(chunkSize,P,C);		\
@@ -1098,7 +1098,7 @@ void				CBrickMap::draw() {
 				cP	+=	3;							\
 				cC	+=	3;							\
 				j--;
-			
+
 				emitLn(0);
 				emitLn(1);
 				emitLn(1);
@@ -1107,7 +1107,7 @@ void				CBrickMap::draw() {
 				emitLn(3);
 				emitLn(3);
 				emitLn(0);
-			
+
 			pts += 12;
 		}
 		if (j != chunkSize) {
@@ -1116,17 +1116,17 @@ void				CBrickMap::draw() {
 			cC	=	C;
 			j	=	chunkSize;
 		}
-		
+
 		{
 			const float hd = side/2.0f;
 			const float d = side+side/2.0f;
 			float tmp[9] = { d,hd,hd,  hd,d,hd,  hd,hd,d};
 			float tmpc[9] = { 0 };
-			
+
 			drawPoints(3,tmp,tmpc);
 		}
 	}
-	
+
 	// For each brick at this level
 	j	=	chunkSize;
 	for (int xe=0;xe<nb;xe++) for (int ye=0;ye<nb;ye++) for (int ze=0;ze<nb;ze++) {
@@ -1135,17 +1135,17 @@ void				CBrickMap::draw() {
 		CBrickMap::CBrick	*bk		= findBrick(x,y,z,level,false,NULL);
 
 		if (bk == NULL) continue;
-		
+
 		CBrickMap::CVoxel	*vx		= bk->voxels;
-		
+
 		float *DD = (float*)((char*)vx + sizeof(CBrickMap::CVoxel));
-		
+
 		// For each voxel
 		for(int zi=0;zi<BRICK_SIZE;zi++) for(int yi=0;yi<BRICK_SIZE;yi++) for(int xi=0;xi<BRICK_SIZE;xi++) {
 			vector	cent,Ctmp;
 
 			initv(cent,x*sz + xi*sz*INV_BRICK_SIZE,y*sz + yi*sz*INV_BRICK_SIZE,z*sz + zi*sz*INV_BRICK_SIZE);
-	
+
 			// Save values before we update
 			float *DDs = DD + sampleStart;
 			if (numSamples == 1) {
@@ -1157,19 +1157,19 @@ void				CBrickMap::draw() {
 			}
 			float wt = vx->weight;
 			float *norm = vx->N;
-			
+
 			// Update for next iteration, incase we skip
 			vx = (CBrickMap::CVoxel*)((char*)vx + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
-			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));	
-			
-			if (wt <= C_EPSILON) continue;			
+			DD = (float*)((char*) DD + sizeof(float)*dataSize + sizeof(CBrickMap::CVoxel));
+
+			if (wt <= C_EPSILON) continue;
 
 			if (drawType == 0) {
 
 				float	*pts = cubePoints;
 				for(int k =0; k<6; k++) {
 					vector tmp;
-					
+
 					#define emitPt(i)						\
 						if (j == 0) {						\
 							drawTriangles(chunkSize,P,C);	\
@@ -1184,14 +1184,14 @@ void				CBrickMap::draw() {
 						cP	+=	3;							\
 						cC	+=	3;							\
 						j--;
-					
+
 						emitPt(0);
 						emitPt(1);
 						emitPt(2);
 						emitPt(2);
 						emitPt(3);
 						emitPt(0);
-					
+
 					pts += 12;
 				}
 			}
@@ -1359,7 +1359,7 @@ void				CBrickMap::flushBrickMap(int allBricks) {
 		numNodes						=	numNodes >> 1;
 		stats.numBrickmapCachePageouts	+=	numNodes;
 	}
-	
+
 
 	// Eliminate nodes
 	for (i=0;i<numNodes;i++) {
@@ -1367,12 +1367,12 @@ void				CBrickMap::flushBrickMap(int allBricks) {
 		CBrickMap	*cMap	=	(CBrickMap *) nodes[i*2+1];
 		CVoxel		*cVoxel,*tVoxel;
 		int			j;
-	
+
 		// Strategy - if we are modifying, save the contents to backing store
 		// otherwise, just forget the voxel altogether
 		if (cMap->modifying == TRUE) {
 			// Write and free the brick
-			
+
 			if (cNode->fileIndex == -1)	{
 				// If this is the first time we're writing, append it to the end
 				fseek(cMap->file,0,SEEK_END);
@@ -1381,30 +1381,30 @@ void				CBrickMap::flushBrickMap(int allBricks) {
 				// Go to the correct position
 				fseek(cMap->file,cNode->fileIndex,SEEK_SET);
 			}
-			
+
 			uint32_t bs[BRICK_PRESENCE_LONGS];
-			
+
 			// Write all voxels, do not spend time compressing
 			for(j=0;j<BRICK_PRESENCE_LONGS;j++) bs[j] = 0xFFFFFFFFL;
-			
+
 			fwrite(bs,sizeof(uint32_t)*BRICK_PRESENCE_LONGS,1,cMap->file);
-		
+
 			for(j=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE,cVoxel=cNode->brick->voxels;j>0;j--) {
 				float *vdata = (float*) (cVoxel + 1);
-			
+
 				fwrite(cVoxel,sizeof(CVoxel) + cMap->dataSize*sizeof(float),1,cMap->file);
-		
+
 				while((tVoxel=cVoxel->next) != NULL) {
 					cVoxel->next	=	tVoxel->next;
 					fwrite(tVoxel,1,sizeof(CVoxel) + cMap->dataSize*sizeof(float),cMap->file);
 					delete [] (char *) tVoxel;
-				
+
 					currentMemory	-=	sizeof(CVoxel) + cMap->dataSize*sizeof(float);
 				}
-				
+
 				cVoxel = (CVoxel*) (vdata + cMap->dataSize);
 			}
-			
+
 			// Free the brick
 			delete[] (char*) cNode->brick;
 			cNode->brick		=	NULL;
@@ -1413,20 +1413,20 @@ void				CBrickMap::flushBrickMap(int allBricks) {
 			currentMemory		-=	sizeof(CBrick) + (sizeof(CVoxel) + cMap->dataSize*sizeof(float))*(BRICK_SIZE*BRICK_SIZE*BRICK_SIZE);
 		} else {
 			// Just free the brick
-			
+
 			for(j=BRICK_SIZE*BRICK_SIZE*BRICK_SIZE,cVoxel=cNode->brick->voxels;j>0;j--) {
 				float *vdata = (float*) (cVoxel + 1);
-			
+
 				while((tVoxel=cVoxel->next) != NULL) {
 					cVoxel->next	=	tVoxel->next;
 					delete [] (char *) tVoxel;
-				
+
 					currentMemory	-=	sizeof(CVoxel) + cMap->dataSize*sizeof(float);
 				}
-				
+
 				cVoxel = (CVoxel*) (vdata + cMap->dataSize);
 			}
-			
+
 			// Free the brick
 			delete[] (char*) cNode->brick;
 			cNode->brick		=	NULL;
@@ -1516,7 +1516,7 @@ void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPa
 	char	tempName[OS_MAX_PATH_LENGTH];
 	char	fileName[OS_MAX_PATH_LENGTH];
 	int		i;
-	
+
 	float maxVariation = 0.002f;
 	float radiusScale = 1.0f;
 	int maxDepth = 10;
@@ -1529,13 +1529,13 @@ void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPa
 			maxDepth = ((int*)params[i])[0];
 		}
 	}
-	
+
 	// If not initialized already, init the brick memory manager
 	// Use a large memory limit when creating brickmaps
 	// Note: needed as RiMakeXYZ can only be called outside a frame, and then
 	// the shading context is gone
 	CBrickMap::initBrickMap(300000000);
-	
+
 	// FIXME: deal with multiple brickmaps
 	if (CRenderer::locateFile(fileName,src[0],searchPath)) {
 		FILE *in;
@@ -1559,12 +1559,12 @@ void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPa
 
 				cBMap->store(C,p->P,p->N,R);
 			}
-			
+
 			cBMap->finalize();
-			
+
 			// compact to the final file
 			cBMap->compact(dest,maxVariation);
-			
+
 			delete cBMap;
 			delete cPtCloud;
 			// clean up
@@ -1575,7 +1575,7 @@ void	makeBrickMap(int nb,const char **src,const char *dest,TSearchpath *searchPa
 	} else {
 		error(CODE_BADTOKEN,"Point cloud file \"%s\" not found\n");
 	}
-	
+
 	CBrickMap::shutdownBrickMap();
 }
 

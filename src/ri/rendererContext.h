@@ -192,7 +192,7 @@ public:
 
 	void				*RiArchiveBeginV(const char *name, int n,const char *tokens[],const void *parms[]);
 	void				RiArchiveEnd(void);
-	
+
 	void				RiResourceV(const char *handle,const char *type,int n,const char *tokens[],const void *parms[]);
 	void				RiResourceBegin(void);
 	void				RiResourceEnd(void);
@@ -210,11 +210,11 @@ public:
 	CXform*
 	getXform(
 		__in bool modify);
-	
+
 	CAttributes*
 	getAttributes(
 		__in bool modify);
-	
+
 	COptions			*getOptions();										// Get the active Options
 	CShaderInstance		*getShader(const char *,int,int,const char **,const void **);	// Load a shader
 

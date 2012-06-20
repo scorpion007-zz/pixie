@@ -138,7 +138,7 @@ void	*displayStart(const char *name,int width,int height,int numSamples,const ch
 // Comments				:
 int		displayData(void *im,int x,int y,int w,int h,float *data) {
 	CRgbeFramebuffer	*fb	=	(CRgbeFramebuffer *) im;
-	
+
 	assert(fb != NULL);
 
 	fb->write(x,y,w,h,data);

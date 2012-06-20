@@ -134,12 +134,12 @@ public:
 		//	endRenderer is called in RiEnd
 		//
 		//  They pretty much do what you would expect
-		// 
+		//
 		////////////////////////////////////////////////////////////////////
 		static void								beginRenderer(CRendererContext *context,const char *ribFile,const char *riNetString);
 		static void								endRenderer();
 
-								
+
 		////////////////////////////////////////////////////////////////////
 		//
 		// Some global data structures that hang around between beginRenderer and endRenderer
@@ -161,7 +161,7 @@ public:
 		static	CDSO							*dsos;						// The list of DSO's that have been loaded
 		static	SOCKET							netClient;					// The client that we're serving (-1 if client)
 		static	int								netNumServers;				// The number of servers (0 if server)
-		static	SOCKET							*netServers;				// The array of servers that are serving us		
+		static	SOCKET							*netServers;				// The array of servers that are serving us
 		static	int								numRenderedBuckets;			// The number of rendered buckets
 		static	char							temporaryPath[OS_MAX_PATH_LENGTH];	// Where tmp files are stored
 		static	int								**textureRefNumber;			// The last reference number for each thread's textures
@@ -174,7 +174,7 @@ public:
 		//
 		// Synchronization objects ...
 		//
-		//    Even though some of them are mainly used between WorldBegin - WorldEnd, 
+		//    Even though some of them are mainly used between WorldBegin - WorldEnd,
 		//    we're defining them as global
 		//
 		////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ public:
 		static	TMutex							deepShadowMutex;			// To serialize deep shadow _writes_
 		static	TMutex							hierarchyMutex;				// To serialize lazy construction of bounding volume hierarchy
 		static	TMutex							atomicMutex;				// To serialize atomic operations on unsupported platforms
-		
+
 		////////////////////////////////////////////////////////////////////
 		//
 		// Here's how the rendering loop works:
@@ -283,15 +283,15 @@ public:
 		static	void			registerFrameTemporary(const char *,int);			// Register file for end-of-frame deletion
 		static	int				getGlobalID(const char *);							// Global ID management
 		static	void			shutdownDeclarations();
-								
+
 		////////////////////////////////////////////////////////////////////
 		// Functions that deal with files (implemented in rendererFiles.cpp)
 		////////////////////////////////////////////////////////////////////
 		static	void			initFiles();
 		static	int				locateFileEx(char *,const char *,const char *extension=NULL,TSearchpath *search=NULL);
 		static	int				locateFile(char *,const char *,TSearchpath *search=NULL);
-		
-		static	void			initTextures(int);										// Set the maximum texture memory and init texturing		
+
+		static	void			initTextures(int);										// Set the maximum texture memory and init texturing
 		static	CTexture		*textureLoad(const char *,TSearchpath *);				// Load a new texture map
 		static	CEnvironment	*environmentLoad(const char *,TSearchpath *,float *);	// Load a new environment map
 		static	CTexture		*getTexture(const char *);								// Load a texture
@@ -328,7 +328,7 @@ public:
 		static	void			sendFrameDataChannels();								// send all per-frame remote channels
 		static	void			recvFrameDataChannels(SOCKET s);						// receive one per-frame remote channel
 
-		
+
 
 
 
@@ -376,7 +376,7 @@ public:
 		static	float					fstop,focallength,focaldistance;				// Depth of field stuff
 		static	float					shutterOpen,shutterClose;						// Motion blur stuff
 		static	float					shutterTime,invShutterTime;						// More motion stuff
-		static	unsigned int			flags;											// Flags	
+		static	unsigned int			flags;											// Flags
 		static	int						endofframe;										// The end of frame statstics number
 		static	char					*filelog;										// The name of the log file
 		static	int						numThreads;										// The number of threads working
@@ -392,8 +392,8 @@ public:
 		static	int						maxEyeSplits;									// Maximum number of eye splits
 		static	float					tsmThreshold;									// Transparency shadow map threshold
 		static	char					*causticIn,*causticOut;							// The caustics in/out file name
-		static	char					*globalIn,*globalOut;							// The global photon map 
-		static	char					*volumeIn,*volumeOut;							// The volume photon map 
+		static	char					*globalIn,*globalOut;							// The global photon map
+		static	char					*volumeIn,*volumeOut;							// The volume photon map
 		static	int						numEmitPhotons;									// The number of photons to emit for the scene
 		static	int						shootStep;										// The number of rays to shoot at a time
 		static	EDepthFilter			depthFilter;									// Holds the depth filter type
@@ -458,7 +458,7 @@ public:
 		static	int						*deepShadowIndex;
 		static	int						deepShadowIndexStart;		// The offset in the file for the indices
 		static	char					*deepShadowFileName;
-		
+
 		static	const CUserAttributeDictionary	*userOptions;
 
 		///////////////////////////////////////////////////////////////////////
@@ -495,7 +495,7 @@ public:
 		static	int							*nonCompChannelOrder;	// channels which do not need compositing
 		static	int							numExtraNonCompChannels;// number of channels which do not need compositing
 
-		static	int							numExtraChannels;	
+		static	int							numExtraChannels;
 
 
 		static	void						computeDisplayData();

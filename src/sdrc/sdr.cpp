@@ -187,7 +187,7 @@ char	*CParameter::codeName() {
 
 
 
-	
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFunction
 // Method				:	CFunction
@@ -246,7 +246,7 @@ CParameter	*CFunction::addParameter(const char *name,int type,int multiplicity) 
 	}
 
 	cParameter	=	new CParameter(name,type,multiplicity);
-					
+
 	parameters->push(cParameter);
 
 	return cParameter;
@@ -345,7 +345,7 @@ CVariable	*CFunction::getVariable(const char *name,int probe) {
 
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CFunction
-// Method				:	getFunction(char *,CList<CCodeBlock *> *,int)	
+// Method				:	getFunction(char *,CList<CCodeBlock *> *,int)
 // Description			:
 /// \brief					This method searches all the defined functions for a match
 // Return Value			:	NULL if no compatible function exists, a pointer to the function othervise
@@ -425,7 +425,7 @@ CFunction	*CFunction::getFunction(const char *name,CList<CExpression *> *args,in
 
 		for (cPar = cFun->parameters->first(), cArg = args->first(); cPar != NULL; cPar = cFun->parameters->next(), cArg = args->next()) {
 			if ((cPar->type & SLC_TYPE_MASK) & (cArg->type & SLC_TYPE_MASK)) continue;
-			
+
 			// Type coersion is possible
 			if ((cPar->type & SLC_VECTOR) && (cArg->type & SLC_FLOAT)) continue;
 			if ((cPar->type & SLC_MATRIX) && (cArg->type & SLC_FLOAT)) continue;
@@ -461,7 +461,7 @@ CFunction	*CFunction::getFunction(const char *name,CList<CExpression *> *args,in
 // Method				:	functionPrototype(char *,char *)
 // Description			:
 /// \brief					Init the data structures
-// Return Value			:	
+// Return Value			:
 // Comments				:
 CFunctionPrototype::CFunctionPrototype(const char *name,const char *p,int compatible,int nonuniform)  : CSymbol(name) {
 	prototype			=	strdup(p);
@@ -579,9 +579,9 @@ int			CFunctionPrototype::perfectMatch(const char *name,CList<CExpression *> *pl
 				continue;
 		} else if ((prototype[cPrototype] == 'f') || (prototype[cPrototype] == 'F')) {
 			if (cCode->type & SLC_FLOAT) continue;
-		} else if (	(prototype[cPrototype] == 'v') || (prototype[cPrototype] == 'V') || 
-					(prototype[cPrototype] == 'p') || (prototype[cPrototype] == 'P') || 
-					(prototype[cPrototype] == 'n') || (prototype[cPrototype] == 'N') || 
+		} else if (	(prototype[cPrototype] == 'v') || (prototype[cPrototype] == 'V') ||
+					(prototype[cPrototype] == 'p') || (prototype[cPrototype] == 'P') ||
+					(prototype[cPrototype] == 'n') || (prototype[cPrototype] == 'N') ||
 					(prototype[cPrototype] == 'c') || (prototype[cPrototype] == 'C')) {
 			if (cCode->type & SLC_VECTOR) continue;
 		} else if ((prototype[cPrototype] == 's') || (prototype[cPrototype] == 'S')) {
@@ -955,14 +955,14 @@ CScriptContext::CScriptContext(int s) {
 	addBuiltInFunction("specular","c=nvf",SLC_SURFACE,TRUE);
 	addBuiltInFunction("specularbrdf","c=vnvf",SLC_SURFACE);
 	addBuiltInFunction("phong","c=nvf",SLC_SURFACE,TRUE);
-	addBuiltInFunction("trace","c=pv!",0,TRUE);	
-	addBuiltInFunction("trace","f=pv",0,TRUE);	
-	addBuiltInFunction("visibility","f=pp",0,TRUE);	
-	addBuiltInFunction("transmission","c=pp!",0,TRUE);	
-	addBuiltInFunction("raydepth","f=",0);	
-	addBuiltInFunction("raylabel","s=",0);	
-	addBuiltInFunction("rayinfo","f=s.",0);	
-	addBuiltInFunction("colormap","c=sf!",0);	
+	addBuiltInFunction("trace","c=pv!",0,TRUE);
+	addBuiltInFunction("trace","f=pv",0,TRUE);
+	addBuiltInFunction("visibility","f=pp",0,TRUE);
+	addBuiltInFunction("transmission","c=pp!",0,TRUE);
+	addBuiltInFunction("raydepth","f=",0);
+	addBuiltInFunction("raylabel","s=",0);
+	addBuiltInFunction("rayinfo","f=s.",0);
+	addBuiltInFunction("colormap","c=sf!",0);
 	addBuiltInFunction("displacement","f=SF",0);
 	addBuiltInFunction("displacement","f=SN",0);
 	addBuiltInFunction("displacement","f=SP",0);
@@ -1115,7 +1115,7 @@ CScriptContext::CScriptContext(int s) {
 /// \brief					Destroy Destroy Destroy
 // Return Value			:
 // Comments				:
-/// \note						
+/// \note
 CScriptContext::~CScriptContext() {
 	char		*str;
 
@@ -1130,7 +1130,7 @@ CScriptContext::~CScriptContext() {
 	while((str = allocatedStrings->pop()) != NULL)	// Delete the allocated stings
 		free(str);
 	delete allocatedStrings;
-					
+
 	if (shaderName != NULL) free(shaderName);
 
 	delete variableList;
@@ -1154,7 +1154,7 @@ CScriptContext::~CScriptContext() {
 /// \brief					Add a built in function
 // Return Value			:
 // Comments				:
-/// \note						
+/// \note
 CFunctionPrototype	*CScriptContext::addBuiltInFunction(const char *name,const char *prototype,int scope,int nonuniform) {
 	CFunctionPrototype	*cFun	=	new CFunctionPrototype(name,prototype,scope,nonuniform);
 
@@ -1172,12 +1172,12 @@ CFunctionPrototype	*CScriptContext::addBuiltInFunction(const char *name,const ch
 /// \brief					Add a built in function
 // Return Value			:
 // Comments				:
-/// \note						
+/// \note
 void	CScriptContext::addGlobalVariable(const char *name,int type,int scope) {
 	CVariable			*cVar	=	lastFunction->addVariable(name,type | SLC_GLOBAL,1);
 
 	cVar->cName					=	strdup(name);
-	
+
 	variables->push(cVar);
 
 	define(cVar);
@@ -1234,7 +1234,7 @@ CVariable	*CScriptContext::getVariable(const char *vn) {
 // Method				:	define(CSymbol *)
 // Description			:
 /// \brief					This method fills in the information about the definition position of the variable
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void		CScriptContext::define(CSymbol *s) {
 	if (sourceFile != NULL) {
@@ -1262,7 +1262,7 @@ void		CScriptContext::printDefine(CSymbol *s) {
 
 	if (s->defFileName != NULL)
 		printf("%s \t(%s(%d)) \t-> %d in %s\n",s->symbolName,sourceFile,lineNo-1,s->defLineNo,s->defFileName);
-	else 
+	else
 		printf("%s \t(%s(%d)) \t-> ??? in ???\n",s->symbolName,sourceFile,lineNo-1);
 }
 
@@ -1326,7 +1326,7 @@ CFunction		*CScriptContext::newFunction(const char *name) {
 // Method				:	addVariable
 // Description			:
 /// \brief					Add a new variable to the system
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void	CScriptContext::addVariable(CVariable *cVariable) {
 	CVariable	*tVar;
@@ -1416,7 +1416,7 @@ void			CScriptContext::uniformParameters() {
 	for (;numParameters>0;numParameters--) {
 		cParameter			=	*parameters++;
 
-		if (cParameter->type & SLC_PARAMETER) {	
+		if (cParameter->type & SLC_PARAMETER) {
 			cParameter->type	|=	SLC_UNIFORM;
 		}
 	}
@@ -1437,7 +1437,7 @@ void			CScriptContext::restoreParameters() {
 	for (;numParameters>0;numParameters--) {
 		cParameter			=	*parameters++;
 
-		if (cParameter->type & SLC_PARAMETER) {	
+		if (cParameter->type & SLC_PARAMETER) {
 			cParameter->type	=	cParameter->savedType;
 		}
 	}
@@ -1520,19 +1520,19 @@ void			CScriptContext::generateCode(const char *o) {
 			} else {
 				fprintf(out,"varying\t");
 			}
-			
+
 			// Write the parameter type
 			if (cParameter->type & SLC_FLOAT)
 				fprintf(out,"float\t");
 			else if (cParameter->type & SLC_VECTOR) {
 				if (cParameter->type & SLC_VPOINT)
-					fprintf(out,"point\t");	
+					fprintf(out,"point\t");
 				else if (cParameter->type & SLC_VVECTOR)
-					fprintf(out,"vector\t");	
+					fprintf(out,"vector\t");
 				else if (cParameter->type & SLC_VNORMAL)
-					fprintf(out,"normal\t");	
+					fprintf(out,"normal\t");
 				else if (cParameter->type & SLC_VCOLOR)
-					fprintf(out,"color\t");	
+					fprintf(out,"color\t");
 				else fprintf(out,"vector\t");
 			} else if (cParameter->type & SLC_STRING)
 				fprintf(out,"string\t");
@@ -1567,7 +1567,7 @@ void			CScriptContext::generateCode(const char *o) {
 			} else {
 				fprintf(out,"varying\t");
 			}
-	
+
 			// Write the type
 			if (cVariable->type & SLC_FLOAT)
 				fprintf(out,"float\t");
@@ -1693,7 +1693,7 @@ void		CScriptContext::error(const char *mes,...) {
 // Method				:	warning(char *,...)
 // Description			:
 /// \brief					Print a warning message
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void		CScriptContext::warning(const char *mes,...) {
 	char	tmp[1024];
@@ -1715,7 +1715,7 @@ void		CScriptContext::warning(const char *mes,...) {
 // Method				:	fatal(char *,...)
 // Description			:
 /// \brief					Unrecoverable error
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void		CScriptContext::fatal(const char *mes,...) {
 	char	tmp[1024];
@@ -1735,7 +1735,7 @@ void		CScriptContext::fatal(const char *mes,...) {
 // Method				:	fatalbailout()
 // Description			:
 /// \brief					Unrecoverable error
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void		CScriptContext::fatalbailout() {
 	fatal("Confused by earlier errors, bailing out\n");
@@ -1746,7 +1746,7 @@ void		CScriptContext::fatalbailout() {
 // Method				:	desire
 // Description			:
 /// \brief					Expect a particular variable type
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void		CScriptContext::desire(int type) {
 	desiredTypeStack->push(desiredType);
@@ -1759,7 +1759,7 @@ void		CScriptContext::desire(int type) {
 // Method				:	undesire
 // Description			:
 /// \brief					Return to the previous desired type
-// Return Value			:	
+// Return Value			:
 // Comments				:
 int			CScriptContext::undesire() {
 	if (desiredTypeStack->numItems == 0) {
@@ -1775,7 +1775,7 @@ int			CScriptContext::undesire() {
 // Method				:	desired
 // Description			:
 /// \brief					Get the expected type
-// Return Value			:	
+// Return Value			:
 // Comments				:
 int			CScriptContext::desired() {
 	return desiredType;
@@ -1788,7 +1788,7 @@ int			CScriptContext::desired() {
 // Method				:	lockRegister
 // Description			:
 /// \brief					Allocate a temporary register
-// Return Value			:	
+// Return Value			:
 // Comments				:
 CVariable			*CScriptContext::lockRegister(int type,int numItems) {
 	CVariable	*cVar;
@@ -1830,7 +1830,7 @@ CVariable			*CScriptContext::lockRegister(int type,int numItems) {
 // Method				:	releaseRegister
 // Description			:
 /// \brief					Release a previously allocated register
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void				CScriptContext::releaseRegister(CVariable *cVar) {
 	cVar->type	^=	SLC_LOCKED;

@@ -35,7 +35,7 @@
 
 /////////////////////////////////////////////////////////////
 //   This mutex serializes the job assignments.
-//   
+//
 //  VERIFIED
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::jobMutex;
@@ -48,7 +48,7 @@ TMutex							CRenderer::jobMutex;
 //	  that it goes to one thread only
 //	- in a network render context, all recieves and commits
 //	  of remote channels and bucket data must lock this mutex
-//	
+//
 //	FIXME - usage doesn't seem clear
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::commitMutex;
@@ -58,7 +58,7 @@ TMutex							CRenderer::commitMutex;
 /////////////////////////////////////////////////////////////
 //  This mutex is used to make sure we unload a display driver
 //  only once
-//	
+//
 //  VERIFIED
 /////////////////////////////////////////////////////////////
 TMutex							CRenderer::displayKillMutex;
@@ -84,8 +84,8 @@ TMutex							CRenderer::networkMutex;
 //	Used to ensure we serialize creation of CTesselationPatch objects
 //	so the list of tesselations is maintained.  This also means that
 //	we must lock the mutex whilst examining the list in purge
-//	
-//	Also used to ensure we only have one thread re-tesselating a level if 
+//
+//	Also used to ensure we only have one thread re-tesselating a level if
 //	TESSELATION_LOCK_PER_ENTRY is not enabled (but it is by default)
 //
 //	VERIFIED
@@ -99,8 +99,8 @@ TMutex							CRenderer::tesselateMutex;
 //  The serial creation of blocks is handled by the fact that
 //	textures are loaded on request from shader PL references
 //  shader PL unpacking is serialized.
-//	
-//	Also used to ensure we only have one thread loading a block if 
+//
+//	Also used to ensure we only have one thread loading a block if
 //	PERBLOCK_LOCK is not enabled (but it is by default)
 //
 //	Note: if we change shaderMutex usage, we will need to ensure
@@ -131,7 +131,7 @@ TMutex							CRenderer::shaderMutex;
 //	Used to ensure that only one thread at a time is expanding
 //	delayed objects - so we have only one thread in rib parse
 //	and only one thread executing a DynamicLoad Procedural
-//	
+//
 //	FIXME - there are still some remaining issues that can
 //	be caused by a thread in rib parse whilst others continue
 //	see memoryMutex
@@ -141,7 +141,7 @@ TMutex							CRenderer::delayedMutex;
 
 
 /////////////////////////////////////////////////////////////
-//	Used to ensure all writes to the deep shadow file are 
+//	Used to ensure all writes to the deep shadow file are
 //	serialized
 //
 //	VERIFIED

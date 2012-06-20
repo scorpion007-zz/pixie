@@ -61,7 +61,7 @@ CPoints::CPoints(CAttributes *a,CXform *x,CPl *pl,int np) : CSurface(a,x) {
 	// Compute the maximum point size (for bounding volume computation)
 	for (i=0;i<pl->numParameters;i++) {
 		const CVariable	*cVar	=	pl->parameters[i].variable;
-		
+
 		if (cVar->entry == VARIABLE_WIDTH) {
 			const float		*vertex	=	pl->data0 + pl->parameters[i].index;
 
@@ -288,17 +288,17 @@ void	CPoints::dice(CShadingContext *rasterizer)	{
 
 		child	=	new CPoints(attributes,xform,base,numFront,front);
 		child->attach();
-		
+
 		rasterizer->drawObject(child);
-		
+
 		child->detach();
-		
+
 		child	=	new CPoints(attributes,xform,base,numBack,back);
-		
+
 		child->attach();
-		
+
 		rasterizer->drawObject(child);
-		
+
 		child->detach();
 
 		memEnd(rasterizer->threadMemory);
@@ -342,11 +342,11 @@ void	CPoints::sample(int start,int numVertices,float **varying,float ***locals,u
 
 		for (int i=numPoints;i>0;--i,N+=3)	initv(N,0,0,-1);
 	}
-	
+
 	// Compute dPdtime
 	if (usedParameters & PARAMETER_DPDTIME) {
 		float	*dest	=	varying[VARIABLE_DPDTIME];
-		
+
 		// Do we have motion?
 		if (variables->moving) {
 			for (int i=0;i<numPoints;++i) {
@@ -431,7 +431,7 @@ void	CPoints::prep() {
 
 		if (cVar->entry == VARIABLE_WIDTH) {
 			float		*vertex	=	pl->data0 + pl->parameters[i].index;
-			
+
 			for (i=0;i<numPoints;i++) {
 				vertex[i]		*=	expansion;
 			}
@@ -447,12 +447,12 @@ void	CPoints::prep() {
 			break;
 		} else if (cVar->entry == VARIABLE_CONSTANTWIDTH) {
 			float		*vertex	=	pl->data0 + pl->parameters[i].index;
-			
+
 			vertex[0]			*=	expansion;
 
 			if (pl->data1 != NULL) {
 				vertex	=	pl->data1 + pl->parameters[i].index;
-				
+
 				vertex[0]		*=	expansion;
 			}
 
@@ -462,7 +462,7 @@ void	CPoints::prep() {
 
 	base->vertex				=	new float[vertexSize*numPoints];
 	pl->collect(i,base->vertex,CONTAINER_VERTEX,NULL);
-	assert(i == vertexSize);	
+	assert(i == vertexSize);
 
 	assert(points == NULL);
 

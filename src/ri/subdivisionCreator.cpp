@@ -292,7 +292,7 @@ public:
 							children[0]					=	new (data.context) CSEdge(data);
 							children[1]					=	new (data.context) CSEdge(data);
 							childVertex					=	new (data.context) CSVertex(data);
-							
+
 							childVertex->parente		=	this;
 
 							children[0]->vertices[0]	=	vertices[0]->childVertex;
@@ -415,11 +415,11 @@ public:
 							for (i=0;i<numEdges;i++) {
 								int	t;
 
-								if (	(vertices[i]->childVertex == edges[i]->children[0]->vertices[0]) || 
+								if (	(vertices[i]->childVertex == edges[i]->children[0]->vertices[0]) ||
 										(vertices[i]->childVertex == edges[i]->children[0]->vertices[1])) {
 									children[i]->edges[0]	=	edges[i]->children[0];
 								} else {
-									assert(	(vertices[i]->childVertex == edges[i]->children[1]->vertices[0]) || 
+									assert(	(vertices[i]->childVertex == edges[i]->children[1]->vertices[0]) ||
 											(vertices[i]->childVertex == edges[i]->children[1]->vertices[1]));
 									children[i]->edges[0]	=	edges[i]->children[1];
 								}
@@ -429,11 +429,11 @@ public:
 								children[i]->edges[1]		=	newEdges[i];
 								children[i]->edges[2]		=	newEdges[t];
 
-								if (	(vertices[i]->childVertex == edges[t]->children[0]->vertices[0]) || 
+								if (	(vertices[i]->childVertex == edges[t]->children[0]->vertices[0]) ||
 										(vertices[i]->childVertex == edges[t]->children[0]->vertices[1])) {
 									children[i]->edges[3]	=	edges[t]->children[0];
 								} else {
-									assert(	(vertices[i]->childVertex == edges[t]->children[1]->vertices[0]) || 
+									assert(	(vertices[i]->childVertex == edges[t]->children[1]->vertices[0]) ||
 											(vertices[i]->childVertex == edges[t]->children[1]->vertices[1]));
 									children[i]->edges[3]	=	edges[t]->children[1];
 								}
@@ -487,7 +487,7 @@ public:
 						} else {
 							// Count the extraordinary vertices
 							for (i=0;i<numEdges;i++) {
-	
+
 								// was: if (vertices[i]->valence != 4 ) {
 								// The following is better as it forces borders to split such that there is
 								// one extraordinart vertex which isn't a natural border point
@@ -495,7 +495,7 @@ public:
 									numExtraordinary++;
 									extraordinary	=	i;
 								}
-	
+
 								if (vertices[i]->valence != vertices[i]->fvalence) {
 									if (!(data.currentFlags & FACE_INTEPOLATEBOUNDARY)) {
 										// We're a face adjacent to a boundary and the interpolate boundary flag is not set
@@ -505,24 +505,24 @@ public:
 										funnyBorder	=	TRUE;
 									}
 								}
-	
+
 								if (vertices[i]->shouldSplit()) split	=	TRUE;
 							}
-	
-	
+
+
 							// was: if (numExtraordinary > 1) {
-							// prefer to split if possible to enforce above 
-							// constraint on extraordinary border vertices								
+							// prefer to split if possible to enforce above
+							// constraint on extraordinary border vertices
 							if (numExtraordinary > 1) {				// If we have more than one ordinary, we must split
 								split = TRUE;
 								funny = FALSE;
 							}
-							
+
 							if (numExtraordinary == 1) {
 								if (vertices[extraordinary]->valence < 3) funny = TRUE;
 							}
 						}
-						
+
 						if ((split == FALSE) || (funny == TRUE)) {
 							// Check if we're a "funny" quad. i.e., have crease edges
 							for (i=0;i<numEdges;i++) {
@@ -643,32 +643,32 @@ public:
 								for (i=0;i<(nv+2)*(nv+2);i++) {
 									data.irregularVertices[i] = NULL;
 								}
-								
+
 								if ( (numExtraordinary > 0) && (vertices[(extraordinary+0)&3]->valence >= 3)) {
 									data.irregularRing	=	(CSVertex **) ralloc(sizeof(CSVertex *)*(vertices[(extraordinary+0)&3]->valence*2),data.context->threadMemory);
 								}
-								
+
 								// Create irregular patch
 								unconditionalSplit(data.irregularDepth,0,0,vertices[extraordinary]);
-								
+
 								va[0]	=	vertices[(extraordinary+0)&3];
 								va[1]	=	vertices[(extraordinary+1)&3];
 								va[2]	=	vertices[(extraordinary+3)&3];
 								va[3]	=	vertices[(extraordinary+2)&3];
-								
+
 								if ( funnyBorder == TRUE ) {
 									// We're at the border so it'll have to be a bilinear patch
-									
-									
+
+
 									// Note: At the border, we may not have found all the corner vertices - this is particularly true
 									// if only the corner is at the border.  Set these to the nearest point to ensure
 									// gather will succeed (we don't use these points anyway)
-									
+
 									if (data.irregularVertices[0*(nv+2)+0] == NULL)				data.irregularVertices[0*(nv+2)+0]				= data.irregularVertices[1*(nv+2)+1];
 									if (data.irregularVertices[0*(nv+2)+(nv+1)] == NULL)		data.irregularVertices[0*(nv+2)+(nv+1)]			= data.irregularVertices[1*(nv+2)+(nv)];
 									if (data.irregularVertices[(nv+1)*(nv+2)+(nv+1)] == NULL)	data.irregularVertices[(nv+1)*(nv+2)+(nv+1)]	= data.irregularVertices[(nv)*(nv+2)+(nv)];
 									if (data.irregularVertices[(nv+1)*(nv+2)+0] == NULL)		data.irregularVertices[(nv+1)*(nv+2)+0]			= data.irregularVertices[(nv)*(nv+2)+1];
-																		
+
 									// now we gather the grid from neighbors on patches where it exists
 									// pass all available data to the patch grid and flags to indicate which
 									// edges are valid.  This is used to create symmetric normals
@@ -676,9 +676,9 @@ public:
 									int bRgt = (edges[(extraordinary+1)&3]->faces[0] == NULL) || (edges[(extraordinary+1)&3]->faces[1] == NULL);
 									int bBot = (edges[(extraordinary+2)&3]->faces[0] == NULL) || (edges[(extraordinary+2)&3]->faces[1] == NULL);
 									int bLft = (edges[(extraordinary+3)&3]->faces[0] == NULL) || (edges[(extraordinary+3)&3]->faces[1] == NULL);
-									
+
 									gatherData(data,(nv+2)*(nv+2),data.irregularVertices,va,uniformIndex,vertex,parameters);
-										
+
 									// Create the primitive
 									CObject	*nObject	=	new CPatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv,nv,bTop,bRgt,bBot,bLft,vertex);
 									nObject->sibling	=	children;
@@ -688,31 +688,31 @@ public:
 										// We're have an extraordinary patch
 										// divide main patch into two side strips which are adjacent
 										// to the extraordinary pathc and a smaller grid
-										
+
 										int			N				=	vertices[extraordinary]->valence;
 										int			K				=	2*N + 8;
-										CSVertex	**v				=	(CSVertex **) ralloc((K+1)*sizeof(CSVertex *),data.context->threadMemory);	
+										CSVertex	**v				=	(CSVertex **) ralloc((K+1)*sizeof(CSVertex *),data.context->threadMemory);
 										CSVertex** strip1Vertices	=	(CSVertex**) ralloc(sizeof(CSVertex*)*4*(nv+1),data.context->threadMemory);
 										CSVertex** strip2Vertices	=	(CSVertex**) ralloc(sizeof(CSVertex*)*4*(nv+1),data.context->threadMemory);
 										CSVertex** patchVertices	=	(CSVertex**) ralloc(sizeof(CSVertex*)*(nv+1)*(nv+1),data.context->threadMemory);
 										const float mult			=	1.0f/(nv-1);
-										
+
 										for (i=0;i<(nv+1);i++) {
 											strip1Vertices[4*i+0] = data.irregularVertices[(i+1)*(nv+2)+0];
 											strip1Vertices[4*i+1] = data.irregularVertices[(i+1)*(nv+2)+1];
 											strip1Vertices[4*i+2] = data.irregularVertices[(i+1)*(nv+2)+2];
 											strip1Vertices[4*i+3] = data.irregularVertices[(i+1)*(nv+2)+3];
-																						
+
 											strip2Vertices[0*(nv+1)+i] = data.irregularVertices[0*(nv+2)+1+i];
 											strip2Vertices[1*(nv+1)+i] = data.irregularVertices[1*(nv+2)+1+i];
 											strip2Vertices[2*(nv+1)+i] = data.irregularVertices[2*(nv+2)+1+i];
 											strip2Vertices[3*(nv+1)+i] = data.irregularVertices[3*(nv+2)+1+i];
-											
+
 											for (j=0;j<(nv+1);j++) {
 												patchVertices[i*(nv+1)+j] = data.irregularVertices[(i+1)*(nv+2)+j+1];
 											}
 										}
-										
+
 										CObject	*nObject;
 
 										// 'left' strip
@@ -720,48 +720,48 @@ public:
 										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,4,nv+1,0.0f,mult,mult,(nv-2)*mult,vertex);
 										nObject->sibling	=	children;
 										children			=	nObject;
-										
+
 										// 'top' strip
 										gatherData(data,(4)*(nv+1),strip2Vertices,va,uniformIndex,vertex,parameters);
 										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,4,mult,0.0f,(nv-2)*mult,mult,vertex);
 										nObject->sibling	=	children;
 										children			=	nObject;
-										
+
 										// main grid
 										gatherData(data,(nv+1)*(nv+1),patchVertices,va,uniformIndex,vertex,parameters);
 										nObject				=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+1,nv+1,mult,mult,(nv-2)*mult,(nv-2)*mult,vertex);
 										nObject->sibling	=	children;
 										children			=	nObject;
-										
+
 										// extraordinary patch
 										for (i=0;i<(2*N);i++) {
 											v[i + 2]	=	data.irregularRing[(i + 2*N - 2) % (2*N)];
 										}
-										
+
 										v[1]		= data.irregularVertices[1*(nv+2)+1];
-										
+
 										v[2*N+6]	= data.irregularVertices[2*(nv+2)+3];
 										v[2*N+7]	= data.irregularVertices[1*(nv+2)+3];
 										v[2*N+8]	= data.irregularVertices[0*(nv+2)+3];
-										
+
 										v[2*N+5]	= data.irregularVertices[3*(nv+2)+0];
 										v[2*N+4]	= data.irregularVertices[3*(nv+2)+1];
 										v[2*N+3]	= data.irregularVertices[3*(nv+2)+2];
 										v[2*N+2]	= data.irregularVertices[3*(nv+2)+3];
-																				
+
 										// Gather the data
 										gatherData(data,K,v+1,va,uniformIndex,vertex,parameters);
-																		
+
 										// Create the primitive
 										nObject				=	new CSubdivision(data.currentAttributes,data.currentXform,data.vd,parameters,N,0.0f,0.0f,mult,mult,vertex);
 										nObject->sibling	=	children;
 										children			=	nObject;
 									} else {
 										// No extraordinary patch, use the a bicubic b-spline patch
-										
+
 										// Gather the data
 										gatherData(data,(nv+2)*(nv+2),data.irregularVertices,va,uniformIndex,vertex,parameters);
-										
+
 										// Create the primitive
 										CObject	*nObject	=	new CBSplinePatchGrid(data.currentAttributes,data.currentXform,data.vd,parameters,nv+2,nv+2,0.0f,0.0f,1.0f,1.0f,vertex);
 										nObject->sibling	=	children;
@@ -816,15 +816,15 @@ public:
 									char t = (y==0);
 									char b = (y==(1 << data.irregularDepth)-1);
 									char ml=0,mr=0,mt=0,mb=0;
-									
+
 									data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 1]		=	vertices[(i + 0) & 3];
 									data.irregularVertices[(y+1) * ((1 << data.irregularDepth) + 3) + x + 2]		=	vertices[(i + 1) & 3];
 									data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 2]		=	vertices[(i + 2) & 3];
 									data.irregularVertices[(y+2) * ((1 << data.irregularDepth) + 3) + x + 1]		=	vertices[(i + 3) & 3];
-									
+
 									// If we're not at an edge, the rest is not relevant
 									if (!(l||r||t||b)) break;
-									
+
 									// Deal with the edges
 									//  either we fetch vertices from a neighboring face or duplicate the edge
 									if (l) {
@@ -855,13 +855,13 @@ public:
 										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x + 1] = v1;
 										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x + 2] = v2;
 									}
-									
+
 									// Deal with the corners
-									//  find the corner from an corner-adjacent face if possible, or 
+									//  find the corner from an corner-adjacent face if possible, or
 									//  duplicate a neighboring point
 									// Note: there's no more than 1 extraordinary vertex here, and its
 									//  at vertices[(i+0)&3] in (0,0) if there is such a point
-									
+
 									if (l&&t) {
 										if (((vertices[(i+0)&3]->valence != 4) && (vertices[(i+0)&3]->valence >= 3) && (vertices[(i+0)&3]->valence==vertices[(i+0)&3]->fvalence))) {
 											// We're an extraordinary point and not at the border
@@ -891,7 +891,7 @@ public:
 											findCornerVertex((i+2)&3,(i+3)&3,v);
 										data.irregularVertices[(y+3) * ((1 << data.irregularDepth) + 3) + x] = v;
 									}
-									
+
 									break;
 								}
 							}
@@ -945,7 +945,7 @@ void		CSVertex::splitIncidentFaces() {
 // Comments				:
 CSEdge		*CSVertex::edgeExists(CSVertex *v) {
 	CVertexEdge	*cEdge;
-	
+
 	for (cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 		if (	(cEdge->edge->vertices[0] == v) ||
 				(cEdge->edge->vertices[1] == v))	return cEdge->edge;
@@ -990,7 +990,7 @@ void		CSVertex::sort(CSVertex **v,CSEdge *cEdge,CSFace *cFace,int exp) {
 
 		if (cEdge->faces[0] == cFace)	cFace	=	cEdge->faces[1];
 		else							cFace	=	cEdge->faces[0];
-		
+
 	} while(cEdge != estart && exp);
 
 	assert(exp == 0);
@@ -1053,10 +1053,10 @@ char	CSFace::findEdgeVertices(int eOrg,int vOrg,CSVertex* &v1,CSVertex* &v2) {
 	CSVertex	*cVert = vertices[vOrg];
 	CSFace		*cFace = NULL;
 	int			i;
-	
+
 	if (cEdge->faces[0] == this)	cFace = cEdge->faces[1];
 	else							cFace = cEdge->faces[0];
-	
+
 	if (cFace != NULL){
 		for (i=0;i<4;i++) {
 			if (cFace->edges[i] == cEdge) {
@@ -1089,13 +1089,13 @@ int		CSFace::findCornerVertex(int eOrg,int vOrg,CSVertex *&v) {
 	CSVertex	*cVert = vertices[vOrg];
 	CSFace		*cFace = this;
 	int i,j;
-	
+
 	for (j=1;j>=0;j--){
 		if (cEdge->faces[0] == cFace)	cFace = cEdge->faces[1];
 		else							cFace = cEdge->faces[0];
-		
+
 		if (cFace == NULL) break;
-		
+
 		for (i=0;i<4;i++){
 			if (cFace->edges[i] == cEdge) {
 				if (cFace->vertices[(i+0)&3] == cVert) {
@@ -1186,14 +1186,14 @@ void	CSVertex::compute(float *vertex) {
 	if (this->vertex == NULL)	compute();
 
 	tvertex			=	(float *) ralloc(data.vertexSize*sizeof(float),data.context->threadMemory);
-	
+
 	for (numSharp=0,sharpness=0,cEdge=edges;cEdge!=NULL;cEdge=cEdge->next) {
 		if (cEdge->edge->sharpness > 0) {
 			sharpness	+=	cEdge->edge->sharpness;
 			numSharp++;
 		}
 	}
-	
+
 	if ((numSharp > 2) || (valence == 2)) {	// We're a corner vertex
 		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	} else {											// We're not a corner vertex
@@ -1251,7 +1251,7 @@ void	CSVertex::compute(float *vertex) {
 			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 		}
 	}
-	
+
 	if (this->sharpness >= 1) {			// sharp corner rule
 		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	}
@@ -1353,7 +1353,7 @@ void	CSVertex::computeLimit(float *vertex) {
 			memcpy(vertex,smoothVertex,data.vertexSize*sizeof(float));
 		}
 	}
-	
+
 	if (this->sharpness >= 1) {			// sharp corner rule
 		memcpy(vertex,this->vertex,data.vertexSize*sizeof(float));
 	}
@@ -1557,7 +1557,7 @@ static void	gatherData(CSubdivData &data,int numVertex,CSVertex **vertices,CSVer
 
 	for (i=0;i<numVertex;i++) {
 		if (vertices[i]->vertex == NULL)	vertices[i]->compute();
-		
+
 		memcpy(vertex+i*data.vertexSize,vertices[i]->vertex,sizeof(float)*data.vertexSize);
 	}
 
@@ -1656,7 +1656,7 @@ CSubdivMesh::CSubdivMesh(CAttributes *a,CXform *x,CPl *c,int numFaces,int *numVe
 
 	xform->transformBound(bmin,bmax);
 	makeBound(bmin,bmax);
-	
+
 	// Create the synch. object
 	osCreateMutex(mutex);
 }
@@ -1676,7 +1676,7 @@ CSubdivMesh::~CSubdivMesh() {
 	delete pl;
 	delete [] numVerticesPerFace;
 	delete [] vertexIndices;
-	
+
 	if (ntags > 0) {
 		for (i=0;i<ntags;i++) {
 			free(tags[i]);
@@ -1686,7 +1686,7 @@ CSubdivMesh::~CSubdivMesh() {
 		if (intargs != NULL)	delete [] intargs;
 		if (floatargs != NULL)	delete [] floatargs;
 	}
-	
+
 	// Delete the synch. object
 	osDeleteMutex(mutex);
 }
@@ -1719,15 +1719,15 @@ void		CSubdivMesh::dice(CShadingContext *rasterizer) {
 	CObject	*cObject,*nObject;
 	for (cObject=children;cObject!=NULL;cObject=nObject) {
 		nObject	=	cObject->sibling;
-		
+
 		cObject->attach();
-		
+
 		rasterizer->drawObject(cObject);
-		
+
 		cObject->detach();
 	}
 }
-							
+
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CSubdivMesh
 // Method				:	instantiate
@@ -1830,7 +1830,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	for (i=0;i<numFaces;i++) {
 		faces[i]				=	new (data.context) CSFace(data,i);
 	}
-	
+
 	// Manage the connectivity
 	for (i=0,cvertexIndex=vertexIndices;i<numFaces;i++) {
 		CSFace	*cFace			=	faces[i];
@@ -1864,7 +1864,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 			cFace->edges[j]->addFace(cFace);
 		}
 	}
-	
+
 	// Process the tags
 	for (i=0,cnargs=nargs,cintargs=intargs,cfloatargs=floatargs;i<ntags;i++) {
 		if (strcmp(tags[i],RI_HOLE) == 0) {
@@ -1911,7 +1911,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 		cfloatargs	+=	cnargs[1];
 		cnargs		+=	2;
 	}
-	
+
 	// Add sharp creases when we've got an interpolateboundary tag
 	// Note: corner in the literature refers to v.valence == 2,
 	// whereas the spec overloads corners as tags to mean sharp vertices
@@ -1919,18 +1919,18 @@ void		CSubdivMesh::create(CShadingContext *context) {
 		for (i=0;i<numFaces;i++) {
 			CSFace	*cFace			=	faces[i];
 			int		numEdges		=	numVerticesPerFace[i];
-	
+
 			// Figure out the edges
 			for (j=0;j<numEdges;j++) {
 				CSEdge	*cEdge = cFace->edges[j];
-	
+
 				if (cEdge->faces[1] == NULL) {
 					cEdge->sharpness = 10;
 				}
 			}
 		}
 	}
-		
+
 	// Finalize the faces
 	allChildren	=	NULL;
 	for (k=0,i=0;i<numFaces;i++) {
@@ -1938,7 +1938,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 		// Set the facevarying parameters
 		for (j=0;j<faces[i]->numEdges;j++) {
 			faces[i]->vertices[j]->facevarying	=	data.facevaryingData + (k+j)*data.facevaryingSize;
-			
+
 			// Check for degenerate faces
 			const int val	= faces[i]->vertices[j]->valence;
 			const int fval	= faces[i]->vertices[j]->fvalence;
@@ -1951,7 +1951,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 
 		// Finally, create the face
 		faces[i]->create(allChildren);
-		
+
 		skipFace:
 			;		// intentionally empty
 	}
@@ -1963,7 +1963,7 @@ void		CSubdivMesh::create(CShadingContext *context) {
 	setChildren(context,allChildren);
 
 	if (i==0) warning(CODE_CONSISTENCY,"Subdivision mesh is trivial (skipped)\n");
-	
+
 	osUnlock(mutex);
 }
 

@@ -88,7 +88,7 @@ typedef struct TSdrParameter {
 	char					*space;					// The space that the default value is expressed in
 	UDefaultVal				defaultValue;			// The default value
 	struct TSdrParameter	*next;					// The next parameter
-	
+
 } TSdrParameter;
 
 // Shader class

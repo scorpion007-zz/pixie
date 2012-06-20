@@ -123,7 +123,7 @@ int	precomputeNoiseData() {
 		FILE	*noiseTables	=	fopen("..\\src\\ri\\noiseTables.h","w");
 	#else
 		FILE	*noiseTables	=	fopen("../ri/noiseTables.h","w");
-	#endif	
+	#endif
 
 	if (noiseTables == NULL)	return FALSE;
 
@@ -135,7 +135,7 @@ int	precomputeNoiseData() {
 	permute(py,NOISE_PERM_SIZE/2);
 	permute(pz,NOISE_PERM_SIZE/2);
 	permute(pN,NOISE_PPERM_SIZE);
-	
+
 	// Duplicate elements for the second half of the perm tables
 	for(i=0;i<NOISE_PERM_SIZE/2;i++) {
 		px[NOISE_PERM_SIZE/2+i] = px[i];
@@ -154,9 +154,9 @@ int	precomputeNoiseData() {
 		rN[ti]			=	rN[i];
 		rN[i]			=	t;
 	}
-	
+
 	fprintf(noiseTables,"// Internally generated noise data...\n// Do not mess with it\n\n");
-	
+
 	fprintf(noiseTables,"// Different permutation tables for x,y and z\n\n");
 
 	print<int>(noiseTables,px,NOISE_PERM_SIZE,"permX","unsigned char");
@@ -336,20 +336,20 @@ int	precomputeSubdivisionData() {
 // Function				:	ouputStochasticFuntionName
 // Description			:
 /// \brief					write out the function name for rasterization functions
-// Return Value			:	
+// Return Value			:
 // Comments				:
 void		ouputStochasticFuntionName(FILE *out, unsigned int i) {
 	if (i & RASTER_POINT)
 		fprintf(out,"drawPointGrid");
 	else
 		fprintf(out,"drawQuadGrid");
-	
+
 	if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
 		fprintf(out,"Zmid");
 	} else {
-		fprintf(out,"Zmin");	
+		fprintf(out,"Zmin");
 	}
-	
+
 	if (i & RASTER_UNSHADED)		fprintf(out,"Unshaded");
 	if (i & RASTER_MOVING)			fprintf(out,"Moving");
 	if (i & RASTER_TRANSPARENT)		fprintf(out,"Transparent");
@@ -375,18 +375,18 @@ int		precomputeStochasticPrimitivesH() {
 	int		i;
 
 	if (out == NULL) return TRUE;
-	
+
 	fprintf(out,"//Internally generated header file.\n//Do not mess with it\n\n");
 
 	// Instantiate the dispatch switch
-	
+
 	fprintf(out,"#ifdef DEFINE_STOCHASTIC_SWITCH\n");
-	
+
 	fprintf(out,"switch((grid->flags & RASTER_GLOBAL_MASK) | ((CRenderer::depthFilter == DEPTH_MID) << RASTER_HIGHBITS_SHIFT)) {\n");
 	const int caseEnumeration = RASTER_GLOBAL_MASK | (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT);
 	for (i=0;i<=caseEnumeration;i++) {
 		fprintf(out,"case %d:\n",i);
-		
+
 		// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
 		// but we leave the case in as it can help the compiler generate a fast switch statement
 		// Shaded grids never have RASTER_UNDERCULL
@@ -408,7 +408,7 @@ int		precomputeStochasticPrimitivesH() {
 				continue;
 			}
 		}
-		
+
 		// output the function name
 		fprintf(out,"\t");
 		ouputStochasticFuntionName(out,i);
@@ -420,15 +420,15 @@ int		precomputeStochasticPrimitivesH() {
 	fprintf(out,"default:\n");
 	fprintf(out,"\tbreak;\n");
 	fprintf(out,"}\n");
-	
+
 	fprintf(out,"#endif\n");
-	
+
 	// Instantiate the functions and the function prototypes
-	
+
 	for (int j = 0; j < 2; j++){
 		if(j)	fprintf(out,"#ifdef DEFINE_STOCHASTIC_FUNPROTOS\n");
 		else	fprintf(out,"#ifdef DEFINE_STOCHASTIC_FUNCTIONS\n");
-		
+
 		for (i=0;i<=caseEnumeration;i++) {
 			// Unshaded grids never have RASTER_MATTE or RASTER_TRANSPARENT or RASTER_LOD set
 			// so we don't have to generate functions for those combinations
@@ -449,7 +449,7 @@ int		precomputeStochasticPrimitivesH() {
 					continue;
 				}
 			}
-	
+
 			// output the function name
 			if (j)	fprintf(out,"void ");
 			else	fprintf(out,"void CStochastic::");
@@ -459,10 +459,10 @@ int		precomputeStochasticPrimitivesH() {
 				fprintf(out,";\n");
 				continue;
 			}
-			
-			// when instantiating the functions, write out the body			
+
+			// when instantiating the functions, write out the body
 			fprintf(out,"{\n");
-			
+
 			if (i & RASTER_MOVING)			fprintf(out,"\t#define STOCHASTIC_MOVING\n");
 			if (i & RASTER_TRANSPARENT)		fprintf(out,"\t#define STOCHASTIC_TRANSPARENT\n");
 			if (i & RASTER_UNSHADED)		fprintf(out,"\t#define STOCHASTIC_UNSHADED\n");
@@ -472,7 +472,7 @@ int		precomputeStochasticPrimitivesH() {
 			if (i & RASTER_LOD)				fprintf(out,"\t#define STOCHASTIC_LOD\n");
 			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#define STOCHASTIC_UNDERCULL\n");
 			if (i & RASTER_XTREME)			fprintf(out,"\t#define STOCHASTIC_XTREME\n");
-			
+
 			// Define the depth filter macros
 			if(i & (RASTER_DEPTHFILT_MASK << RASTER_HIGHBITS_SHIFT)) {
 				fprintf(out,"\t#define depthFilterIf()\t\tdepthFilterIfZMid()\n");
@@ -483,18 +483,18 @@ int		precomputeStochasticPrimitivesH() {
 				fprintf(out,"\t#define depthFilterElse()\tdepthFilterElseZMin()\n");
 				fprintf(out,"\t#define depthFilterTouchNode()\tdepthFilterTouchNodeZMin()\n");
 			}
-			
+
 			if (i & RASTER_POINT) {
 				fprintf(out,"\n\n\t\t#include \"stochasticPoint.h\"\n");
 			} else {
 				fprintf(out,"\n\n\t\t#include \"stochasticQuad.h\"\n\n\n");
 			}
-			
+
 			fprintf(out,"\t#undef depthFilterIf\n");
 			fprintf(out,"\t#undef depthFilterElse\n");
 			fprintf(out,"\t#undef depthFilterTouchNode\n");
-			
-		
+
+
 			if (i & RASTER_MOVING)			fprintf(out,"\t#undef STOCHASTIC_MOVING\n");
 			if (i & RASTER_TRANSPARENT)		fprintf(out,"\t#undef STOCHASTIC_TRANSPARENT\n");
 			if (i & RASTER_UNSHADED)		fprintf(out,"\t#undef STOCHASTIC_UNSHADED\n");
@@ -504,10 +504,10 @@ int		precomputeStochasticPrimitivesH() {
 			if (i & RASTER_LOD)				fprintf(out,"\t#undef STOCHASTIC_LOD\n");
 			if (i & RASTER_UNDERCULL)		fprintf(out,"\t#undef STOCHASTIC_UNDERCULL\n");
 			if (i & RASTER_XTREME)			fprintf(out,"\t#undef STOCHASTIC_XTREME\n");
-	
+
 			fprintf(out,"}\n");
 		}
-		
+
 		fprintf(out,"#endif\n");
 	}
 
@@ -523,12 +523,12 @@ int		precomputeStochasticPrimitivesH() {
 // Comments				:
 int	main(int argc,char *argv[]) {
 
-	
+
 	// Warning: Re-running this will totally alter the noise values you get
 	/*if (precomputeNoiseData() == TRUE) {
 		return 1;
 	}*/
-	
+
 	/*
 	if (precomputeSubdivisionData() == TRUE) {
 		return 1;
