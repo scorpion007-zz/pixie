@@ -496,7 +496,7 @@ for (y = ymin; y <= ymax; y++)
 					drawPixelCheck();
 				} else {
 
-					// Back face culling
+					// Front face culling
 					if (!shouldDrawFront()) {
 						continue;
 					}
@@ -521,11 +521,12 @@ for (y = ymin; y <= ymax; y++)
 // Iterate over quads, discarding pixels
 // --- No (significant) motion blur/depth of field
 
+const	int	xres		=	sampleWidth - 1;
+const	int	yres		=	sampleHeight - 1;
+
 int			i,j;
 const int	*bounds		=	grid->bounds;
 const float	*vertices	=	grid->vertices;
-const	int	xres		=	sampleWidth - 1;
-const	int	yres		=	sampleHeight - 1;
 const	int	udiv		=	grid->udiv;
 const	int	vdiv		=	grid->vdiv;
 const	int	flags		=	grid->flags;

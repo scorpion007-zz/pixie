@@ -35,6 +35,12 @@
 #include "memory.h"
 #include "random.h"
 
+static bool
+checkQuadOrientation(
+	__in const float* v0,
+	__in const float* v1,
+	__in const float* v2,
+	__in const float* v3);
 
 // This function is used to allocate fragments.
 // Maintains a lookaside list so we don't allocate all the time.
@@ -287,6 +293,8 @@ CStochastic::lodCheck(
 	return true;
 }
 
+// TODO: refactor.
+//
 static bool
 shouldDrawBack(unsigned flags)
 {
@@ -330,13 +338,28 @@ CStochastic::checkPixel(
 	__out float* pV)
 {
 	const float		xcent	=	pixel->xcent;																
-	const float		ycent	=	pixel->ycent;																
-	float			aleft,atop,aright,abottom;	
+	const float		ycent	=	pixel->ycent;
+	
+	float			aleft, atop, aright, abottom;	
 
 	// Compute areas.
 	//
-	atop		= area(xcent,ycent,v0[COMP_X],v0[COMP_Y],v1[COMP_X],v1[COMP_Y]); 	
-	aright		= area(xcent,ycent,v1[COMP_X],v1[COMP_Y],v3[COMP_X],v3[COMP_Y]); 	
+	atop = area(
+		xcent,
+		ycent,
+		v0[COMP_X],
+		v0[COMP_Y],
+		v1[COMP_X],
+		v1[COMP_Y]);
+	
+	aright = area(
+		xcent,
+		ycent,
+		v1[COMP_X],
+		v1[COMP_Y],
+		v3[COMP_X],
+		v3[COMP_Y]); 	
+	
 	abottom	= area(xcent,ycent,v3[COMP_X],v3[COMP_Y],v2[COMP_X],v2[COMP_Y]); 
 	aleft		= area(xcent,ycent,v2[COMP_X],v2[COMP_Y],v0[COMP_X],v0[COMP_Y]); 	
 
@@ -834,8 +857,141 @@ CStochastic::updateOpaque(
 	pixel->update			=	cSample;					
 }
 
+// returns true if we should bail out.
+bool
+CStochastic::processPixel(
+	__in CRasterGrid* grid,
+	__in int displacement,
+	__in CPixel* pixel,
+	__in const float* vertices) // the quad to consider.
+{
+	const	int udiv		=	grid->udiv;
+	const	int vdiv		=	grid->vdiv;
+	const	int flags		=	grid->flags;
+	
+	if (flags & RASTER_LOD)
+	{
+		// If failed the LOD check, skip this grid vertex.
+		//
+		if (!lodCheck(grid, pixel))
+		{
+			return false;
+		}
+	}
+	
+	const float *v0 =	vertices;
+	const float *v1 =	vertices + numVertexSamples;
+	const float *v2 =	v1 + udiv*numVertexSamples;
+	const float *v3 =	v2 + numVertexSamples;
+	
+	// focal blur stuff (DOF)
+	//
+	float v0d = 0;
+	float v1d = 0;
+	float v2d = 0;
+	float v3d = 0;
+	
+	vector	v0focTmp = {0};
+	vector	v1focTmp = {0};
+	vector	v2focTmp = {0};
+	vector	v3focTmp = {0};
+	
+	// mo blur stuff
+	vector	v0movTmp = {0};
+	vector	v1movTmp = {0};
+	vector	v2movTmp = {0};
+	vector	v3movTmp = {0};
+	// --------------
+	
+	
+	if (flags & RASTER_FOCALBLUR)
+	{
+		v0d =	v0[9];
+		v1d =	v1[9];
+		v2d =	v2[9];
+		v3d =	v3[9];
+	}
+	
+	if (flags & RASTER_MOVING)
+	{
+		interpolatev(v0movTmp,v0,v0+displacement,pixel->jt);
+		interpolatev(v1movTmp,v1,v1+displacement,pixel->jt);
+		interpolatev(v2movTmp,v2,v2+displacement,pixel->jt);
+		interpolatev(v3movTmp,v3,v3+displacement,pixel->jt);
+		v0		=	v0movTmp;
+		v1		=	v1movTmp;
+		v2		=	v2movTmp;
+		v3		=	v3movTmp;
+	}
+	
+	if (flags & RASTER_FOCALBLUR)
+	{
+		v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
+		v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
+		v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
+		v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
+	
+		v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
+		v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
+		v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
+		v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
+	
+		v0focTmp[COMP_Z]	=	v0[COMP_Z];
+		v1focTmp[COMP_Z]	=	v1[COMP_Z];
+		v2focTmp[COMP_Z]	=	v2[COMP_Z];
+		v3focTmp[COMP_Z]	=	v3[COMP_Z];
+	
+		v0					=	v0focTmp;
+		v1					=	v1focTmp;
+		v2					=	v2focTmp;
+		v3					=	v3focTmp;
+	}
+	
+	// TODO: clean
+	float z = 0;
+	float u = 0;
+	float v = 0;
 
+	bool backFacing = checkQuadOrientation(v0, v1, v2, v3);
+	
+	// Back or front face culling.
+	//
+	bool cull = false;
+	if (backFacing)
+	{
+		cull = !shouldDrawBack(flags);
+	}
+	else
+	{
+		cull = !shouldDrawFront(flags);
+	}
+	
+	if (cull)
+	{
+		return false;
+	}
+	
+	// Use less-than (<) in the comparison of checkPixel
+	// if quad is backfacing
+	//
+	if (!checkPixel(backFacing, pixel, v0, v1, v2, v3, &z, &u, &v))
+	{
+		return false;
+	}
+	
+	v0	=	vertices;
+	v1	=	v0 + numVertexSamples;
+	v2	=	v1 + udiv*numVertexSamples;
+	v3	=	v2 + numVertexSamples;
+	
+	if (!drawPixelCheck(grid, pixel, z, u, v, v0, v1, v2, v3, displacement))
+	{
+		// bail out
+		return true;
+	}
 
+	return false;
+}
 ///////////////////////////////////////////////////////////////////////
 // Class				:	CStochastic
 // Method				:	rasterDrawPrimitives
@@ -847,45 +1003,44 @@ void
 CStochastic::rasterDrawPrimitives(
 	__in CRasterGrid *grid)
 {
-	// TODO: REFACTOR to use a real function!
-	//
+	const	int flags		=	grid->flags;
+	const int xres = sampleWidth - 1;
+	const int yres = sampleHeight - 1;
 
-// TODO
+	// Offset in vertex data to displacement part. (i.e. to the next "logical" vertex image)
+	// TODO: redesign this.
+	//
+	int displacement = 10;
+	if (flags & RASTER_EXTRASAMPLES)
+	{
+		displacement += CRenderer::numExtraSamples;
+	}
+	
+	
 	// Shade _very_ early if we know we are guaranteed to have to anyway
 	// This also solves issues with grids viewed exactly side-on never
 	// being shaded when baking
 	// Note: we retain the pre-rasterization method for the case where RASTER_SHADE_HIDDEN
 	// is not set, and for the cases where 1 sidedness must be respected
 	
-	if (grid->flags & RASTER_UNDERCULL &&
-		grid->flags & RASTER_UNSHADED)
+	if (flags & RASTER_UNDERCULL &&
+		flags & RASTER_UNSHADED)
 	{
-		const	int _flags = grid->flags;
-		if ((_flags & RASTER_SHADE_HIDDEN) &&
-			(_flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE)) &&
-			(_flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE))) {
+		if ((flags & RASTER_SHADE_HIDDEN) &&
+			(flags & (RASTER_DRAW_FRONT | RASTER_SHADE_BACKFACE)) &&
+			(flags & (RASTER_DRAW_BACK | RASTER_SHADE_BACKFACE))) {
 			
 			shadeGrid(grid,FALSE);
 			rasterDrawPrimitives(grid);
 			return;
 		}
 	}
-
-	// Offset in vertex data to displacement part. (i.e. to the next "logical" vertex image)
-	// TODO: redesign this.
-	//
-	int displacement = 10;
-	if (grid->flags & RASTER_EXTRASAMPLES)
-	{
-		displacement += CRenderer::numExtraSamples;
-	}
-
+	
+	
 	// Extreme motion blur/DOF.
 	//
-	if (grid->flags & RASTER_XTREME)
+	if (flags & RASTER_XTREME)
 	{
-		const int xres = sampleWidth - 1;
-		const int yres = sampleHeight - 1;
 		
 		int xmin =	grid->xbound[0] - left;
 		int xmax =	grid->xbound[1] - left;
@@ -899,7 +1054,9 @@ CStochastic::rasterDrawPrimitives(
 		
 		int x = 0;
 		int y = 0;
-		
+
+		// For each pixel in this bucket.
+		//
 		for (y = ymin; y <= ymax; y++) 
 		{
 			for (x = xmin; x <= xmax; x++) 
@@ -913,8 +1070,9 @@ CStochastic::rasterDrawPrimitives(
 				const	int udiv		=	grid->udiv;
 		
 				const	int vdiv		=	grid->vdiv;
-				const	int flags		=	grid->flags;
-		
+
+				// For each vertex in the grid.
+				//
 				for (j = 0; j < vdiv; j++)
 				{
 					for (i = 0;
@@ -926,131 +1084,9 @@ CStochastic::rasterDrawPrimitives(
 						if (y+top < bounds[2])		continue;
 						if (y+top > bounds[3])		continue;
 
-						if (grid->flags & RASTER_LOD)
+						if (processPixel(grid, displacement, pixel, vertices))
 						{
-							// If failed the LOD check, skip this grid vertex.
-							//
-							if (!lodCheck(grid, pixel))
-							{
-								continue;
-							}
-						}
-
-						// focal blur stuff (DOF)
-						//
-						float v0d = 0;
-						float v1d = 0;
-						float v2d = 0;
-						float v3d = 0;
-
-						vector	v0focTmp = {0};
-						vector	v1focTmp = {0};
-						vector	v2focTmp = {0};
-						vector	v3focTmp = {0};
-
-						// mo blur stuff
-						vector	v0movTmp = {0};
-						vector	v1movTmp = {0};
-						vector	v2movTmp = {0};
-						vector	v3movTmp = {0};
-						// --------------
-						
-						const float *v0 =	vertices;
-						const float *v1 =	vertices + numVertexSamples;
-						const float *v2 =	v1 + udiv*numVertexSamples;
-						const float *v3 =	v2 + numVertexSamples;
-		
-						if (grid->flags & RASTER_FOCALBLUR)
-						{
-							v0d =	v0[9];
-							v1d =	v1[9];
-							v2d =	v2[9];
-							v3d =	v3[9];
-						}
-		
-						if (grid->flags & RASTER_MOVING)
-						{
-							interpolatev(v0movTmp,v0,v0+displacement,pixel->jt);
-							interpolatev(v1movTmp,v1,v1+displacement,pixel->jt);
-							interpolatev(v2movTmp,v2,v2+displacement,pixel->jt);
-							interpolatev(v3movTmp,v3,v3+displacement,pixel->jt);
-							v0		=	v0movTmp;
-							v1		=	v1movTmp;
-							v2		=	v2movTmp;
-							v3		=	v3movTmp;
-						}
-		
-						if (grid->flags & RASTER_FOCALBLUR)
-						{
-							v0focTmp[COMP_X]	=	v0[COMP_X] + pixel->jdx*v0d;
-							v1focTmp[COMP_X]	=	v1[COMP_X] + pixel->jdx*v1d;
-							v2focTmp[COMP_X]	=	v2[COMP_X] + pixel->jdx*v2d;
-							v3focTmp[COMP_X]	=	v3[COMP_X] + pixel->jdx*v3d;
-			
-							v0focTmp[COMP_Y]	=	v0[COMP_Y] + pixel->jdy*v0d;
-							v1focTmp[COMP_Y]	=	v1[COMP_Y] + pixel->jdy*v1d;
-							v2focTmp[COMP_Y]	=	v2[COMP_Y] + pixel->jdy*v2d;
-							v3focTmp[COMP_Y]	=	v3[COMP_Y] + pixel->jdy*v3d;
-			
-							v0focTmp[COMP_Z]	=	v0[COMP_Z];
-							v1focTmp[COMP_Z]	=	v1[COMP_Z];
-							v2focTmp[COMP_Z]	=	v2[COMP_Z];
-							v3focTmp[COMP_Z]	=	v3[COMP_Z];
-			
-							v0					=	v0focTmp;
-							v1					=	v1focTmp;
-							v2					=	v2focTmp;
-							v3					=	v3focTmp;
-						}
-
-						// TODO: clean
-						float z = 0;
-						float u = 0;
-						float v = 0;
-		
-						// Check the orientation of the quad.
-						//
-						float a = area(
-							v0[COMP_X],
-							v0[COMP_Y],
-							v1[COMP_X],
-							v1[COMP_Y],
-							v2[COMP_X],
-							v2[COMP_Y]);
-						
-						if (fabsf(a) < C_EPSILON) 
-						{
-							a = area(
-								v1[COMP_X],
-								v1[COMP_Y],
-								v3[COMP_X],
-								v3[COMP_Y],
-								v2[COMP_X],
-								v2[COMP_Y]);
-						}
-						
-						// Back face culling.
-						//
-						if (!shouldDrawBack(grid->flags))
-						{
-							continue;
-						}
-
-						// Use less-than (<) in the comparison of checkPixel
-						// if the area 'a' is positive.
-						//
-						if (!checkPixel(a > 0, pixel, v0, v1, v2, v3, &z, &u, &v))
-						{
-							continue;
-						}
-	
-						v0	=	vertices;
-						v1	=	v0 + numVertexSamples;
-						v2	=	v1 + udiv*numVertexSamples;
-						v3	=	v2 + numVertexSamples;
-	
-						if (!drawPixelCheck(grid, pixel, z, u, v, v0, v1, v2, v3, displacement))
-						{
+							// bail out
 							return;
 						}
 					}
@@ -1063,21 +1099,170 @@ CStochastic::rasterDrawPrimitives(
 	{
 		// Not so extreme motion blur or DOF.
 		//
-		assert(!"Not yet implemented");
+		assert(0);
+		
+		int 		i,j;
+		const int	*bounds 	=	grid->bounds;
+		const float *vertices	=	grid->vertices;
+		const	int udiv		=	grid->udiv;
+		const	int vdiv		=	grid->vdiv;
+		const	int flags		=	grid->flags;
+
+		bool useSlowRaster = false;
+
+		if (grid->flags & RASTER_FOCALBLUR || grid->flags & RASTER_MOVING)
+		{
+			useSlowRaster = true;
+		}
+
+		// For each vertex in the grid.
+		//
+		for (j=0;j<vdiv;j++) 
+		{
+			for (i=0;i<udiv;i++,bounds+=4,vertices+=numVertexSamples) 
+			{
+		
+				// Trivial rejects
+				if (bounds[1] < left)		continue;
+				if (bounds[3] < top)		continue;
+				if (bounds[0] >= right) 	continue;
+				if (bounds[2] >= bottom)	continue;
+		
+				// Extract the quad corners
+				const float *v0 =	vertices;
+				const float *v1 =	vertices + numVertexSamples;
+				const float *v2 =	v1 + udiv*numVertexSamples;
+				const float *v3 =	v2 + numVertexSamples;
+		
+		
+				int xmin	=	bounds[0] - left;	// Convert the bound into the current bucket
+				int ymin	=	bounds[2] - top;
+				int xmax	=	bounds[1] - left;
+				int ymax	=	bounds[3] - top;
+		
+				xmin		=	max(xmin,0);		// Clamp the bound in the current bucket
+				ymin		=	max(ymin,0);
+				xmax		=	min(xmax,xres);
+				ymax		=	min(ymax,yres);
+				
+				// SLOW_RASTER means the quad has motion blur or depth of field
+				// In such a case, we need to deform the quad individually for each
+				// sample which makes the rasterization slower
+
+				int x,y;
+
+				// for fast rasterizer only.
+				bool backFacing = false;
+
+				if (!useSlowRaster)
+				{
+					// Do the fast rasterization
+					//
+					backFacing = checkQuadOrientation(v0, v1, v2, v3);
+					bool cull = false;
+					if (backFacing)
+					{
+						cull = !shouldDrawBack(flags);
+					}
+					else
+					{
+						cull = !shouldDrawFront(flags);
+					}
+					if (cull)
+					{
+						continue;
+					}
+				}
+				
+				// for each pixel in bucket.
+				//
+				for (y = ymin; y <= ymax; y++)
+				{
+					CPixel		*pixel;
+				
+					for (pixel = fb[y] + xmin, x = xmin;
+						 x <= xmax; x++, pixel++)
+					{
+						if (useSlowRaster)
+						{
+							// Slow path.
+							//
+							processPixel(grid, displacement, pixel, vertices);
+						}
+						else
+						{
+							// Fast path (no motion blur or DOF).
+							//
+							if (flags & RASTER_LOD)
+							{
+								// If failed the LOD check, skip this grid vertex.
+								//
+								if (!lodCheck(grid, pixel))
+								{
+									continue;
+								}
+							}
+
+							float z, u, v;
+
+							if (!checkPixel(backFacing, pixel, v0, v1, v2, v3, &z, &u, &v))
+							{
+								continue;
+							}
+							
+							if (!drawPixelCheck(grid, pixel, z, u, v, v0, v1, v2, v3, displacement))
+							{
+								// bail out
+								return;
+							}
+						}
+					}
+				}
+			}
+			
+			vertices	+=	numVertexSamples;
+		}
+		
 	}
-
-	// etc. etc.
-	
-#if 0
-// Instantiate the dispatch switch
-#define DEFINE_STOCHASTIC_SWITCH
-	#include "stochasticPrimitives.h"
-#undef DEFINE_STOCHASTIC_SWITCH
-#endif
-
 }
 
+// Check the orientation of the quad.
+//
+// Returns:
+//
+//  true if back facing.
+//  false if front facing.
+//
+static bool
+checkQuadOrientation(
+	__in const float* v0,
+	__in const float* v1,
+	__in const float* v2,
+	__in const float* v3)
+{
+	float a = area(
+		v0[COMP_X],
+		v0[COMP_Y],
+		v1[COMP_X],
+		v1[COMP_Y],
+		v2[COMP_X],
+		v2[COMP_Y]);
 
+	if (fabsf(a) < C_EPSILON)
+	{
+		a = area(
+			v1[COMP_X],
+			v1[COMP_Y],
+			v3[COMP_X],
+			v3[COMP_Y],
+			v2[COMP_X],
+			v2[COMP_Y]);
+	}
+
+	// if a > 0, it's back facing, else front facing.
+	//
+	return a > 0;
+}
 
 // Note: due to the way we insert samples, we may have inserted a new one behind the 
 // maximum opaque depth - in which case we must flush the new sample and everything

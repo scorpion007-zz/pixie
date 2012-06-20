@@ -98,6 +98,13 @@ private:
 	void		filterSamples(int,CFragment **,float *);
 	void		deepShadowCompute();
 	
+	bool
+	processPixel(
+		__in CRasterGrid* grid,
+		__in int displacement,
+		__in CPixel* pixel,
+		__in const float* vertices);
+	
 	void
 	newFragment(
 		__out CFragment** ppSample);
@@ -228,9 +235,9 @@ private:
 	int			numFragments;
 	float		*extraSampleMemory;
 	
-	int			width,height;
-	int			top,left,right,bottom;
-	int			sampleWidth,sampleHeight;
+	int			width, height;
+	int			top, left, right, bottom;
+	int			sampleWidth, sampleHeight;
 	
 	CSobol<2>	apertureGenerator;
 	
