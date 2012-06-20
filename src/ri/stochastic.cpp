@@ -1099,8 +1099,6 @@ CStochastic::rasterDrawPrimitives(
 	{
 		// Not so extreme motion blur or DOF.
 		//
-		assert(0);
-
 		int 		i,j;
 		const int	*bounds 	=	grid->bounds;
 		const float *vertices	=	grid->vertices;
